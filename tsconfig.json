@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2018",
+    "baseUrl": "./",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+  }
+}
