@@ -21,15 +21,16 @@ jobs:
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci
       - name: ESlint
-        if: always()
         run: 'npm run lint'
       - name: Typescript type check
-        if: always()
         run: 'npm run lint:types'
       - name: Prettier
-        if: always()
         run: npm run format
       - name: Unit test
-        if: always()
-        run: npm run test
-      
+        id: unit-test
+        run: npm run test -- --coverage
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/**/*
+          flags: unittests

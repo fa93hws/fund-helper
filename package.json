@@ -7,7 +7,8 @@
     "format": "prettier --check \"**/*.*\"",
     "lint": "eslint \"src/**/*.ts{,x}\"",
     "lint:types": "tsc",
-    "test": "jest --ci"
+    "test": "jest --ci",
+    "codecov": "codecov"
   },
   "keywords": [
     "fund",
@@ -33,6 +34,7 @@
     "@types/node": "^13.7.6",
     "@typescript-eslint/eslint-plugin": "^2.21.0",
     "@typescript-eslint/parser": "^2.21.0",
+    "codecov": "^3.6.5",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-babel": "^5.3.0",

@@ -39,8 +39,18 @@ describe('HttpService', () => {
     expect(() => service.parseHttpResponse(response)).toThrow();
   });
 
-  it('sends options through request', () => {
-    service.sendHttpRequest(options);
+  it('sends options through request', async () => {
+    request.mockImplementationOnce((_: any, resCallback: any) => {
+      const resObject = {
+        on: (type: string, callback: (para: any) => any) => {
+          callback(type);
+        },
+        statusCode: 200,
+      };
+      resCallback(resObject);
+      return { on: jest.fn(), end: jest.fn() };
+    });
+    await service.sendHttpRequest(options);
     expect(request).toHaveBeenCalledWith(
       {
         hostname: 'some.host',

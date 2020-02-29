@@ -3,3 +3,4 @@
 .gitignore
 .github/**/*.yml
 data
+coverage
