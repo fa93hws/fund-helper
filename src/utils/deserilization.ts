@@ -9,14 +9,14 @@ export function deserializeNumber(object: any, field: string): number {
     }
     return num;
   }
-  throw new Error(`expect ${field} to be number, got ${typeof object[field]}`)
+  throw new Error(`expect ${field} to be number, got ${typeof object[field]}`);
 }
 
 export function deserializeString(object: any, field: string): string {
   if (typeof object[field] === 'string') {
     return object[field];
   }
-  throw new Error(`expect ${field} to be string, got ${typeof object[field]}`)
+  throw new Error(`expect ${field} to be string, got ${typeof object[field]}`);
 }
 
 // deserialize YYYY-MM-DD date (BeiJing time) to javascript timestamp
@@ -28,5 +28,5 @@ export function deserializeDate(object: any, field: string): Date {
   if (Number.isNaN(BeijingTimeStamp)) {
     throw new Error(`failed to parse ${dateString} to date`);
   }
-  return new Date(BeijingTimeStamp + timeDiff)
+  return new Date(BeijingTimeStamp + timeDiff);
 }
