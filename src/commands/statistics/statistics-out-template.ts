@@ -1,0 +1,15 @@
+import { readFileSync } from 'fs';
+import * as ejs from 'ejs';
+
+type TemplateParameter = {
+  fundId: string;
+  fundName: string;
+  average: number;
+  max: number;
+  min: number;
+  numDays: number;
+}
+export function formatOutput(templateParameter: TemplateParameter) {
+  var compiled = ejs.compile(readFileSync(__dirname + '/statistics-out.ejs', 'utf8'));
+  return compiled(templateParameter);
+}

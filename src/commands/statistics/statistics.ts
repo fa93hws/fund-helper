@@ -1,9 +1,10 @@
 import * as yargs from 'yargs';
-import { calculateBasics } from '../analyze/analyze';
-import { LocalIOService } from '../services/local-io/local-io';
-import { HttpService } from '../services/http/http';
-import { EastMoneyService } from '../services/eastmoney/eastmoney-service';
-import { PersistCacheService } from '../services/cache/persist-cache';
+import { calculateBasics } from '../../analyze/analyze';
+import { LocalIOService } from '../../services/local-io/local-io';
+import { HttpService } from '../../services/http/http';
+import { EastMoneyService } from '../../services/eastmoney/eastmoney-service';
+import { PersistCacheService } from '../../services/cache/persist-cache';
+import { formatOutput } from './statistics-out-template';
 
 type CliArgs = {
   numDays: number;
@@ -30,13 +31,15 @@ async function handler({ numDays, fundId }: CliArgs) {
     pageNum: 1,
   });
   const statistics = calculateBasics(netValues);
-  console.log(`
-    基金ID: ${fundId}
-    基金名称: ${fundInfo.name}
-    ${numDays}日均值: ${statistics.average}
-    ${numDays}日最高: ${statistics.max}
-    ${numDays}日最低: ${statistics.min}
-  `);
+  const output = formatOutput({
+    fundId,
+    fundName: fundInfo.name,
+    max: statistics.max,
+    min: statistics.min,
+    average: statistics.average,
+    numDays,
+  });
+  console.log(output);
 }
 
 export function addStatisticsCommand(yargs: yargs.Argv) {
