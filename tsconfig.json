@@ -6,6 +6,6 @@
     "target": "ES2018",
     "baseUrl": "./",
     "skipLibCheck": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   }
 }

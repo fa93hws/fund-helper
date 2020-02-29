@@ -8,8 +8,10 @@ type TemplateParameter = {
   max: number;
   min: number;
   numDays: number;
-}
+};
 export function formatOutput(templateParameter: TemplateParameter) {
-  var compiled = ejs.compile(readFileSync(__dirname + '/statistics-out.ejs', 'utf8'));
+  var compiled = ejs.compile(
+    readFileSync(__dirname + '/statistics-out.ejs', 'utf8'),
+  );
   return compiled(templateParameter);
 }

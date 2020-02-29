@@ -1,11 +1,11 @@
 import * as Debug from 'debug';
-import type { HttpService } from '../http/http';
+import { HttpService } from '../http/http';
 import { FundValuesProto } from './fund-value.proto';
 import { FundListProto, FundInfo } from './fund-list.proto';
-import type { PersistCacheService } from '../cache/persist-cache';
+import { PersistCacheService } from '../cache/persist-cache';
 import { UnreachableError } from '../../utils/error';
 
-const debugClient = Debug('eastmoney-service')
+const debugClient = Debug('eastmoney-service');
 const debug = debugClient.extend('debug');
 const info = debugClient.extend('info');
 
@@ -18,18 +18,14 @@ export class EastMoneyService {
   constructor(
     private readonly httpService: HttpService,
     private readonly persistCacheService: PersistCacheService,
-  ) {
-  }
+  ) {}
 
   /**
    * @param param.id fund id
    * @param param.pageNum pagination parameter
    */
-  async getNetValues({ id, pageNum }: {
-    id: string;
-    pageNum: number;
-  }) {
-    const queryParameters = `type=lsjz&code=${id}&page=${pageNum}&per=${NUM_ITEM_PER_PAGE}`
+  async getNetValues({ id, pageNum }: { id: string; pageNum: number }) {
+    const queryParameters = `type=lsjz&code=${id}&page=${pageNum}&per=${NUM_ITEM_PER_PAGE}`;
     const response = await this.httpService.sendHttpRequest({
       hostname: this.hostname,
       path: `/f10/F10DataApi.aspx?${queryParameters}`,
@@ -39,25 +35,34 @@ export class EastMoneyService {
     if (parsedHttpResponse.kind === 'success') {
       return FundValuesProto.deserialize(parsedHttpResponse.body);
     } else {
-      throw new Error(`failed to fetch net values for queryParameters: ${queryParameters}`);
+      throw new Error(
+        `failed to fetch net values for queryParameters: ${queryParameters}`,
+      );
     }
   }
 
   async getFundInfoList(): Promise<Record<string, FundInfo>> {
     const cacheKey = 'eastmoney/fundlist';
-    const cacheResult = this.persistCacheService.get({ key: cacheKey, age: 24 * 3600 * 1000, version: CACHE_VERSION });
+    const cacheResult = this.persistCacheService.get({
+      key: cacheKey,
+      age: 24 * 3600 * 1000,
+      version: CACHE_VERSION,
+    });
     switch (cacheResult.kind) {
       case 'success':
         debug('cache for fundInfoList found');
         return cacheResult.result as Record<string, FundInfo>;
       case 'badCache':
-        debug('cache for fundInfoList found, but format is not correct, reason: ', cacheResult.reason)
+        debug(
+          'cache for fundInfoList found, but format is not correct, reason: ',
+          cacheResult.reason,
+        );
         break;
       case 'notFound':
-        debug('cache for fundInfoList not found')
+        debug('cache for fundInfoList not found');
         break;
       case 'outdated':
-        debug('cache for fundInfoList found, but it is outdated')
+        debug('cache for fundInfoList found, but it is outdated');
         break;
       default:
         throw new UnreachableError(cacheResult);
@@ -71,7 +76,11 @@ export class EastMoneyService {
     const parsedHttpResponse = this.httpService.parseHttpResponse(response);
     if (parsedHttpResponse.kind === 'success') {
       const { fundList } = FundListProto.deserialize(parsedHttpResponse.body);
-      this.persistCacheService.set({ key: cacheKey, value: fundList, version: CACHE_VERSION });
+      this.persistCacheService.set({
+        key: cacheKey,
+        value: fundList,
+        version: CACHE_VERSION,
+      });
       return fundList;
     } else {
       throw new Error(`failed to fetch fund list`);

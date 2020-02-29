@@ -10,19 +10,23 @@ import { getNetValues } from '../../utils/net-values';
 type CliArgs = {
   numDays: number;
   fundId: string;
-}
+};
 
 async function handler({ numDays, fundId }: CliArgs) {
   const httpService = new HttpService();
   const eastMoneyLocalIOService = new LocalIOService('east-money');
-  const eastMoneyCacheService = new PersistCacheService(eastMoneyLocalIOService);
-  const eastMoneyService = new EastMoneyService(httpService, eastMoneyCacheService);
-  getNetValues({ eastMoneyService, numDays, fundId });
+  const eastMoneyCacheService = new PersistCacheService(
+    eastMoneyLocalIOService,
+  );
+  const eastMoneyService = new EastMoneyService(
+    httpService,
+    eastMoneyCacheService,
+  );
 
   const fundList = await eastMoneyService.getFundInfoList();
   const fundInfo = fundList[fundId];
   if (fundInfo == null) {
-    throw new Error(`No matching result for fundId = ${fundId}`)
+    throw new Error(`No matching result for fundId = ${fundId}`);
   }
   const netValues = await getNetValues({ eastMoneyService, numDays, fundId });
   const statistics = calculateBasics(netValues);
@@ -38,21 +42,25 @@ async function handler({ numDays, fundId }: CliArgs) {
 }
 
 export function addStatisticsCommand(yargs: yargs.Argv) {
-  return yargs
-    .command('statistics', 'calculate statics such as x days average/min/max', {
-      builder: (): yargs.Argv<CliArgs> => yargs
-        .option('numDays', {
-          alias: 'num-days',
-          demand: true,
-          description: 'number of days need to be taken into consideration',
-          type: 'number',
-        })
-        .options('fundId', {
-          alias: 'fund-id',
-          demand: true,
-          description: 'id of the fund',
-          type: 'string',
-        }),
+  return yargs.command(
+    'statistics',
+    'calculate statics such as x days average/min/max',
+    {
+      builder: (): yargs.Argv<CliArgs> =>
+        yargs
+          .option('numDays', {
+            alias: 'num-days',
+            demand: true,
+            description: 'number of days need to be taken into consideration',
+            type: 'number',
+          })
+          .options('fundId', {
+            alias: 'fund-id',
+            demand: true,
+            description: 'id of the fund',
+            type: 'string',
+          }),
       handler,
-    });
+    },
+  );
 }

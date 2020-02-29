@@ -5,10 +5,12 @@ export type FundInfo = {
   name: string;
   type: string;
   pinyin: string;
-}
+};
 
 // return: id, abbr, name, type, pinyin
-function parseApiResult(code: string): [string, string, string, string, string][] {
+function parseApiResult(
+  code: string,
+): [string, string, string, string, string][] {
   const { r } = evalInVm(code);
   if (!Array.isArray(r)) {
     throw new Error(`expect fund list is an array`);
@@ -22,10 +24,10 @@ function parseApiResult(code: string): [string, string, string, string, string][
     }
     info.forEach(field => {
       if (typeof field !== 'string') {
-        throw new Error(`item in fund info must be string, got ${field}`)
+        throw new Error(`item in fund info must be string, got ${field}`);
       }
-    })
-  })
+    });
+  });
   return r;
 }
 
@@ -43,7 +45,7 @@ export class FundListProto {
         name: cur[2],
         type: cur[3],
         pinyin: cur[4],
-      }
+      };
       return acc;
     }, {});
     return new FundListProto(fundList);

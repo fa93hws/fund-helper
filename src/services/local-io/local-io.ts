@@ -4,9 +4,7 @@ import * as path from 'path';
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const CACHE_LOCATION = 'data';
 
-type ReadFileResult = |
-  { kind: 'found', content: string } |
-  { kind: 'notFound' };
+type ReadFileResult = { kind: 'found'; content: string } | { kind: 'notFound' };
 
 export class LocalIOService {
   constructor(private readonly folder: string) {}
@@ -34,7 +32,7 @@ export class LocalIOService {
     }
     return {
       kind: 'found',
-      content: fs.readFileSync(filePath, { encoding: 'utf-8' })
-    }
+      content: fs.readFileSync(filePath, { encoding: 'utf-8' }),
+    };
   }
 }
