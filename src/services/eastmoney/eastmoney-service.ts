@@ -1,13 +1,24 @@
-import { HttpService } from '../http/http';
+import * as Debug from 'debug';
+import type { HttpService } from '../http/http';
 import { FundValuesProto } from './fund-value.proto';
-import { FundListProto } from './fund-list.proto';
+import { FundListProto, FundInfo } from './fund-list.proto';
+import type { PersistCacheService } from '../cache/persist-cache';
+import { UnreachableError } from '../../utils/error';
+
+const debugClient = Debug('eastmoney-service')
+const debug = debugClient.extend('debug');
+const info = debugClient.extend('info');
 
 export const NUM_ITEM_PER_PAGE = 20;
+const CACHE_VERSION = '20200229';
 
 export class EastMoneyService {
   private readonly hostname = 'fund.eastmoney.com';
 
-  constructor(private readonly httpService: HttpService) {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly persistCacheService: PersistCacheService,
+  ) {
   }
 
   /**
@@ -32,7 +43,26 @@ export class EastMoneyService {
     }
   }
 
-  async getFundInfo(id: string) {
+  async getFundInfoList(): Promise<Record<string, FundInfo>> {
+    const cacheKey = 'eastmoney/fundlist';
+    const cacheResult = this.persistCacheService.get({ key: cacheKey, age: 24 * 3600 * 1000, version: CACHE_VERSION });
+    switch (cacheResult.kind) {
+      case 'success':
+        debug('cache for fundInfoList found');
+        return Promise.resolve(cacheResult.result as Record<string, FundInfo>);
+      case 'badCache':
+        debug('cache for fundInfoList found, but format is not correct, reason: ', cacheResult.reason)
+        break;
+      case 'notFound':
+        debug('cache for fundInfoList not found')
+        break;
+      case 'outdated':
+        debug('cache for fundInfoList found, but it is outdated')
+        break;
+      default:
+        throw new UnreachableError(cacheResult);
+    }
+
     const response = await this.httpService.sendHttpRequest({
       hostname: this.hostname,
       path: '/js/fundcode_search.js',
@@ -41,10 +71,8 @@ export class EastMoneyService {
     const parsedHttpResponse = this.httpService.parseHttpResponse(response);
     if (parsedHttpResponse.kind === 'success') {
       const { fundList } = FundListProto.deserialize(parsedHttpResponse.body);
-      if (fundList[id] != null) {
-        return fundList[id]
-      }
-      throw new Error(`fundId ${id} does not match anything in the list`);
+      this.persistCacheService.set({ key: cacheKey, value: fundList, version: CACHE_VERSION });
+      return fundList;
     } else {
       throw new Error(`failed to fetch fund list`);
     }

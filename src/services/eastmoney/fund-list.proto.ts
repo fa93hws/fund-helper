@@ -1,6 +1,6 @@
 import { evalInVm } from '../../utils/eval';
 
-type FundInfo = {
+export type FundInfo = {
   abbr: string;
   name: string;
   type: string;
