@@ -65,7 +65,7 @@ export class FundValuesProto {
 
   static deserialize(reply: unknown) {
     if (typeof reply !== 'string') {
-      throw new Error(`expect reply to be string, got ${  typeof reply}`);
+      throw new Error(`expect reply to be string, got ${typeof reply}`);
     }
     const result = parseApiResult(reply);
     const netValues = parseNetValues(result.content);
