@@ -1,9 +1,9 @@
-import * as vm from 'vm';
 import * as cheerio from 'cheerio';
+import { evalInVm } from '../../utils/eval';
 import type { NetValue } from '../../analyze/analyze';
 import { deserializeNumber, deserializeString, deserializeDate } from '../../utils/deserilization';
 
-type EasyMoneyParams = {
+type FundValuesParams = {
   curPage: number;
   records: number;
   pages: number;
@@ -25,12 +25,8 @@ function parseNetValues(htmlContent: string): NetValue[] {
   return result;
 }
 
-function parseApiResult(code: string): EasyMoneyParams {
-  const script = new vm.Script(code);
-  const context: { apidata?: any } = {};
-  vm.createContext(context);
-  script.runInContext(context);
-  const { apidata } = context;
+function parseApiResult(code: string): FundValuesParams {
+  const { apidata } = evalInVm(code);
   return {
     curPage: deserializeNumber(apidata, 'curpage'),
     records: deserializeNumber(apidata, 'records'),
@@ -39,13 +35,13 @@ function parseApiResult(code: string): EasyMoneyParams {
   }
 }
 
-export class EastMoneyProto {
+export class FundValuesProto {
   curPage: number;
   records: number;
   pages: number;
   // In ACES order
   netValues: NetValue[];
-  constructor({curPage, records, pages, netValues }: Omit<EasyMoneyParams, 'content'> & {
+  constructor({curPage, records, pages, netValues }: Omit<FundValuesParams, 'content'> & {
     netValues: NetValue[]; 
   }) {
     this.curPage = curPage;
@@ -61,7 +57,7 @@ export class EastMoneyProto {
     const result = parseApiResult(reply);
     const netValues = parseNetValues(result.content);;
     netValues.sort((a, b) => a.date.getTime() - b.date.getTime());
-    return new EastMoneyProto({
+    return new FundValuesProto({
       curPage: result.curPage,
       records: result.records,
       pages: result.pages,

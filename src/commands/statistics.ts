@@ -1,6 +1,6 @@
 import { calculateBasics } from '../analyze/analyze';
 import { HttpService } from '../services/http/http';
-import { EastMoneyService } from '../services/eastmoney/eastmoney';
+import { EastMoneyService } from '../services/eastmoney/eastmoney-service';
 import * as yargs from 'yargs';
 
 type CliArgs = {
@@ -16,11 +16,19 @@ async function handler({ numDays, fundId }: CliArgs) {
   const httpService = new HttpService();
   const eastMoneyService = new EastMoneyService(httpService);
 
+  const { name } = await eastMoneyService.getFundInfo(fundId);
   const { netValues } = await eastMoneyService.getNetValues({
     id: fundId,
     pageNum: 1,
   });
-  console.log(calculateBasics(netValues));
+  const statistics = calculateBasics(netValues);
+  console.log(`
+    基金ID: ${fundId}
+    基金名称: ${name}
+    ${numDays}日均值: ${statistics.average}
+    ${numDays}日最高: ${statistics.max}
+    ${numDays}日最低: ${statistics.min}
+  `);
 }
 
 export function addStatisticsCommand(yargs: yargs.Argv) {
