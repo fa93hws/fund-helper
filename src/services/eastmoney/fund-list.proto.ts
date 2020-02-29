@@ -36,7 +36,7 @@ export class FundListProto {
 
   static deserialize(reply: unknown) {
     if (typeof reply !== 'string') {
-      throw new Error('expect reply to be string, got ' + typeof reply);
+      throw new Error(`expect reply to be string, got ${  typeof reply}`);
     }
     const result = parseApiResult(reply);
     const fundList = result.reduce<Record<string, FundInfo>>((acc, cur) => {

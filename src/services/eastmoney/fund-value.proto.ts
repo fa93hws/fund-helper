@@ -41,10 +41,14 @@ function parseApiResult(code: string): FundValuesParams {
 
 export class FundValuesProto {
   curPage: number;
+
   records: number;
+
   pages: number;
+
   // In ACES order
   netValues: NetValue[];
+
   constructor({
     curPage,
     records,
@@ -61,7 +65,7 @@ export class FundValuesProto {
 
   static deserialize(reply: unknown) {
     if (typeof reply !== 'string') {
-      throw new Error('expect reply to be string, got ' + typeof reply);
+      throw new Error(`expect reply to be string, got ${  typeof reply}`);
     }
     const result = parseApiResult(reply);
     const netValues = parseNetValues(result.content);

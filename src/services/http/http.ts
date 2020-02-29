@@ -46,7 +46,7 @@ export class HttpService {
     if (statusCode === 'none') {
       throw new Error('http service internal error');
     }
-    if (200 <= statusCode && statusCode < 300) {
+    if (statusCode >= 200 && statusCode < 300) {
       return { kind: 'success', statusCode, body };
     }
     return { kind: 'failed', statusCode, body };

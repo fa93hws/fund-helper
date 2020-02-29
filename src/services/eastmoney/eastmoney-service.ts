@@ -7,7 +7,6 @@ import { UnreachableError } from '../../utils/error';
 
 const debugClient = Debug('eastmoney-service');
 const debug = debugClient.extend('debug');
-const info = debugClient.extend('info');
 
 export const NUM_ITEM_PER_PAGE = 20;
 const CACHE_VERSION = '20200229';
@@ -34,11 +33,10 @@ export class EastMoneyService {
     const parsedHttpResponse = this.httpService.parseHttpResponse(response);
     if (parsedHttpResponse.kind === 'success') {
       return FundValuesProto.deserialize(parsedHttpResponse.body);
-    } else {
-      throw new Error(
-        `failed to fetch net values for queryParameters: ${queryParameters}`,
-      );
     }
+    throw new Error(
+      `failed to fetch net values for queryParameters: ${queryParameters}`,
+    );
   }
 
   async getFundInfoList(): Promise<Record<string, FundInfo>> {
@@ -82,8 +80,7 @@ export class EastMoneyService {
         version: CACHE_VERSION,
       });
       return fundList;
-    } else {
-      throw new Error(`failed to fetch fund list`);
     }
+    throw new Error(`failed to fetch fund list`);
   }
 }

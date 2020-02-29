@@ -8,6 +8,7 @@ type ReadFileResult = { kind: 'found'; content: string } | { kind: 'notFound' };
 
 export class LocalIOService {
   constructor(private readonly folder: string) {}
+
   private static ensureFolderExists(dirname: string) {
     if (fs.existsSync(dirname)) {
       return;
