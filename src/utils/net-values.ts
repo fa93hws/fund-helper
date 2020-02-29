@@ -1,8 +1,11 @@
+import * as Debug from 'debug';
 import {
   EastMoneyService,
   NUM_ITEM_PER_PAGE,
 } from '../services/eastmoney/eastmoney-service';
 import { NetValue } from '../analyze/analyze';
+
+const debug = Debug('net-values').extend('debug');
 
 export function getNetValues({
   eastMoneyService,
@@ -22,8 +25,9 @@ export function getNetValues({
     Promise.all(promises)
       .then(data => {
         const values = data.map(d => d.netValues);
-        const out: NetValue[] = [];
-        resolve(out.concat(...values));
+        const out = ([] as NetValue[]).concat(...values).slice(-numDays);
+        debug(out);
+        resolve(out);
       })
       .catch(reject);
   });
