@@ -1,4 +1,4 @@
-import * as yargs from 'yargs';
+import { Argv } from 'yargs';
 import { calculateBasics } from '../../analyze/analyze';
 import { LocalIOService } from '../../services/local-io/local-io';
 import { HttpService } from '../../services/http/http';
@@ -38,15 +38,15 @@ async function handler({ numDays, fundId }: CliArgs) {
     average: statistics.average,
     numDays,
   });
-  console.log(output);
+  console.log(output); // eslint-disable-line no-console
 }
 
-export function addStatisticsCommand(yargs: yargs.Argv) {
+export function addStatisticsCommand(yargs: Argv) {
   return yargs.command(
     'statistics',
     'calculate statics such as x days average/min/max',
     {
-      builder: (): yargs.Argv<CliArgs> =>
+      builder: (): Argv<CliArgs> =>
         yargs
           .option('numDays', {
             alias: 'num-days',
