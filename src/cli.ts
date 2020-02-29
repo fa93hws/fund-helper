@@ -1,5 +1,5 @@
 import * as yargs from 'yargs';
-import { addStatisticsCommand } from './commands/statistics';
+import { addStatisticsCommand } from './commands/statistics/statistics';
 
 export async function main() {
   addStatisticsCommand(yargs)
