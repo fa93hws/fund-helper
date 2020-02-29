@@ -31,5 +31,6 @@ module.exports = {
     'no-useless-constructor': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'class-methods-use-this': 'off',
+    'no-underscore-dangle': 'off',
   },
 };

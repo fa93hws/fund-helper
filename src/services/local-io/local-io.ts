@@ -7,13 +7,20 @@ const CACHE_LOCATION = 'data';
 type ReadFileResult = { kind: 'found'; content: string } | { kind: 'notFound' };
 
 export class LocalIOService {
-  constructor(private readonly folder: string) {}
+  private readonly folder: string;
 
-  private static ensureFolderExists(dirname: string) {
-    if (fs.existsSync(dirname)) {
+  private readonly fs: typeof fs;
+
+  constructor({ folder, _fs = fs }: { folder: string; _fs?: typeof fs }) {
+    this.folder = folder;
+    this.fs = _fs;
+  }
+
+  private ensureFolderExists(dirname: string) {
+    if (this.fs.existsSync(dirname)) {
       return;
     }
-    fs.mkdirSync(dirname, { recursive: true });
+    this.fs.mkdirSync(dirname, { recursive: true });
   }
 
   private resolvePath(filename: string) {
@@ -22,18 +29,20 @@ export class LocalIOService {
 
   write(filename: string, content: object) {
     const filePath = this.resolvePath(filename);
-    LocalIOService.ensureFolderExists(path.dirname(filePath));
-    fs.writeFileSync(filePath, JSON.stringify(content), { encoding: 'utf-8' });
+    this.ensureFolderExists(path.dirname(filePath));
+    this.fs.writeFileSync(filePath, JSON.stringify(content), {
+      encoding: 'utf-8',
+    });
   }
 
   read(filename: string): ReadFileResult {
     const filePath = this.resolvePath(filename);
-    if (!fs.existsSync(filePath)) {
+    if (!this.fs.existsSync(filePath)) {
       return { kind: 'notFound' };
     }
     return {
       kind: 'found',
-      content: fs.readFileSync(filePath, { encoding: 'utf-8' }),
+      content: this.fs.readFileSync(filePath, { encoding: 'utf-8' }),
     };
   }
 }

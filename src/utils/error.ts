@@ -1,5 +1,6 @@
-export class UnreachableError {
+export class UnreachableError extends Error {
   constructor(val: never, msg?: string) {
-    return msg == null ? new Error(`unreachable case: ${val}`) : new Error(msg);
+    super();
+    this.message = msg == null ? `unreachable case: ${val}` : msg;
   }
 }

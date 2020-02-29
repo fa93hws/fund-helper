@@ -1,4 +1,4 @@
-import { request, RequestOptions } from 'http';
+import { request as _request, RequestOptions } from 'http';
 
 export type HttpRequestOptions = {
   hostname: string;
@@ -16,6 +16,12 @@ type ParsedHttpResponse =
   | { statusCode: number; kind: 'failed'; body: any };
 
 export class HttpService {
+  private readonly request: typeof _request;
+
+  constructor({ request = _request }: { request?: typeof _request } = {}) {
+    this.request = request;
+  }
+
   private static transformOptions(option: HttpRequestOptions): RequestOptions {
     return option;
   }
@@ -25,7 +31,7 @@ export class HttpService {
   ): Promise<HttpResponse> {
     const options = HttpService.transformOptions(httpRequestOptions);
     return new Promise((resolve, reject) => {
-      const req = request(options, res => {
+      const req = this.request(options, res => {
         let data = '';
         res.on('data', chunk => {
           data += chunk;

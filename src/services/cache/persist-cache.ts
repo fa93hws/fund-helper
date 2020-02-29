@@ -26,7 +26,7 @@ export class PersistCacheService {
   }) {
     const output: PersistCacheOutput = {
       value,
-      timeStamp: new Date().getTime(),
+      timeStamp: Date.now(),
       version,
     };
     this.ioService.write(`${key}.json`, output);
@@ -82,8 +82,7 @@ export class PersistCacheService {
         return { kind: 'badCache', reason: 'version is different' };
       }
 
-      const now = new Date().getTime();
-      if (parsedCacheContent.timeStamp + age > now) {
+      if (parsedCacheContent.timeStamp + age > Date.now()) {
         return { kind: 'success', result: parsedCacheContent.value };
       }
       return { kind: 'outdated' };
