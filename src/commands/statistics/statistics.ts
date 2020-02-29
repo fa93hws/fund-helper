@@ -14,7 +14,7 @@ type CliArgs = {
 
 async function handler({ numDays, fundId }: CliArgs) {
   const httpService = new HttpService();
-  const eastMoneyLocalIOService = new LocalIOService('east-money');
+  const eastMoneyLocalIOService = new LocalIOService({ folder: 'east-money' });
   const eastMoneyCacheService = new PersistCacheService(
     eastMoneyLocalIOService,
   );
@@ -28,7 +28,9 @@ async function handler({ numDays, fundId }: CliArgs) {
   if (fundInfo == null) {
     throw new Error(`No matching result for fundId = ${fundId}`);
   }
-  const netValues = await getNetValues({ eastMoneyService, numDays, fundId });
+  const fetchNetValues = (pageNum: number) =>
+    eastMoneyService.getNetValues({ id: fundId, pageNum });
+  const netValues = await getNetValues({ fetchNetValues, numDays });
   const statistics = calculateBasics(netValues);
   const output = formatOutput({
     fundId,
