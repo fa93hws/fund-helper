@@ -1,3 +1,4 @@
 *.ejs
 .prettierignore
 .gitignore
+.github/**/*.yml

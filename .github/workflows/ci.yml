@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  CI:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: 'actions/checkout@v1'
+      - name: Find NPM Cache
+        id: cache-npm
+        uses: actions/cache@v1
+        with:
+          key: '${{ runner.os }}-npm-${{ hashFiles(''package-lock.json'') }}'
+          path: node_modules
+      - name: Install node modules
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: ESlint
+        if: always()
+        run: 'npm run lint'
+      - name: Typescript type check
+        if: always()
+        run: 'npm run lint:types'
+      - name: Prettier
+        if: always()
+        run: npm run format
+      - name: Unit test
+        if: always()
+        run: npm run test
+      
