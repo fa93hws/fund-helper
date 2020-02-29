@@ -5,6 +5,7 @@ import { HttpService } from '../../services/http/http';
 import { EastMoneyService } from '../../services/eastmoney/eastmoney-service';
 import { PersistCacheService } from '../../services/cache/persist-cache';
 import { formatOutput } from './statistics-out-template';
+import { getNetValues } from '../../utils/net-values';
 
 type CliArgs = {
   numDays: number;
@@ -12,24 +13,18 @@ type CliArgs = {
 }
 
 async function handler({ numDays, fundId }: CliArgs) {
-  if (numDays > 20) {
-    // TODO Fix this!
-    throw new Error('numDays > 20 is not supported yet');
-  }
   const httpService = new HttpService();
   const eastMoneyLocalIOService = new LocalIOService('east-money');
   const eastMoneyCacheService = new PersistCacheService(eastMoneyLocalIOService);
   const eastMoneyService = new EastMoneyService(httpService, eastMoneyCacheService);
+  getNetValues({ eastMoneyService, numDays, fundId });
 
   const fundList = await eastMoneyService.getFundInfoList();
   const fundInfo = fundList[fundId];
   if (fundInfo == null) {
     throw new Error(`No matching result for fundId = ${fundId}`)
   }
-  const { netValues } = await eastMoneyService.getNetValues({
-    id: fundId,
-    pageNum: 1,
-  });
+  const netValues = await getNetValues({ eastMoneyService, numDays, fundId });
   const statistics = calculateBasics(netValues);
   const output = formatOutput({
     fundId,

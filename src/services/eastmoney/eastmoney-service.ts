@@ -49,7 +49,7 @@ export class EastMoneyService {
     switch (cacheResult.kind) {
       case 'success':
         debug('cache for fundInfoList found');
-        return Promise.resolve(cacheResult.result as Record<string, FundInfo>);
+        return cacheResult.result as Record<string, FundInfo>;
       case 'badCache':
         debug('cache for fundInfoList found, but format is not correct, reason: ', cacheResult.reason)
         break;
