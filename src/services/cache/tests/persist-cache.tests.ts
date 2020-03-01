@@ -11,8 +11,8 @@ describe('PersistCacheService', () => {
   const value = { foo: 'bar' };
 
   afterEach(() => {
-    write.mockClear();
-    read.mockClear();
+    write.mockRestore();
+    read.mockRestore();
   });
 
   it('writes to file when set', () => {
@@ -86,6 +86,26 @@ describe('PersistCacheService', () => {
     const result = cacheService.get({ key: 'key', age: 9, version: 'v1' });
     expect(read).toHaveBeenCalledWith('key.json');
     expect(result.kind).toEqual('outdated');
+  });
+
+  it('complains bad cache if it is not an object', () => {
+    read.mockReturnValueOnce({
+      kind: 'success',
+      content: JSON.stringify({
+        value: '123',
+        version: 'v1',
+        timeStamp: 90,
+      }),
+    });
+    const result = cacheService.get({ key: 'key', age: 9, version: 'v1' });
+    expect(read).toHaveBeenCalledWith('key.json');
+    if (result.kind === 'badCache') {
+      expect(result.reason).toMatchInlineSnapshot(
+        `"unable to parse key, value must be object"`,
+      );
+    } else {
+      throw new Error('kind must be badCache');
+    }
   });
 
   it('retrive the cache contents', () => {
