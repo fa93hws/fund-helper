@@ -12,7 +12,7 @@ describe('HttpService', () => {
   beforeEach(() => {
     service = new HttpService({ request });
   });
-  afterEach(() => request.mockClear());
+  afterEach(() => request.mockRestore());
 
   it('parse the http response as success when status code is 2xx', () => {
     const response = { statusCode: 200, body: '123' };

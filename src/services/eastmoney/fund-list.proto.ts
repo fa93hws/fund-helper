@@ -24,7 +24,9 @@ function parseApiResult(
     }
     info.forEach(field => {
       if (typeof field !== 'string') {
-        throw new Error(`item in fund info must be string, got ${field}`);
+        throw new Error(
+          `item in fund info must be string, got ${typeof field}`,
+        );
       }
     });
   });

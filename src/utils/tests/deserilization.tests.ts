@@ -19,6 +19,11 @@ describe('deserializeNumber', () => {
     const obj = { num: false };
     expect(() => deserializeNumber(obj, 'num')).toThrow();
   });
+
+  it('throw if input is unparsable string', () => {
+    const obj = { num: '123a' };
+    expect(() => deserializeNumber(obj, 'num')).toThrow();
+  });
 });
 
 describe('deserializeString', () => {

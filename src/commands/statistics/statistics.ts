@@ -5,24 +5,34 @@ import { HttpService } from '../../services/http/http';
 import { EastMoneyService } from '../../services/eastmoney/eastmoney-service';
 import { PersistCacheService } from '../../services/cache/persist-cache';
 import { formatOutput } from './statistics-out-template';
-import { getNetValues } from '../../utils/net-values';
+import { getNetValues as _getNetValues } from '../../utils/net-values';
 
 type CliArgs = {
   numDays: number;
   fundId: string;
 };
 
-async function handler({ numDays, fundId }: CliArgs) {
+function createEastMoneyService() {
   const httpService = new HttpService();
   const eastMoneyLocalIOService = new LocalIOService({ folder: 'east-money' });
   const eastMoneyCacheService = new PersistCacheService(
     eastMoneyLocalIOService,
   );
-  const eastMoneyService = new EastMoneyService(
-    httpService,
-    eastMoneyCacheService,
-  );
+  return new EastMoneyService(httpService, eastMoneyCacheService);
+}
 
+// for testing
+export async function handler({
+  numDays,
+  fundId,
+  eastMoneyService = createEastMoneyService(),
+  getNetValues = _getNetValues,
+  enableStdout = false,
+}: CliArgs & {
+  eastMoneyService?: EastMoneyService;
+  getNetValues?: typeof _getNetValues;
+  enableStdout?: boolean;
+}) {
   const fundList = await eastMoneyService.getFundInfoList();
   const fundInfo = fundList[fundId];
   if (fundInfo == null) {
@@ -40,7 +50,9 @@ async function handler({ numDays, fundId }: CliArgs) {
     average: statistics.average,
     numDays,
   });
-  console.log(output); // eslint-disable-line no-console
+  if (enableStdout) {
+    console.log(output); // eslint-disable-line no-console
+  }
 }
 
 export function addStatisticsCommand(yargs: Argv) {

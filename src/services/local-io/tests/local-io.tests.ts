@@ -21,10 +21,10 @@ describe('LocalIOService', () => {
   } as any) as typeof fs;
 
   afterEach(() => {
-    writeFileSync.mockClear();
-    readFileSync.mockClear();
-    existsSync.mockClear();
-    mkdirSync.mockClear();
+    writeFileSync.mockRestore();
+    readFileSync.mockRestore();
+    existsSync.mockRestore();
+    mkdirSync.mockRestore();
   });
 
   it('should write json to file in data folder', () => {
