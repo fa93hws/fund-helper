@@ -34,5 +34,6 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'no-restricted-globals': 'off',
     'no-console': 'off',
+    'consistent-return': 'off',
   },
 };

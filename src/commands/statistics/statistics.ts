@@ -38,7 +38,7 @@ export async function handler({
   const fundInfo = fundList[fundId];
   if (fundInfo == null) {
     console.error(red(`No matching result for fundId: ${fundId}`));
-    process.exit();
+    return process.exit(1);
   }
   const fetchNetValues = (pageNum: number) =>
     eastMoneyService.getNetValues({ id: fundId, pageNum });
