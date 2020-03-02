@@ -17,6 +17,7 @@
   "author": "fa93hws",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^3.0.0",
     "cheerio": "^1.0.0-rc.3",
     "debug": "^4.1.1",
     "ejs": "^3.0.1",
