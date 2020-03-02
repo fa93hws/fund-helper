@@ -1,4 +1,5 @@
 import { Argv } from 'yargs';
+import { yellow } from 'chalk';
 import { calculateBasics } from '../../analyze/analyze';
 import { LocalIOService } from '../../services/local-io/local-io';
 import { HttpService } from '../../services/http/http';
@@ -51,7 +52,7 @@ export async function handler({
     numDays,
   });
   if (enableStdout) {
-    console.log(output);
+    console.log(yellow(output));
   }
 }
 
