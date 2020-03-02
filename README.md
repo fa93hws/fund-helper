@@ -11,6 +11,14 @@
 node cli.js "${command}" "${args}"
 ```
 
+# Install & Start
+
+1. 确保有 Docker(我的是 19.03.5)
+1. `docker pull postgres:12.2`
+1. (可跳过)修改`docker-compose.yml`中的`POSTGRES_PASSWORD`为任意密码,`POSTGRES_USER`为任意用户名。因为并没有什么敏感数据，改不改密码其实无所谓。。
+1. `docker-compose up -d` 初始化镜像
+1. `npm run test` 无报错
+
 # Command List
 
 ## 数据查询 (均值/最高/最低)

@@ -1,0 +1,25 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+  db-prod:
+    image: postgres:12.2
+    container_name: 'fund-helper-db'
+    restart: always
+    environment:
+      POSTGRES_USER: fund-helper
+      POSTGRES_PASSWORD: fund-helper
+      POSTGRES_DB: fund_helper
+    ports:
+      - 5432:5432
+
+  db-test:
+    image: postgres:12.2
+    container_name: 'fund-helper-db-test'
+    restart: always
+    environment:
+      POSTGRES_USER: fund-helper
+      POSTGRES_PASSWORD: fund-helper
+      POSTGRES_DB: fund_helper
+    ports:
+      - 54321:5432

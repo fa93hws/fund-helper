@@ -32,5 +32,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     'class-methods-use-this': 'off',
     'no-underscore-dangle': 'off',
+    'no-restricted-globals': 'off',
   },
 };
