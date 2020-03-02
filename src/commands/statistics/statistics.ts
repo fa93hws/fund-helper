@@ -27,7 +27,7 @@ export async function handler({
   fundId,
   eastMoneyService = createEastMoneyService(),
   getNetValues = _getNetValues,
-  enableStdout = false,
+  enableStdout = true,
 }: CliArgs & {
   eastMoneyService?: EastMoneyService;
   getNetValues?: typeof _getNetValues;
