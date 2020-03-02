@@ -4,7 +4,6 @@ export function deserializeNumber(object: any, field: string): number {
   }
   if (typeof object[field] === 'string') {
     const num = parseFloat(object[field]);
-    // eslint-disable-next-line no-restricted-globals
     if (Number.isNaN(num) || !isFinite(object[field])) {
       throw new Error(`failed to parse ${object[field]} to number`);
     }

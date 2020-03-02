@@ -20,6 +20,10 @@ jobs:
       - name: Install node modules
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci
+      - name: Start docker image
+        run: |
+          docker pull postgres:12.2
+          docker-compose up -d
       - name: ESlint
         run: 'npm run lint'
       - name: Typescript type check
@@ -33,4 +37,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage/**/*
+          yml: ./codecov.yml
           flags: unittests
