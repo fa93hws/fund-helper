@@ -51,7 +51,7 @@ export async function handler({
     numDays,
   });
   if (enableStdout) {
-    console.log(output); // eslint-disable-line no-console
+    console.log(output);
   }
 }
 

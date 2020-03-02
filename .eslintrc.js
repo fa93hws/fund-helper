@@ -33,5 +33,6 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-underscore-dangle': 'off',
     'no-restricted-globals': 'off',
+    'no-console': 'off',
   },
 };

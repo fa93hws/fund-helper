@@ -26,7 +26,7 @@ describe('StatisticsHandler', () => {
   it('fetch the fund values if fund id is found', async () => {
     getFundInfoList.mockReturnValueOnce({ '123': { name: 'guming' } });
     getNetValues.mockReturnValueOnce([{ date: 1, value: 1 }]);
-    console.log = () => undefined; // eslint-disable-line no-console
+    console.log = () => undefined;
     await handler({
       numDays: 100,
       fundId: '123',
