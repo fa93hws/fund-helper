@@ -1,4 +1,5 @@
 import { Argv } from 'yargs';
+import { yellow, red } from 'chalk';
 import { calculateBasics } from '../../analyze/analyze';
 import { LocalIOService } from '../../services/local-io/local-io';
 import { HttpService } from '../../services/http/http';
@@ -36,7 +37,8 @@ export async function handler({
   const fundList = await eastMoneyService.getFundInfoList();
   const fundInfo = fundList[fundId];
   if (fundInfo == null) {
-    throw new Error(`No matching result for fundId = ${fundId}`);
+    console.error(red(`No matching result for fundId: ${fundId}`));
+    return process.exit(1);
   }
   const fetchNetValues = (pageNum: number) =>
     eastMoneyService.getNetValues({ id: fundId, pageNum });
@@ -51,7 +53,7 @@ export async function handler({
     numDays,
   });
   if (enableStdout) {
-    console.log(output); // eslint-disable-line no-console
+    console.log(yellow(output));
   }
 }
 

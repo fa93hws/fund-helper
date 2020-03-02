@@ -1,9 +1,9 @@
 import * as yargs from 'yargs';
 import { addStatisticsCommand } from './commands/statistics/statistics';
-import { addInitDBCommand } from './commands/database/init-db';
+import { addDatabaseCommand } from './commands/database/database';
 
 export async function main() {
-  const commands = [addStatisticsCommand, addInitDBCommand];
+  const commands = [addStatisticsCommand, addDatabaseCommand];
   commands
     .reduce((acc, cur) => cur(acc), yargs)
     .strict(true)

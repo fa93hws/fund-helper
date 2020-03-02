@@ -4,3 +4,4 @@
 .github/**/*.yml
 data
 coverage
+*.sql
