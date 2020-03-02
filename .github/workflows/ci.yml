@@ -22,7 +22,7 @@ jobs:
         run: npm ci
       - name: Start docker image
         run: |
-          docker pull docker pull postgres:12.2
+          docker pull postgres:12.2
           docker-compose up -d
       - name: ESlint
         run: 'npm run lint'
