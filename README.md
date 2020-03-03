@@ -17,6 +17,7 @@ node cli.js "${command}" "${args}"
 1. (可跳过)修改`docker-compose.yml`中的`POSTGRES_PASSWORD`为任意密码,`POSTGRES_USER`为任意用户名。因为并没有什么敏感数据，改不改密码其实无所谓。。
 1. `docker-compose up -d` 初始化镜像
 1. `npm run test` 无报错
+1. `node cli.js database init` 初始化数据库
 
 # Command List
 
