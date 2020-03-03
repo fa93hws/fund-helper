@@ -4,7 +4,7 @@ import { createPool } from 'services/database/connection';
 import { PGService } from 'services/database/pgservice';
 import { HttpService } from 'services/http/http';
 import { EastMoneyService } from 'services/eastmoney/eastmoney-service';
-import { getNetValues } from 'utils/net-values';
+import { getNetValues as _getNetValues } from 'utils/net-values';
 import {
   maybeDownloadList,
   FundListService,
@@ -14,7 +14,7 @@ import { formatOutput } from './statistics-out-template';
 
 type CliArgs = {
   numDays: number;
-  fundId: string;
+  fundIds: string[];
 };
 
 function createServices() {
@@ -26,16 +26,19 @@ function createServices() {
   return { eastMoneyService, fundListService, dbService };
 }
 
-async function printFundStatistics({
+// export for test only
+export async function printFundStatistics({
   numDays,
   fundId,
   fundListService,
   eastMoneyService,
+  getNetValues = _getNetValues,
 }: {
   numDays: number;
   fundId: string;
   fundListService: FundListService;
   eastMoneyService: EastMoneyService;
+  getNetValues?: typeof _getNetValues;
 }) {
   const fundInfo = await fundListService.findInfo(fundId);
   if (fundInfo == null) {
@@ -49,6 +52,7 @@ async function printFundStatistics({
   const output = formatOutput({
     fundId,
     fundName: fundInfo.name,
+    fundType: fundInfo.type,
     max: statistics.max,
     min: statistics.min,
     average: statistics.average,
@@ -57,16 +61,19 @@ async function printFundStatistics({
   console.log(output);
 }
 
-async function handler({ numDays, fundId }: CliArgs) {
+async function handler({ numDays, fundIds }: CliArgs) {
   const { eastMoneyService, fundListService, dbService } = createServices();
   try {
     await maybeDownloadList({ fundListService, eastMoneyService });
-    await printFundStatistics({
-      numDays,
-      fundId,
-      eastMoneyService,
-      fundListService,
-    });
+    const promises = fundIds.map(fundId =>
+      printFundStatistics({
+        numDays,
+        fundId,
+        eastMoneyService,
+        fundListService,
+      }),
+    );
+    await Promise.all(promises);
   } catch (e) {
     console.error(e);
   } finally {
@@ -76,24 +83,22 @@ async function handler({ numDays, fundId }: CliArgs) {
 
 export function addStatisticsCommand(yargs: Argv) {
   return yargs.command(
-    'statistics',
+    'statistics [fundIds...]',
     'calculate statics such as x days average/min/max',
     {
-      builder: (): Argv<CliArgs> =>
+      builder: (): Argv<any> =>
         yargs
+          .positional('fundIds', {
+            description: 'id of the fund',
+            type: 'string',
+          })
           .option('numDays', {
             alias: 'num-days',
             demand: true,
             description: 'number of days need to be taken into consideration',
             type: 'number',
-          })
-          .options('fundId', {
-            alias: 'fund-id',
-            demand: true,
-            description: 'id of the fund',
-            type: 'string',
           }),
-      handler,
+      handler: handler as any,
     },
   );
 }

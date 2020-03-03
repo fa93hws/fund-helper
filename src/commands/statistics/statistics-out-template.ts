@@ -4,6 +4,7 @@ import * as ejs from 'ejs';
 type TemplateParameter = {
   fundId: string;
   fundName: string;
+  fundType: string;
   average: number;
   max: number;
   min: number;
