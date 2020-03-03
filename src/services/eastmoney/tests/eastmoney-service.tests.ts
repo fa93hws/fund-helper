@@ -1,4 +1,4 @@
-import { HttpService } from '../../http/http';
+import { HttpService } from 'services/http/http';
 import { EastMoneyService } from '../eastmoney-service';
 import { FundValuesProto } from '../fund-value.proto';
 import { FundListProto } from '../fund-list.proto';

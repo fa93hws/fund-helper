@@ -1,7 +1,7 @@
 import { Argv, showHelp } from 'yargs';
 import { red, yellow } from 'chalk';
-import { createPool } from '../../services/database/connection';
-import { PGService } from '../../services/database/pgservice';
+import { createPool } from 'services/database/connection';
+import { PGService } from 'services/database/pgservice';
 import { addDownloadCommand } from './download';
 
 async function initHandler() {

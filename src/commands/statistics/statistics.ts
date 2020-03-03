@@ -1,16 +1,16 @@
 import { Argv } from 'yargs';
 import { red } from 'chalk';
-import { createPool } from '../../services/database/connection';
-import { PGService } from '../../services/database/pgservice';
-import { calculateBasics } from '../../analyze/analyze';
-import { HttpService } from '../../services/http/http';
-import { EastMoneyService } from '../../services/eastmoney/eastmoney-service';
-import { formatOutput } from './statistics-out-template';
-import { getNetValues } from '../../utils/net-values';
+import { createPool } from 'services/database/connection';
+import { PGService } from 'services/database/pgservice';
+import { HttpService } from 'services/http/http';
+import { EastMoneyService } from 'services/eastmoney/eastmoney-service';
+import { getNetValues } from 'utils/net-values';
 import {
   maybeDownloadList,
   FundListService,
-} from '../../services/fund-list/fund-list';
+} from 'services/fund-list/fund-list';
+import { calculateBasics } from '../../analyze/analyze';
+import { formatOutput } from './statistics-out-template';
 
 type CliArgs = {
   numDays: number;

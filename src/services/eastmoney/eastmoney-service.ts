@@ -1,4 +1,4 @@
-import { HttpService } from '../http/http';
+import { HttpService } from 'services/http/http';
 import { FundValuesProto } from './fund-value.proto';
 import { FundListProto } from './fund-list.proto';
 import { FundInfo } from '../fund-list/fund-list';

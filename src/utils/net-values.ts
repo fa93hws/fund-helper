@@ -1,5 +1,5 @@
 import * as Debug from 'debug';
-import { NUM_ITEM_PER_PAGE } from '../services/eastmoney/eastmoney-service';
+import { NUM_ITEM_PER_PAGE } from 'services/eastmoney/eastmoney-service';
 import { NetValue } from '../analyze/analyze';
 
 const debug = Debug('net-values').extend('debug');

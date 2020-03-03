@@ -1,3 +1,5 @@
+const { resolve } = require('path');
+
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
@@ -35,5 +37,6 @@ module.exports = {
     'no-restricted-globals': 'off',
     'no-console': 'off',
     'consistent-return': 'off',
+    'import/no-unresolved': 'off',
   },
 };

@@ -1,13 +1,13 @@
 import { Argv } from 'yargs';
 import { red } from 'chalk';
-import { HttpService } from '../../services/http/http';
-import { createPool } from '../../services/database/connection';
-import { PGService } from '../../services/database/pgservice';
+import { HttpService } from 'services/http/http';
+import { createPool } from 'services/database/connection';
+import { PGService } from 'services/database/pgservice';
 import {
   maybeDownloadList,
   FundListService,
-} from '../../services/fund-list/fund-list';
-import { EastMoneyService } from '../../services/eastmoney/eastmoney-service';
+} from 'services/fund-list/fund-list';
+import { EastMoneyService } from 'services/eastmoney/eastmoney-service';
 
 type CliArgs = {
   fundId: string[];

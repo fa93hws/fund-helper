@@ -1,5 +1,5 @@
-import { evalInVm } from '../../utils/eval';
-import { FundInfo } from '../fund-list/fund-list';
+import { evalInVm } from 'utils/eval';
+import { FundInfo } from 'services/fund-list/fund-list';
 
 // return: id, abbr, name, type, pinyin
 function parseApiResult(

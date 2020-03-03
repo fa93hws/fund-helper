@@ -1,11 +1,11 @@
 import * as cheerio from 'cheerio';
-import { evalInVm } from '../../utils/eval';
-import { NetValue } from '../../analyze/analyze';
+import { evalInVm } from 'utils/eval';
 import {
   deserializeNumber,
   deserializeString,
   deserializeDate,
-} from '../../utils/deserilization';
+} from 'utils/deserilization';
+import { NetValue } from '../../analyze/analyze';
 
 type FundValuesParams = {
   curPage: number;
