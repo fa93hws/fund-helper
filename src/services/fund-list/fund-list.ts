@@ -1,6 +1,6 @@
 import { yellow } from 'chalk';
-import { PGService } from '../database/pgservice';
-import { EastMoneyService } from '../eastmoney/eastmoney-service';
+import { PGService } from 'services/database/pgservice';
+import { EastMoneyService } from 'services/eastmoney/eastmoney-service';
 
 const TABLE_NAME = 'fund_info';
 

@@ -1,4 +1,4 @@
-import { fakeNetValues } from '../../services/eastmoney/fake/fake-values';
+import { fakeNetValues } from 'services/eastmoney/fake/fake-values';
 import { getNetValues } from '../net-values';
 
 describe('getNetValues', () => {

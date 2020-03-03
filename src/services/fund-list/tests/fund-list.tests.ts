@@ -1,5 +1,5 @@
-import { FundListService, maybeDownloadList } from '../fund-list';
-import { PGService } from '../../database/pgservice';
+import { PGService } from 'services/database/pgservice';
+import { FundListService } from '../fund-list';
 
 describe('FundListService', () => {
   const query = jest.fn();
