@@ -1,11 +1,5 @@
 import { evalInVm } from '../../utils/eval';
-
-export type FundInfo = {
-  abbr: string;
-  name: string;
-  type: string;
-  pinyin: string;
-};
+import { FundInfo } from '../database/fund-list/fund-list';
 
 // return: id, abbr, name, type, pinyin
 function parseApiResult(

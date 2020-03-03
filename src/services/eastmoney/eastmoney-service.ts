@@ -1,7 +1,8 @@
 import * as Debug from 'debug';
 import { HttpService } from '../http/http';
 import { FundValuesProto } from './fund-value.proto';
-import { FundListProto, FundInfo } from './fund-list.proto';
+import { FundListProto } from './fund-list.proto';
+import { FundInfo } from '../database/fund-list/fund-list';
 import { PersistCacheService } from '../cache/persist-cache';
 import { UnreachableError } from '../../utils/error';
 
