@@ -1,4 +1,3 @@
-import { PersistCacheService } from '../../cache/persist-cache';
 import { HttpService } from '../../http/http';
 import { EastMoneyService } from '../eastmoney-service';
 import { FundValuesProto } from '../fund-value.proto';
@@ -11,13 +10,7 @@ describe('EastMoneyService', () => {
     sendHttpRequest,
     parseHttpResponse,
   } as any) as HttpService;
-  const set = jest.fn();
-  const get = jest.fn();
-  const cacheService = ({
-    set,
-    get,
-  } as any) as PersistCacheService;
-  const eastMoneyService = new EastMoneyService(httpService, cacheService);
+  const eastMoneyService = new EastMoneyService(httpService);
   FundListProto.deserialize = () => new FundListProto({});
   FundValuesProto.deserialize = () =>
     new FundValuesProto({ curPage: 1, records: 1, pages: 1, netValues: [] });
@@ -25,8 +18,6 @@ describe('EastMoneyService', () => {
   afterEach(() => {
     sendHttpRequest.mockRestore();
     parseHttpResponse.mockRestore();
-    set.mockRestore();
-    get.mockRestore();
   });
 
   describe('getNetValues', () => {
@@ -51,73 +42,17 @@ describe('EastMoneyService', () => {
   });
 
   describe('getFundInfoList', () => {
-    it('use cache value if exists and valid', async () => {
-      get.mockReturnValueOnce({ kind: 'success', result: { a: 1 } });
-      await eastMoneyService.getFundInfoList();
-      expect(get).toHaveBeenCalled();
-      expect(sendHttpRequest).not.toHaveBeenCalled();
-    });
-
-    it('skip cache value if exists but not valid', async () => {
-      get.mockReturnValueOnce({ kind: 'badCache', reason: 'I do not know' });
-      parseHttpResponse.mockReturnValueOnce({ kind: 'success' });
-      await eastMoneyService.getFundInfoList();
-      expect(get).toHaveBeenCalled();
-      expect(sendHttpRequest).toHaveBeenCalledWith({
-        hostname: 'fund.eastmoney.com',
-        path: '/js/fundcode_search.js',
-        method: 'GET',
-      });
-    });
-
-    it('skip cache value if exists but outdated', async () => {
-      get.mockReturnValueOnce({ kind: 'outdated' });
-      parseHttpResponse.mockReturnValueOnce({ kind: 'success' });
-      await eastMoneyService.getFundInfoList();
-      expect(get).toHaveBeenCalled();
-      expect(sendHttpRequest).toHaveBeenCalledWith({
-        hostname: 'fund.eastmoney.com',
-        path: '/js/fundcode_search.js',
-        method: 'GET',
-      });
-    });
-
-    it('skip cache value if not found', async () => {
-      get.mockReturnValueOnce({ kind: 'notFound' });
-      parseHttpResponse.mockReturnValueOnce({ kind: 'success' });
-      await eastMoneyService.getFundInfoList();
-      expect(get).toHaveBeenCalled();
-      expect(sendHttpRequest).toHaveBeenCalledWith({
-        hostname: 'fund.eastmoney.com',
-        path: '/js/fundcode_search.js',
-        method: 'GET',
-      });
-    });
-
-    it('throws for other cases', async () => {
-      get.mockReturnValueOnce({ kind: 'guming' });
-      parseHttpResponse.mockReturnValueOnce({ kind: 'success' });
-      await expect(
-        eastMoneyService.getFundInfoList(),
-      ).rejects.toMatchInlineSnapshot(
-        `[Error: unreachable case: {"kind":"guming"}]`,
-      );
-      expect(parseHttpResponse).not.toHaveBeenCalled();
-    });
-
     it('throws if the request fails', async () => {
-      get.mockReturnValueOnce({ kind: 'notFound' });
       parseHttpResponse.mockReturnValueOnce({ kind: 'failed' });
       await expect(
         eastMoneyService.getFundInfoList(),
       ).rejects.toMatchInlineSnapshot(`[Error: failed to fetch fund list]`);
     });
 
-    it('write to cache if request success', async () => {
-      get.mockReturnValueOnce({ kind: 'notFound' });
+    it('resolves the list if request success', async () => {
       parseHttpResponse.mockReturnValueOnce({ kind: 'success' });
-      await eastMoneyService.getFundInfoList();
-      expect(set).toHaveBeenCalled();
+      const list = await eastMoneyService.getFundInfoList();
+      expect(list).toEqual(new FundListProto({}).fundList);
     });
   });
 });

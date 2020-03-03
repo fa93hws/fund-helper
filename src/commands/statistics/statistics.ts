@@ -1,41 +1,43 @@
 import { Argv } from 'yargs';
-import { yellow, red } from 'chalk';
+import { red } from 'chalk';
+import { createPool } from '../../services/database/connection';
+import { PGService } from '../../services/database/pgservice';
 import { calculateBasics } from '../../analyze/analyze';
-import { LocalIOService } from '../../services/local-io/local-io';
 import { HttpService } from '../../services/http/http';
 import { EastMoneyService } from '../../services/eastmoney/eastmoney-service';
-import { PersistCacheService } from '../../services/cache/persist-cache';
 import { formatOutput } from './statistics-out-template';
-import { getNetValues as _getNetValues } from '../../utils/net-values';
+import { getNetValues } from '../../utils/net-values';
+import {
+  maybeDownloadList,
+  FundListService,
+} from '../../services/fund-list/fund-list';
 
 type CliArgs = {
   numDays: number;
   fundId: string;
 };
 
-function createEastMoneyService() {
+function createServices() {
   const httpService = new HttpService();
-  const eastMoneyLocalIOService = new LocalIOService({ folder: 'east-money' });
-  const eastMoneyCacheService = new PersistCacheService(
-    eastMoneyLocalIOService,
-  );
-  return new EastMoneyService(httpService, eastMoneyCacheService);
+  const eastMoneyService = new EastMoneyService(httpService);
+  const dbPool = createPool('prod');
+  const dbService = new PGService(dbPool);
+  const fundListService = new FundListService(dbService);
+  return { eastMoneyService, fundListService, dbService };
 }
 
-// for testing
-export async function handler({
+async function printFundStatistics({
   numDays,
   fundId,
-  eastMoneyService = createEastMoneyService(),
-  getNetValues = _getNetValues,
-  enableStdout = true,
-}: CliArgs & {
-  eastMoneyService?: EastMoneyService;
-  getNetValues?: typeof _getNetValues;
-  enableStdout?: boolean;
+  fundListService,
+  eastMoneyService,
+}: {
+  numDays: number;
+  fundId: string;
+  fundListService: FundListService;
+  eastMoneyService: EastMoneyService;
 }) {
-  const fundList = await eastMoneyService.getFundInfoList();
-  const fundInfo = fundList[fundId];
+  const fundInfo = await fundListService.findInfo(fundId);
   if (fundInfo == null) {
     console.error(red(`No matching result for fundId: ${fundId}`));
     return process.exit(1);
@@ -52,8 +54,23 @@ export async function handler({
     average: statistics.average,
     numDays,
   });
-  if (enableStdout) {
-    console.log(yellow(output));
+  console.log(output);
+}
+
+async function handler({ numDays, fundId }: CliArgs) {
+  const { eastMoneyService, fundListService, dbService } = createServices();
+  try {
+    await maybeDownloadList({ fundListService, eastMoneyService });
+    await printFundStatistics({
+      numDays,
+      fundId,
+      eastMoneyService,
+      fundListService,
+    });
+  } catch (e) {
+    console.error(e);
+  } finally {
+    dbService.killPool();
   }
 }
 

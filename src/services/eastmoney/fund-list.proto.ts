@@ -1,5 +1,5 @@
 import { evalInVm } from '../../utils/eval';
-import { FundInfo } from '../database/fund-list/fund-list';
+import { FundInfo } from '../fund-list/fund-list';
 
 // return: id, abbr, name, type, pinyin
 function parseApiResult(
@@ -37,10 +37,8 @@ export class FundListProto {
     const result = parseApiResult(reply);
     const fundList = result.reduce<Record<string, FundInfo>>((acc, cur) => {
       acc[cur[0]] = {
-        abbr: cur[1],
         name: cur[2],
         type: cur[3],
-        pinyin: cur[4],
       };
       return acc;
     }, {});

@@ -7,16 +7,12 @@ describe('FundListProto', () => {
     expect(result).toEqual(
       new FundListProto({
         '000001': {
-          abbr: 'HXCZHH',
           name: '华夏成长混合',
           type: '混合型',
-          pinyin: 'HUAXIACHENGZHANGHUNHE',
         },
         '000002': {
-          abbr: 'HXCZHH',
           name: '华夏成长混合(后端)',
           type: '混合型',
-          pinyin: 'HUAXIACHENGZHANGHUNHE',
         },
       }),
     );

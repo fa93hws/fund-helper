@@ -15,4 +15,8 @@ export class PGService {
     });
     await this.pool.query(sqlContent);
   }
+
+  killPool() {
+    this.pool.end();
+  }
 }
