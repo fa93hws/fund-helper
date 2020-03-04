@@ -1,10 +1,5 @@
+import { NetValue } from 'services/fund-net-values/fund-net-values';
 import { calculateAverage } from './math';
-
-export type NetValue = {
-  // javascript timestamp
-  date: Date;
-  value: number;
-};
 
 export function calculateBasics(data: readonly NetValue[]) {
   if (data.length === 0) {

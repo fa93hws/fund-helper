@@ -1,3 +1,4 @@
+process.env.TZ = 'UTC';
 module.exports = {
   roots: ['<rootDir>'],
   preset: 'ts-jest',

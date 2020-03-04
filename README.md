@@ -56,3 +56,18 @@ example: `node cli.js statistics 320007 005223 --numDays 20`
 
 统计天数
 类型: `number`
+
+## 下载净值历史数据到本地数据库
+
+command:
+
+```
+node cli.js database download [fundId]
+```
+
+### 参数列表:
+
+#### fundId(required)
+
+基金代码
+类型: `string`

@@ -5,7 +5,7 @@ import {
   deserializeString,
   deserializeDate,
 } from 'utils/deserilization';
-import { NetValue } from '../../analyze/analyze';
+import { NetValue } from 'services/fund-net-values/fund-net-values';
 
 type FundValuesParams = {
   curPage: number;

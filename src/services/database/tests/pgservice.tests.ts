@@ -45,7 +45,7 @@ describe('CreateClient', () => {
     const res = await pool.query(queryName);
     expect(res.rows).toEqual([
       { column_name: 'id', data_type: 'character varying' },
-      { column_name: 'time', data_type: 'timestamp without time zone' },
+      { column_name: 'time', data_type: 'timestamp with time zone' },
       { column_name: 'value', data_type: 'real' },
     ]);
   });

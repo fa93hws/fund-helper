@@ -11,7 +11,7 @@ CREATE INDEX fund_info_type_idx on fund_info(type);
 
 CREATE TABLE fund_net_values (
   id varchar(10) REFERENCES fund_info(id),
-  time TIMESTAMP NOT NULL,
+  time TIMESTAMPTZ NOT NULL,
   value float(4) NOT NULL,
   PRIMARY KEY (id, time)
 );

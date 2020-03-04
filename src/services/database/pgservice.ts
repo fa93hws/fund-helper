@@ -5,8 +5,8 @@ import { resolve } from 'path';
 export class PGService {
   constructor(private readonly pool: Pool) {}
 
-  async query<T = any>(queryString: string) {
-    return this.pool.query<T>(queryString);
+  async query<T = any>(queryString: string, values?: (string | Date)[]) {
+    return this.pool.query<T>(queryString, values);
   }
 
   async initDB() {
