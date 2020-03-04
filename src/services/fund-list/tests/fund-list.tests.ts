@@ -40,7 +40,7 @@ describe('FundListService', () => {
   });
 
   it('is the query to write two fund infos to db', async () => {
-    query.mockReturnValueOnce({ rowCount: 1 });
+    query.mockReturnValueOnce({ rowCount: 2 });
     const rowCount = await fundListService.writeToDB({
       '01': { name: 'name', type: 'type' },
       '1001': { name: 'guming', type: 'cwx' },
@@ -48,7 +48,7 @@ describe('FundListService', () => {
     expect(query).toHaveBeenCalledWith(
       `INSERT INTO fund_info (id, name, type) VALUES('1001', 'guming', 'cwx'),('01', 'name', 'type')`,
     );
-    expect(rowCount).toBe(1);
+    expect(rowCount).toBe(2);
   });
 
   it('is the query string for find info', async () => {
