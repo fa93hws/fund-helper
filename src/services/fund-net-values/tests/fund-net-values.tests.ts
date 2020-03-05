@@ -42,4 +42,12 @@ describe('FundNetValuesService', () => {
     );
     expect(rowCount).toBe(2);
   });
+
+  it('does nothing if input values is empty array', async () => {
+    await fundNetValuesService.writeToDB({
+      fundId: '01',
+      netValues: [],
+    });
+    expect(query).not.toBeCalled();
+  });
 });

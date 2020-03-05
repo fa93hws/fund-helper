@@ -22,6 +22,9 @@ export class FundNetValuesService {
     fundId: string;
     netValues: readonly NetValue[];
   }) {
+    if (netValues.length === 0) {
+      return 0;
+    }
     const insertString = `INSERT INTO ${TABLE_NAME} (id, time, value) VALUES`;
     const queryStringBuffer = netValues.map(
       ({ value }, idx) => `('${fundId}', $${idx + 1}, '${value}')`,
@@ -36,6 +39,7 @@ export class FundNetValuesService {
   }
 }
 
+// TODO Add unit test
 export async function downloadAllValues({
   fundId,
   eastMoneyService,
@@ -47,6 +51,9 @@ export async function downloadAllValues({
     id: fundId,
     pageNum: 1,
   });
+  if (pages === 0) {
+    return [];
+  }
   const bar = new SingleBar({}, Presets.shades_classic);
   bar.start(pages, 0);
   const fetchNetValues = (pageNum: number) =>

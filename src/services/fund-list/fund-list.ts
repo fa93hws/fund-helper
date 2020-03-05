@@ -33,8 +33,19 @@ export class FundListService {
     const res = await this.dbService.query<FundInfo>(queryString);
     return res.rows[0];
   }
+
+  async getList() {
+    const queryString = `SELECT id, type, name FROM ${TABLE_NAME}`;
+    const res = await this.dbService.query<{
+      id: string;
+      type: string;
+      name: string;
+    }>(queryString);
+    return res.rows;
+  }
 }
 
+// TODO Add test
 export async function maybeDownloadList({
   fundListService,
   eastMoneyService,

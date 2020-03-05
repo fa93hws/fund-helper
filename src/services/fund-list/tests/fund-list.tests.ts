@@ -68,4 +68,13 @@ describe('FundListService', () => {
     );
     expect(res).toEqual(undefined);
   });
+
+  it('is the query to get fund list', async () => {
+    query.mockReturnValueOnce({
+      rows: [{ id: 'cwx', type: 'cwx', name: 'guming' }],
+    });
+    const list = await fundListService.getList();
+    expect(query).toHaveBeenCalledWith(`SELECT id, type, name FROM fund_info`);
+    expect(list).toEqual([{ id: 'cwx', type: 'cwx', name: 'guming' }]);
+  });
 });

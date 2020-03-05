@@ -40,4 +40,15 @@ describe('FundValuesProto', () => {
       ],
     });
   });
+
+  it('returns empty net values if no data are found', () => {
+    const input = `var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td colspan='7' align='center'>暂无数据!</td></tr></tbody></table>",records:0,pages:0,curpage:1};`;
+    const result = FundValuesProto.deserialize(input);
+    expect(result).toEqual({
+      records: 0,
+      pages: 0,
+      curPage: 1,
+      netValues: [],
+    });
+  });
 });
