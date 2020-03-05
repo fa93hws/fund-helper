@@ -26,6 +26,7 @@ node cli.js "${command}" "${args}"
 command: `statistics [fundIds...]`
 
 example: `node cli.js statistics 320007 005223 --numDays 20`
+
 输出:
 
 ```
@@ -50,11 +51,13 @@ example: `node cli.js statistics 320007 005223 --numDays 20`
 #### fundIds(required)
 
 基金代码
+
 类型: `string[]`
 
 #### numDays(required)
 
 统计天数
+
 类型: `number`
 
 ## 下载净值历史数据到本地数据库
@@ -65,9 +68,18 @@ command:
 node cli.js database download [fundId]
 ```
 
+or
+
+```
+node cli.js database download all
+```
+
 ### 参数列表:
 
 #### fundId(required)
 
 基金代码
-类型: `string`
+
+类型: `string[] | 'all'`
+
+如果是`all`,则尝试下载所有数据(由于 api 接口有反 DDOS 机制，所以下载需要一些时间)

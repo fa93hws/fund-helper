@@ -19,9 +19,14 @@ function parseNetValues(htmlContent: string): NetValue[] {
   const $ = cheerio.load(htmlContent);
   $('tr').each((_, ele) => {
     const cells = ele.children;
-    if (cells[0].name === 'th') {
+    if (
+      cells[0].name === 'th' ||
+      cells[0].children[0].data === '暂无数据!' ||
+      cells[0].children[0].data == null
+    ) {
       return;
     }
+    cells[0].children[0].data = cells[0].children[0].data.slice(0, 10);
     const date = deserializeDate(cells[0].children[0], 'data');
     const value = deserializeNumber(cells[1].children[0], 'data');
     result.push({ date, value });

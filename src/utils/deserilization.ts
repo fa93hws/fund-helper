@@ -16,6 +16,7 @@ export function deserializeString(object: any, field: string): string {
   if (typeof object[field] === 'string') {
     return object[field];
   }
+  console.log(object[field]);
   throw new Error(`expect ${field} to be string, got ${typeof object[field]}`);
 }
 
