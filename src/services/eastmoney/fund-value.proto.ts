@@ -21,8 +21,9 @@ function parseNetValues(htmlContent: string): NetValue[] {
     const cells = ele.children;
     if (
       cells[0].name === 'th' ||
-      cells[0].children[0].data === '暂无数据!' ||
-      cells[0].children[0].data == null
+      cells[0]?.children[0]?.data == null ||
+      cells[1]?.children[0]?.data == null ||
+      cells[0].children[0].data === '暂无数据!'
     ) {
       return;
     }

@@ -76,10 +76,19 @@ node cli.js database download all
 
 ### 参数列表:
 
-#### fundId(required)
+#### fundIds(required)
 
 基金代码
 
 类型: `string[] | 'all'`
 
 如果是`all`,则尝试下载所有数据(由于 api 接口有反 DDOS 机制，所以下载需要一些时间)
+
+#### continueFrom(optional)
+
+续传记号
+
+类型: `string`
+
+如果传入的 `fundIds` 过长或是 `all` 模式，且中途发生网络错误失败，可以从最后失败的基金代码继续下载
+但是要求 `fundIds` 的顺序不能改变。

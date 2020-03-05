@@ -26,6 +26,7 @@ export class HttpService {
     return option;
   }
 
+  // Add retry
   sendHttpRequest(
     httpRequestOptions: HttpRequestOptions,
   ): Promise<HttpResponse> {
