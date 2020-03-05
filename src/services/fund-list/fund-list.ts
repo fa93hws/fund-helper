@@ -28,7 +28,7 @@ export class FundListService {
     return res.rowCount;
   }
 
-  async findInfo(fundId: string) {
+  async findInfo(fundId: string): Promise<FundInfo | undefined> {
     const queryString = `SELECT name, type FROM ${TABLE_NAME} WHERE id = '${fundId}'`;
     const res = await this.dbService.query<FundInfo>(queryString);
     return res.rows[0];
