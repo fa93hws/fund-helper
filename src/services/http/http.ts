@@ -29,6 +29,7 @@ export class HttpService {
   // Add retry
   sendHttpRequest(
     httpRequestOptions: HttpRequestOptions,
+    numRetry = 3,
   ): Promise<HttpResponse> {
     const options = HttpService.transformOptions(httpRequestOptions);
     return new Promise((resolve, reject) => {
@@ -44,7 +45,16 @@ export class HttpService {
           }),
         );
       });
-      req.on('error', error => reject(error));
+      req.on('error', error => {
+        if (numRetry < 0) {
+          reject(error);
+        } else {
+          console.log('retry!');
+          this.sendHttpRequest(httpRequestOptions, numRetry - 1)
+            .then(resolve)
+            .catch(reject);
+        }
+      });
       req.end();
     });
   }

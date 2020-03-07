@@ -52,7 +52,8 @@ async function downloadOne({
     fundInfo.type.includes('债券') ||
     fundInfo.type.includes('理财') ||
     fundInfo.type.includes('货币') ||
-    fundInfo.type.includes('保本')
+    fundInfo.type.includes('保本') ||
+    fundInfo.type.includes('固定')
   ) {
     return;
   }
@@ -92,6 +93,7 @@ async function downloadHandler({ fundIds, continueFrom }: CliArgs) {
     await maybeDownloadList({ fundListService, eastMoneyService });
     /* eslint-disable no-await-in-loop */
     // Too many request causes request failure, we need to slow it down :(
+    // TODO download multiple one at once
     for (let idx = 0; idx < queryIds.length; idx += 1) {
       if (queryIds[idx] === continueFrom) {
         skip = false;
