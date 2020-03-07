@@ -39,5 +39,6 @@ module.exports = {
     'consistent-return': 'off',
     'import/no-unresolved': 'off',
     'no-restricted-syntax': 'off',
+    'no-plusplus': 'off',
   },
 };
