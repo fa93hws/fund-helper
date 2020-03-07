@@ -1,4 +1,5 @@
 import { HttpService } from 'services/http/http';
+import { retryPromise } from 'utils/retry-promise';
 import { FundValuesProto } from './fund-value.proto';
 import { FundListProto } from './fund-list.proto';
 import { FundInfo } from '../fund-list/fund-list';
@@ -16,11 +17,13 @@ export class EastMoneyService {
    */
   async getNetValues({ id, pageNum }: { id: string; pageNum: number }) {
     const queryParameters = `type=lsjz&code=${id}&page=${pageNum}&per=${NUM_ITEM_PER_PAGE}`;
-    const response = await this.httpService.sendHttpRequest({
-      hostname: this.hostname,
-      path: `/f10/F10DataApi.aspx?${queryParameters}`,
-      method: 'GET',
-    });
+    const getResponsePromise = () =>
+      this.httpService.sendHttpRequest({
+        hostname: this.hostname,
+        path: `/f10/F10DataApi.aspx?${queryParameters}`,
+        method: 'GET',
+      });
+    const response = await retryPromise(getResponsePromise, 3);
     const parsedHttpResponse = this.httpService.parseHttpResponse(response);
     if (parsedHttpResponse.kind === 'success') {
       return FundValuesProto.deserialize(parsedHttpResponse.body);
