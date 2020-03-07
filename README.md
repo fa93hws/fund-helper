@@ -92,3 +92,11 @@ node cli.js database download all
 
 如果传入的 `fundIds` 过长或是 `all` 模式，且中途发生网络错误失败，可以从最后失败的基金代码继续下载
 但是要求 `fundIds` 的顺序不能改变。
+
+#### maxConcurrent(optional)
+
+最大同时请求数
+
+类型: `number`
+
+默认值: `1`

@@ -18,6 +18,7 @@ const debug = Debug('download').extend('debug');
 
 type CliArgs = {
   fundIds: string[];
+  maxConcurrent: number;
   continueFrom?: string;
 };
 
@@ -80,7 +81,12 @@ async function getQueryIds({
 }
 
 // TODO Add unit test
-async function downloadHandler({ fundIds, continueFrom }: CliArgs) {
+// TODO refactor this function
+async function downloadHandler({
+  fundIds,
+  maxConcurrent,
+  continueFrom,
+}: CliArgs) {
   const {
     eastMoneyService,
     fundListService,
@@ -91,9 +97,11 @@ async function downloadHandler({ fundIds, continueFrom }: CliArgs) {
   let skip = continueFrom != null;
   try {
     await maybeDownloadList({ fundListService, eastMoneyService });
+    console.log(maxConcurrent);
     /* eslint-disable no-await-in-loop */
     // Too many request causes request failure, we need to slow it down :(
-    // TODO download multiple one at once
+    // TODO Change to pool model
+    const buffer: string[] = [];
     for (let idx = 0; idx < queryIds.length; idx += 1) {
       if (queryIds[idx] === continueFrom) {
         skip = false;
@@ -102,13 +110,24 @@ async function downloadHandler({ fundIds, continueFrom }: CliArgs) {
         // eslint-disable-next-line no-continue
         continue;
       }
+      buffer.push(queryIds[idx]);
+      if (buffer.length < maxConcurrent) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      // Change the console message to bar
       console.log(`${idx}/${queryIds.length}`);
-      await downloadOne({
-        fundId: queryIds[idx],
-        fundListService,
-        fundNetValuesService,
-        eastMoneyService,
-      });
+      await Promise.all(
+        buffer.map(fundId =>
+          downloadOne({
+            fundId,
+            fundListService,
+            fundNetValuesService,
+            eastMoneyService,
+          }),
+        ),
+      );
+      buffer.length = 0;
     }
     /* eslint-enable no-await-in-loop */
   } finally {
@@ -129,6 +148,12 @@ export function addDownloadCommand(y: Argv<any>) {
           describe: 'download from this id',
           type: 'string',
           alias: 'continue-from',
+        })
+        .option('maxConcurrent', {
+          describe: 'max concurrent number',
+          type: 'number',
+          alias: 'max-concurrent',
+          default: 1,
         }),
     handler: downloadHandler as any,
   });
