@@ -1,3 +1,7 @@
+import * as Debug from 'debug';
+
+const debug = Debug('retry-promise').extend('debug');
+
 export async function retryPromise<T>(
   promiseFactory: () => Promise<T>,
   numRetry: number,
@@ -8,6 +12,7 @@ export async function retryPromise<T>(
     if (numRetry <= 0) {
       throw e;
     }
+    debug('retrying!');
     return retryPromise(promiseFactory, numRetry - 1);
   }
 }
