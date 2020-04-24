@@ -1,7 +1,7 @@
 extern crate clap;
 extern crate std;
 
-use clap::{App, SubCommand, Arg};
+use clap::{App, Arg, SubCommand};
 
 mod commands;
 mod services;
@@ -13,13 +13,11 @@ async fn main() {
         .author("Eric W. <wjun0912@gmail.com>")
         .about("help you with fund")
         .subcommand(
-            SubCommand::with_name("fetch")
-                .about("fetch fund data")
-                .arg(
-                    Arg::with_name("fund-id")
+            SubCommand::with_name("fetch").about("fetch fund data").arg(
+                Arg::with_name("fund-id")
                     .help("id of the fund")
-                    .multiple(true)
-                )
+                    .multiple(true),
+            ),
         )
         .get_matches();
 
