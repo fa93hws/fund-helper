@@ -1,8 +1,13 @@
 extern crate clap;
+extern crate std;
 
 use clap::{App, SubCommand, Arg};
 
-fn main() {
+mod commands;
+mod services;
+
+#[tokio::main]
+async fn main() {
     let matches = App::new("fund-helper")
         .version("0.1.0")
         .author("Eric W. <wjun0912@gmail.com>")
@@ -13,14 +18,10 @@ fn main() {
                 .arg(
                     Arg::with_name("fund-id")
                     .help("id of the fund")
-                    .index(1)
-                    .required(true)
+                    .multiple(true)
                 )
         )
         .get_matches();
 
-    if let Some(ref matches) = matches.subcommand_matches("fetch") {
-        // Safe to use unwrap() because of the required() option
-        println!("fetching fund: {}", matches.value_of("fund-id").unwrap());
-    }
+    commands::main(matches);
 }
