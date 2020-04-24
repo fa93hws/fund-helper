@@ -29,6 +29,4 @@ impl EastMoneyService<'_> {
 }
 
 #[cfg(test)]
-mod tests {
-  
-}
+mod tests {}

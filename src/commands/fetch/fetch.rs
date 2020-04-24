@@ -1,5 +1,5 @@
-use futures::executor::block_on;
 use crate::commands::Services;
+use futures::executor::block_on;
 
 fn fetch_one(id: &str, services: &Services) {
     println!("fetching fund: {}", id);
