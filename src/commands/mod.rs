@@ -1,8 +1,8 @@
 mod fetch;
 
 use super::services;
-type HttpService = services::http_service::HttpService;
-type EastMoneyService<'a> = services::east_money_service::EastMoneyService<'a>;
+type HttpService = services::HttpService;
+type EastMoneyService<'a> = services::EastMoneyService<'a>;
 
 pub struct Services<'a> {
   pub http_service: &'a HttpService,
