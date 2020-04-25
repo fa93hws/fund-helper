@@ -1,4 +1,4 @@
-use crate::services::http_service::IHttpService;
+use crate::services::http::IHttpService;
 
 pub struct EastMoneyService<'a> {
     base_url: String,
@@ -37,9 +37,7 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::EastMoneyService;
-    use crate::services::http_service::{
-        create_unknown_error, HttpError, IHttpService, MockHttpService,
-    };
+    use crate::services::http::{create_unknown_error, HttpError, IHttpService, MockHttpService};
 
     #[async_trait]
     impl IHttpService for MockHttpService {
