@@ -1,5 +1,6 @@
 use super::fetch;
-use crate::services::{EastMoneyService, HttpService};
+use crate::services::east_money::EastMoneyService;
+use crate::services::http_service::HttpService;
 
 pub struct Services<'a> {
     pub http_service: &'a HttpService,
