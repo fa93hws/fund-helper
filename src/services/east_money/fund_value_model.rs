@@ -20,7 +20,9 @@ fn parse_json(raw_response: &String) -> Result<Value, Error> {
     let prefix = "var apidata=";
     let start_index = prefix.len();
     if &raw_response[..start_index] != prefix {
-        return Err(Error::JsonFormatError(String::from("prefix string is not var apidata=")));
+        return Err(Error::JsonFormatError(String::from(
+            "prefix string is not var apidata=",
+        )));
     }
     let end_index = raw_response.len() - 1;
     let raw_js = &raw_response[start_index..end_index];
