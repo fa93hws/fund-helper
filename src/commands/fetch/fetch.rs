@@ -5,7 +5,7 @@ fn fetch_one(id: &str, services: &Services) {
     println!("fetching fund: {}", id);
     let result = services.east_money_service.fetch_value(id);
     let fund_value_model = block_on(result);
-    println!("{}", fund_value_model.content);
+    println!("{:?}", fund_value_model);
 }
 
 fn fetch_all() {

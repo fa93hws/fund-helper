@@ -35,6 +35,7 @@ mod tests {
     use async_trait::async_trait;
     use futures::executor::block_on;
     use std::sync::{Arc, Mutex};
+    use super::super::{FundValueModel,FundValueData};
 
     use super::EastMoneyService;
     use crate::services::http::{create_unknown_error, HttpError, IHttpService, MockHttpService};
@@ -55,22 +56,44 @@ mod tests {
         let got_url_arc = Arc::new(Mutex::new(String::default()));
         let got_url_arc_clone = Arc::clone(&got_url_arc);
         let raw_response = String::from(
-            r#"var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-22</td><td class='tor bold'>3.8360</td><td class='tor bold'>3.8360</td><td class='tor bold red'>2.48%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-21</td><td class='tor bold'>3.7430</td><td class='tor bold'>3.7430</td><td class='tor bold grn'>-1.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-20</td><td class='tor bold'>3.7810</td><td class='tor bold'>3.7810</td><td class='tor bold red'>0.43%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-17</td><td class='tor bold'>3.7650</td><td class='tor bold'>3.7650</td><td class='tor bold red'>1.92%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-16</td><td class='tor bold'>3.6940</td><td class='tor bold'>3.6940</td><td class='tor bold red'>0.52%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-15</td><td class='tor bold'>3.6750</td><td class='tor bold'>3.6750</td><td class='tor bold grn'>-0.60%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-14</td><td class='tor bold'>3.6970</td><td class='tor bold'>3.6970</td><td class='tor bold red'>3.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-13</td><td class='tor bold'>3.5890</td><td class='tor bold'>3.5890</td><td class='tor bold grn'>-1.54%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></tbody></table>",records:2102,pages:211,curpage:1};"#,
+            r#"var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-22</td><td class='tor bold'>3.8360</td><td class='tor bold'>3.8360</td><td class='tor bold red'>2.48%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-21</td><td class='tor bold'>3.7430</td><td class='tor bold'>3.7430</td><td class='tor bold grn'>-1.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-20</td><td class='tor bold'>3.7810</td><td class='tor bold'>3.7810</td><td class='tor bold red'>0.43%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></table>",records:2102,pages:211,curpage:1};"#,
         );
-        let content = "<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-22</td><td class='tor bold'>3.8360</td><td class='tor bold'>3.8360</td><td class='tor bold red'>2.48%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-21</td><td class='tor bold'>3.7430</td><td class='tor bold'>3.7430</td><td class='tor bold grn'>-1.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-20</td><td class='tor bold'>3.7810</td><td class='tor bold'>3.7810</td><td class='tor bold red'>0.43%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-17</td><td class='tor bold'>3.7650</td><td class='tor bold'>3.7650</td><td class='tor bold red'>1.92%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-16</td><td class='tor bold'>3.6940</td><td class='tor bold'>3.6940</td><td class='tor bold red'>0.52%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-15</td><td class='tor bold'>3.6750</td><td class='tor bold'>3.6750</td><td class='tor bold grn'>-0.60%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-14</td><td class='tor bold'>3.6970</td><td class='tor bold'>3.6970</td><td class='tor bold red'>3.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-13</td><td class='tor bold'>3.5890</td><td class='tor bold'>3.5890</td><td class='tor bold grn'>-1.54%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></tbody></table>";
         mock.expect_sync_get().returning(move |url| {
             let mut data = got_url_arc_clone.lock().unwrap();
             *data = url.to_string();
             Ok(raw_response.clone())
         });
-
+        let expected_fund_value_model = FundValueModel {
+            curpage: 1,
+            pages: 211,
+            records: 2102,
+            values: vec![
+                FundValueData {
+                    date: String::from("2020-04-24"),
+                    real_value: 3.7510,
+                },
+                FundValueData {
+                    date: String::from("2020-04-23"),
+                    real_value: 3.7950,
+                },
+                FundValueData {
+                    date: String::from("2020-04-22"),
+                    real_value: 3.8360,
+                },
+                FundValueData {
+                    date: String::from("2020-04-21"),
+                    real_value: 3.7430,
+                },
+                FundValueData {
+                    date: String::from("2020-04-20"),
+                    real_value: 3.7810,
+                }
+            ],
+        };
         let east_money_service = EastMoneyService::new(&mock);
         let model = block_on(east_money_service.fetch_value(FUND_ID));
         assert_eq!(*got_url_arc.lock().unwrap(), expect_url);
-        assert_eq!(model.content, content);
-        assert_eq!(model.curpage, 1);
-        assert_eq!(model.pages, 211);
-        assert_eq!(model.records, 2102);
+        assert_eq!(model, expected_fund_value_model);
     }
 
     #[test]
