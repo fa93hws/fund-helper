@@ -29,12 +29,18 @@ pub struct FundValueModel {
 
 fn parse_json(raw_response: &String) -> Result<Value, Error> {
     let prefix = "var apidata=";
-    let start_index = prefix.len();
-    if &raw_response[..start_index] != prefix {
-        return Err(Error::JsonFormatError(String::from(
-            "prefix string is not var apidata=",
-        )));
+    let start_index: usize;
+
+    match raw_response.find(prefix) {
+        Some(start) => start_index = start + prefix.len(),
+        None => {
+            return Err(Error::JsonFormatError(format!(
+                "prefix string is {}",
+                prefix
+            )))
+        }
     }
+
     let end_index = raw_response.len() - 1;
     let raw_js = &raw_response[start_index..end_index];
     let raw_json = transfer_js_to_json(
@@ -85,26 +91,22 @@ fn parse_values(html: &str) -> Result<Vec<FundValueData>, Error> {
     Ok(values)
 }
 
-pub fn extract_fund_value(raw_response: String) -> Result<FundValueModel, Error> {
+pub fn extract_fund_value(raw_response: &String) -> Result<FundValueModel, Error> {
     let object = parse_json(&raw_response)?;
     let content = deserialize_str(
-        &object,
-        "content",
+        &object["content"],
         build_type_error("string", "content", &object["content"]),
     )?;
     let records = deserialize_u64(
-        &object,
-        "records",
+        &object["records"],
         build_type_error("u64", "records", &object["records"]),
     )?;
     let curpage = deserialize_u64(
-        &object,
-        "curpage",
+        &object["curpage"],
         build_type_error("u64", "curpage", &object["curpage"]),
     )?;
     let pages = deserialize_u64(
-        &object,
-        "pages",
+        &object["pages"],
         build_type_error("u64", "pages", &object["pages"]),
     )?;
     let values = parse_values(&content)?;
@@ -139,7 +141,7 @@ mod test {
                 },
             ],
         };
-        let maybe_model = extract_fund_value(raw_response);
+        let maybe_model = extract_fund_value(&raw_response);
         match maybe_model {
             Ok(model) => assert_eq!(model, expected_fund_value_model),
             Err(e) => panic!(e),
@@ -150,7 +152,7 @@ mod test {
         let raw_response = String::from(
             r#"var apidata={ content:json content,records:2102,pages:211,curpage:1};"#,
         );
-        let maybe_model = extract_fund_value(raw_response);
+        let maybe_model = extract_fund_value(&raw_response);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
             Err(Error::JsonFormatError(_)) => (),
@@ -162,7 +164,7 @@ mod test {
         let raw_response = String::from(
             r#"var apidata={ content: "json content",records:"2102",pages:211,curpage:1};"#,
         );
-        let maybe_model = extract_fund_value(raw_response);
+        let maybe_model = extract_fund_value(&raw_response);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
             Err(Error::TypeMismatchError(_)) => (),
@@ -172,7 +174,7 @@ mod test {
     #[test]
     fn test_deserialize_fund_value_with_wrong_response() {
         let raw_response = String::from("var _apidata={};");
-        let maybe_model = extract_fund_value(raw_response);
+        let maybe_model = extract_fund_value(&raw_response);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
             Err(Error::JsonFormatError(_)) => (),

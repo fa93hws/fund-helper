@@ -16,22 +16,23 @@ pub fn parse_json_string(raw_json: &String) -> Result<Value, Error> {
     }
 }
 
-pub fn deserialize_str(
-    object: &Value,
-    field: &str,
-    error_message: String,
-) -> Result<String, Error> {
-    let raw_value = &object[field];
+pub fn deserialize_str(raw_value: &Value, error_message: String) -> Result<String, Error> {
     match raw_value.as_str() {
         Some(value) => Ok(String::from(value)),
         None => Err(Error::TypeMismatchError(error_message)),
     }
 }
 
-pub fn deserialize_u64(object: &Value, field: &str, error_message: String) -> Result<u64, Error> {
-    let raw_value = &object[field];
+pub fn deserialize_u64(raw_value: &Value, error_message: String) -> Result<u64, Error> {
     match raw_value.as_u64() {
         Some(value) => Ok(value),
+        None => Err(Error::TypeMismatchError(error_message)),
+    }
+}
+
+pub fn deserialize_array(object: &Value, error_message: String) -> Result<&Vec<Value>, Error> {
+    match object.as_array() {
+        Some(arr) => Ok(arr),
         None => Err(Error::TypeMismatchError(error_message)),
     }
 }
