@@ -72,7 +72,7 @@ mod test {
         match result {
             Ok(_) => panic!("It should not pass"),
             Err(Error::TypeMismatchError(s)) => assert_eq!(s, "not a number"),
-            _ => panic!("It should throw TypeMismatchError")
+            _ => panic!("It should throw TypeMismatchError"),
         }
     }
 

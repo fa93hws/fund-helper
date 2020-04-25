@@ -32,10 +32,10 @@ impl EastMoneyService<'_> {
 mod tests {
     extern crate reqwest;
 
+    use super::super::{FundValueData, FundValueModel};
     use async_trait::async_trait;
     use futures::executor::block_on;
     use std::sync::{Arc, Mutex};
-    use super::super::{FundValueModel,FundValueData};
 
     use super::EastMoneyService;
     use crate::services::http::{create_unknown_error, HttpError, IHttpService, MockHttpService};
@@ -87,7 +87,7 @@ mod tests {
                 FundValueData {
                     date: String::from("2020-04-20"),
                     real_value: 3.7810,
-                }
+                },
             ],
         };
         let east_money_service = EastMoneyService::new(&mock);

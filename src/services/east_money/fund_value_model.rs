@@ -1,6 +1,9 @@
-use super::super::deserializer::{deserialize_str, deserialize_u64, parse_f32_from_str, parse_date_string, parse_json_string, Error};
-use serde_json::Value;
+use super::super::deserializer::{
+    deserialize_str, deserialize_u64, parse_date_string, parse_f32_from_str, parse_json_string,
+    Error,
+};
 use scraper::{Html, Selector};
+use serde_json::Value;
 
 fn transfer_js_to_json(js: String, keys: Vec<&str>) -> String {
     let mut raw_json: String = String::from(js);
@@ -61,12 +64,18 @@ fn parse_values(html: &str) -> Result<Vec<FundValueData>, Error> {
         let raw_date = cells[0].inner_html();
         let date = parse_date_string(
             &raw_date,
-            format!("expect yyyy-mm-dd for cells[0], got {}, html is {}", raw_date, html),
+            format!(
+                "expect yyyy-mm-dd for cells[0], got {}, html is {}",
+                raw_date, html
+            ),
         )?;
         let raw_value = cells[2].inner_html();
         let value = parse_f32_from_str(
             &raw_value,
-            format!("expect f32 for cells[2], got {}, html is {}", raw_value, html),
+            format!(
+                "expect f32 for cells[2], got {}, html is {}",
+                raw_value, html
+            ),
         )?;
         values.push(FundValueData {
             date,
@@ -127,7 +136,7 @@ mod test {
                 FundValueData {
                     date: String::from("2020-04-23"),
                     real_value: 3.7950,
-                }
+                },
             ],
         };
         let maybe_model = extract_fund_value(raw_response);
