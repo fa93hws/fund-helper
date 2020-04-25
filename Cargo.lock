@@ -207,6 +207,7 @@ dependencies = [
  "futures",
  "mockall",
  "reqwest",
+ "serde_json",
  "tokio",
 ]
 

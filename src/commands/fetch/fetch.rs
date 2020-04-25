@@ -4,8 +4,8 @@ use futures::executor::block_on;
 fn fetch_one(id: &str, services: &Services) {
     println!("fetching fund: {}", id);
     let result = services.east_money_service.fetch_value(id);
-    let body = block_on(result);
-    println!("{}", body);
+    let fund_value_model = block_on(result);
+    println!("{}", fund_value_model.content);
 }
 
 fn fetch_all() {

@@ -1,28 +1,28 @@
+use super::{extract_fund_value, FundValueModel};
 use crate::services::http::IHttpService;
 
+const BASE_URL: &str = "http://fund.eastmoney.com";
+const FETCH_FUND_PREFIX: &str = "/f10/F10DataApi.aspx?type=lsjz&code=";
+
 pub struct EastMoneyService<'a> {
-    base_url: String,
     http_service: &'a dyn IHttpService,
 }
 
 impl EastMoneyService<'_> {
     pub fn new(http_service: &dyn IHttpService) -> EastMoneyService {
-        EastMoneyService {
-            http_service,
-            base_url: String::from("http://fund.eastmoney.com"),
-        }
+        EastMoneyService { http_service }
     }
 }
 
 impl EastMoneyService<'_> {
-    pub async fn fetch_value(&self, id: &str) -> String {
-        let url = format!(
-            "{}{}{}",
-            self.base_url, "/f10/F10DataApi.aspx?type=lsjz&code=", id
-        );
+    pub async fn fetch_value(&self, id: &str) -> FundValueModel {
+        let url = format!("{}{}{}", BASE_URL, FETCH_FUND_PREFIX, id);
         let http_result = self.http_service.get(&url).await;
         match http_result {
-            Ok(result) => result,
+            Ok(result) => match extract_fund_value(result) {
+                Ok(model) => model,
+                Err(e) => panic!(e),
+            },
             Err(_) => panic!(format!("failed to fetch url {}", url)),
         }
     }
@@ -54,15 +54,23 @@ mod tests {
         let expect_url = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123";
         let got_url_arc = Arc::new(Mutex::new(String::default()));
         let got_url_arc_clone = Arc::clone(&got_url_arc);
+        let raw_response = String::from(
+            r#"var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-22</td><td class='tor bold'>3.8360</td><td class='tor bold'>3.8360</td><td class='tor bold red'>2.48%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-21</td><td class='tor bold'>3.7430</td><td class='tor bold'>3.7430</td><td class='tor bold grn'>-1.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-20</td><td class='tor bold'>3.7810</td><td class='tor bold'>3.7810</td><td class='tor bold red'>0.43%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-17</td><td class='tor bold'>3.7650</td><td class='tor bold'>3.7650</td><td class='tor bold red'>1.92%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-16</td><td class='tor bold'>3.6940</td><td class='tor bold'>3.6940</td><td class='tor bold red'>0.52%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-15</td><td class='tor bold'>3.6750</td><td class='tor bold'>3.6750</td><td class='tor bold grn'>-0.60%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-14</td><td class='tor bold'>3.6970</td><td class='tor bold'>3.6970</td><td class='tor bold red'>3.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-13</td><td class='tor bold'>3.5890</td><td class='tor bold'>3.5890</td><td class='tor bold grn'>-1.54%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></tbody></table>",records:2102,pages:211,curpage:1};"#,
+        );
+        let content = "<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-22</td><td class='tor bold'>3.8360</td><td class='tor bold'>3.8360</td><td class='tor bold red'>2.48%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-21</td><td class='tor bold'>3.7430</td><td class='tor bold'>3.7430</td><td class='tor bold grn'>-1.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-20</td><td class='tor bold'>3.7810</td><td class='tor bold'>3.7810</td><td class='tor bold red'>0.43%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-17</td><td class='tor bold'>3.7650</td><td class='tor bold'>3.7650</td><td class='tor bold red'>1.92%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-16</td><td class='tor bold'>3.6940</td><td class='tor bold'>3.6940</td><td class='tor bold red'>0.52%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-15</td><td class='tor bold'>3.6750</td><td class='tor bold'>3.6750</td><td class='tor bold grn'>-0.60%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-14</td><td class='tor bold'>3.6970</td><td class='tor bold'>3.6970</td><td class='tor bold red'>3.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-13</td><td class='tor bold'>3.5890</td><td class='tor bold'>3.5890</td><td class='tor bold grn'>-1.54%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></tbody></table>";
         mock.expect_sync_get().returning(move |url| {
             let mut data = got_url_arc_clone.lock().unwrap();
             *data = url.to_string();
-            Ok(String::default())
+            Ok(raw_response.clone())
         });
 
         let east_money_service = EastMoneyService::new(&mock);
-        block_on(east_money_service.fetch_value(FUND_ID));
+        let model = block_on(east_money_service.fetch_value(FUND_ID));
         assert_eq!(*got_url_arc.lock().unwrap(), expect_url);
+        assert_eq!(model.content, content);
+        assert_eq!(model.curpage, 1);
+        assert_eq!(model.pages, 211);
+        assert_eq!(model.records, 2102);
     }
 
     #[test]
