@@ -33,9 +33,12 @@ fn parse_json(raw_response: &String) -> Result<Value, Error> {
 
     match raw_response.find(prefix) {
         Some(start) => start_index = start + prefix.len(),
-        None => return Err(Error::JsonFormatError(format!(
-            "prefix string is {}", prefix
-        ))),
+        None => {
+            return Err(Error::JsonFormatError(format!(
+                "prefix string is {}",
+                prefix
+            )))
+        }
     }
 
     let end_index = raw_response.len() - 1;

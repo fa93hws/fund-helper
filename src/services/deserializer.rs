@@ -16,10 +16,7 @@ pub fn parse_json_string(raw_json: &String) -> Result<Value, Error> {
     }
 }
 
-pub fn deserialize_str(
-    raw_value: &Value,
-    error_message: String,
-) -> Result<String, Error> {
+pub fn deserialize_str(raw_value: &Value, error_message: String) -> Result<String, Error> {
     match raw_value.as_str() {
         Some(value) => Ok(String::from(value)),
         None => Err(Error::TypeMismatchError(error_message)),

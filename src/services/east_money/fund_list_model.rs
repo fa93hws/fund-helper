@@ -1,4 +1,4 @@
-use super::super::deserializer::{parse_json_string,deserialize_array,deserialize_str,Error};
+use super::super::deserializer::{deserialize_array, deserialize_str, parse_json_string, Error};
 use serde_json::Value;
 
 #[derive(Debug, PartialEq)]
@@ -15,9 +15,11 @@ fn parse_json(raw_response: &String) -> Result<Value, Error> {
 
     match raw_response.find(prefix) {
         Some(start) => start_index = start + prefix.len(),
-        None => return Err(Error::JsonFormatError(String::from(
-            "prefix string is not var r = ",
-        ))),
+        None => {
+            return Err(Error::JsonFormatError(String::from(
+                "prefix string is not var r = ",
+            )))
+        }
     }
 
     let end_index = raw_response.len() - 1;
@@ -38,17 +40,24 @@ pub fn extract_fund_list(raw_response: &String) -> Result<FundList, Error> {
             format!("Expect array for fund list item, got {}", raw_tup),
         )?;
         if tup.len() != 5 {
-            return Err(Error::TypeMismatchError(
-                format!("Expect fund list item to have 5 items, got {}", raw_tup)
-            ));
+            return Err(Error::TypeMismatchError(format!(
+                "Expect fund list item to have 5 items, got {}",
+                raw_tup
+            )));
         }
         let id = deserialize_str(
             &tup[0],
-            format!("Expect first item of fund list item (fund-id) to be string, got {}", tup[0]),
+            format!(
+                "Expect first item of fund list item (fund-id) to be string, got {}",
+                tup[0]
+            ),
         )?;
         let name = deserialize_str(
             &tup[2],
-            format!("Expect third item of fund list item (fund-name) to be string, got {}", tup[2]),
+            format!(
+                "Expect third item of fund list item (fund-name) to be string, got {}",
+                tup[2]
+            ),
         )?;
         list.push(FundListItem { id, name });
     }
@@ -66,7 +75,7 @@ mod test {
         let expected_fund_list = vec![
             FundListItem {
                 id: String::from("000001"),
-                name: String::from("华夏成长混合")
+                name: String::from("华夏成长混合"),
             },
             FundListItem {
                 id: String::from("000002"),

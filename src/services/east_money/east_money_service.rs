@@ -1,6 +1,6 @@
-use super::{extract_fund_value,extract_fund_list, FundValueModel, FundList};
-use crate::services::http::IHttpService;
+use super::{extract_fund_list, extract_fund_value, FundList, FundValueModel};
 use crate::services::deserializer::Error;
+use crate::services::http::IHttpService;
 
 const FETCH_FUND_PREFIX: &str = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=";
 const FETCH_LIST_URL: &str = "http://fund.eastmoney.com/js/fundcode_search.js";
@@ -36,7 +36,7 @@ impl EastMoneyService<'_> {
                 Ok(fund_list) => fund_list,
                 Err(Error::TypeMismatchError(e)) => panic!(e),
                 Err(Error::JsonFormatError(e)) => panic!(e),
-            }
+            },
             Err(_) => panic!("failed to fetch list"),
         }
     }
