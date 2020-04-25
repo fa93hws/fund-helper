@@ -8,13 +8,15 @@ fn fetch_one(id: &str, services: &Services) {
     println!("{:?}", fund_value_model);
 }
 
-fn fetch_all() {
+fn fetch_all(services: &Services) {
     println!("fetching all!");
+    let list_result = block_on(services.east_money_service.fetch_list());
+    println!("{:?}", list_result);
 }
 
 pub fn main(matches: &clap::ArgMatches<'_>, services: Services) {
     if !matches.is_present("fund-id") {
-        fetch_all();
+        fetch_all(&services);
     } else if let Some(ids) = matches.values_of("fund-id") {
         for id in ids {
             fetch_one(id, &services);

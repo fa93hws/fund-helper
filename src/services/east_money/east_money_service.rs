@@ -1,8 +1,9 @@
-use super::{extract_fund_value, FundValueModel};
+use super::{extract_fund_value,extract_fund_list, FundValueModel, FundList};
 use crate::services::http::IHttpService;
+use crate::services::deserializer::Error;
 
-const BASE_URL: &str = "http://fund.eastmoney.com";
-const FETCH_FUND_PREFIX: &str = "/f10/F10DataApi.aspx?type=lsjz&code=";
+const FETCH_FUND_PREFIX: &str = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=";
+const FETCH_LIST_URL: &str = "http://fund.eastmoney.com/js/fundcode_search.js";
 
 pub struct EastMoneyService<'a> {
     http_service: &'a dyn IHttpService,
@@ -16,14 +17,27 @@ impl EastMoneyService<'_> {
 
 impl EastMoneyService<'_> {
     pub async fn fetch_value(&self, id: &str) -> FundValueModel {
-        let url = format!("{}{}{}", BASE_URL, FETCH_FUND_PREFIX, id);
+        let url = format!("{}{}", FETCH_FUND_PREFIX, id);
         let http_result = self.http_service.get(&url).await;
         match http_result {
-            Ok(result) => match extract_fund_value(result) {
+            Ok(result) => match extract_fund_value(&result) {
                 Ok(model) => model,
-                Err(e) => panic!(e),
+                Err(Error::TypeMismatchError(e)) => panic!(e),
+                Err(Error::JsonFormatError(e)) => panic!(e),
             },
             Err(_) => panic!(format!("failed to fetch url {}", url)),
+        }
+    }
+
+    pub async fn fetch_list(&self) -> FundList {
+        let http_result = self.http_service.get(FETCH_LIST_URL).await;
+        match http_result {
+            Ok(result) => match extract_fund_list(&result) {
+                Ok(fund_list) => fund_list,
+                Err(Error::TypeMismatchError(e)) => panic!(e),
+                Err(Error::JsonFormatError(e)) => panic!(e),
+            }
+            Err(_) => panic!("failed to fetch list"),
         }
     }
 }
