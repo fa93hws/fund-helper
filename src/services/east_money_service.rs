@@ -36,7 +36,7 @@ mod tests {
     use futures::executor::block_on;
     use std::sync::{Arc, Mutex};
 
-    use super::super::{MockHttpService, IHttpService, HttpError, create_unknown_error};
+    use super::super::{create_unknown_error, HttpError, IHttpService, MockHttpService};
     use super::EastMoneyService;
 
     #[async_trait]
@@ -54,20 +54,21 @@ mod tests {
         let expect_url = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123";
         let got_url_arc = Arc::new(Mutex::new(String::default()));
         let got_url_arc_clone = Arc::clone(&got_url_arc);
-        mock.expect_sync_get()
-            .returning(move |url| {
-                let mut data = got_url_arc_clone.lock().unwrap();
-                *data = url.to_string();
-                Ok(String::default())
-            });
-        
+        mock.expect_sync_get().returning(move |url| {
+            let mut data = got_url_arc_clone.lock().unwrap();
+            *data = url.to_string();
+            Ok(String::default())
+        });
+
         let east_money_service = EastMoneyService::new(&mock);
         block_on(east_money_service.fetch_value(FUND_ID));
         assert_eq!(*got_url_arc.lock().unwrap(), expect_url);
     }
 
     #[test]
-    #[should_panic(expected = "failed to fetch url http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123")]
+    #[should_panic(
+        expected = "failed to fetch url http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123"
+    )]
     fn test_fetch_fail() {
         let mut mock = MockHttpService::new();
         let err = create_unknown_error(None);

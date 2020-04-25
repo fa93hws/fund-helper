@@ -1,6 +1,6 @@
-use reqwest;
 use async_trait::async_trait;
 use mockall::mock;
+use reqwest;
 
 pub struct HttpService {}
 impl HttpService {
@@ -54,7 +54,7 @@ pub fn create_unknown_error(maybe_message: Option<&str>) -> HttpError {
         Some(msg) => msg,
         None => "Unknown http error",
     };
-    HttpError{
+    HttpError {
         kind: ErrorKind::UnknownError,
         msg: message.to_string(),
     }
