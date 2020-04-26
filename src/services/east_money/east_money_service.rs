@@ -1,6 +1,6 @@
 use super::{extract_fund_list, extract_fund_value, FundList, FundValueModel};
-use crate::services::deserializer::Error;
 use crate::services::http::IHttpService;
+use crate::utils::context::{FetchListContext, FetchValueContext};
 
 const FETCH_FUND_PREFIX: &str = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=";
 const FETCH_LIST_URL: &str = "http://fund.eastmoney.com/js/fundcode_search.js";
@@ -19,11 +19,14 @@ impl EastMoneyService<'_> {
     pub async fn fetch_value(&self, id: &str) -> FundValueModel {
         let url = format!("{}{}", FETCH_FUND_PREFIX, id);
         let http_result = self.http_service.get(&url).await;
+        let context = FetchValueContext {
+            id: id.to_string(),
+            page: 1,
+        };
         match http_result {
-            Ok(result) => match extract_fund_value(&result) {
+            Ok(result) => match extract_fund_value(&result, &context) {
                 Ok(model) => model,
-                Err(Error::TypeMismatchError(e)) => panic!(e),
-                Err(Error::JsonFormatError(e)) => panic!(e),
+                Err(e) => panic!("{}", e),
             },
             Err(_) => panic!(format!("failed to fetch url {}", url)),
         }
@@ -31,11 +34,11 @@ impl EastMoneyService<'_> {
 
     pub async fn fetch_list(&self) -> FundList {
         let http_result = self.http_service.get(FETCH_LIST_URL).await;
+        let context = FetchListContext {};
         match http_result {
-            Ok(result) => match extract_fund_list(&result) {
+            Ok(result) => match extract_fund_list(&result, &context) {
                 Ok(fund_list) => fund_list,
-                Err(Error::TypeMismatchError(e)) => panic!(e),
-                Err(Error::JsonFormatError(e)) => panic!(e),
+                Err(e) => panic!("{}", e),
             },
             Err(_) => panic!("failed to fetch list"),
         }

@@ -5,6 +5,7 @@ use clap::{App, Arg, SubCommand};
 
 mod commands;
 mod services;
+mod utils;
 
 #[tokio::main]
 async fn main() {
