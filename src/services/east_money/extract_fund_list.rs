@@ -1,11 +1,7 @@
 use crate::models::fund_list::{FundList, FundListItem, FundType};
 use crate::utils::context::FetchListContext;
-use crate::utils::deserializer::{TypeMismatchError, WrongPrefixError};
 
-fn normalize_fund_type(
-    typ: &str,
-    context: &FetchListContext,
-) -> FundType {
+fn normalize_fund_type(typ: &str, context: &FetchListContext) -> FundType {
     match typ {
         "混合型" | "混合-FOF" => FundType::Mix,
         "债券型" | "定开债券" | "债券指数" => FundType::Bond,
@@ -17,17 +13,12 @@ fn normalize_fund_type(
         "货币型" | "固定收益" | "理财型" | "分级杠杆" | "保本型" => {
             FundType::NotInterested
         }
-        _ => panic!("{:?}", TypeMismatchError {
-            expected_type: String::from("fund type enum"),
-            got: String::from(typ),
-            field: String::from("cells[3]"),
-            context: format!("{}", context),
-        }),
+        _ => panic!("Unknown fund type, got 'typ'. Context: {}", context),
     }
 }
 
 fn parse_json<'a>(
-    raw_response: &String,
+    raw_response: &'a String,
     context: &FetchListContext,
 ) -> Vec<(&'a str, &'a str, &'a str, &'a str, &'a str)> {
     let prefix = "var r = ";
@@ -35,23 +26,16 @@ fn parse_json<'a>(
 
     match raw_response.find(prefix) {
         Some(start) => start_index = start + prefix.len(),
-        None => panic!("{:?}", WrongPrefixError {
-                prefix: prefix.to_string(),
-                context: format!("{}", context),
-            })
-        }
+        None => panic!("Wrong prefix, expected 'var r = '. Context: {}", context),
+    }
 
     let end_index = raw_response.len() - 1;
-    let raw_json = String::from(&raw_response[start_index..end_index]);
-    serde_json::from_str::<Vec<(&'a str, &'a str, &'a str, &'a str, &'a str)>>(&raw_json).expect(
-        &format!("wrong json format. Context: {}", context)
-    )
+    let raw_json: &'a str = &raw_response[start_index..end_index];
+    serde_json::from_str::<'a, Vec<(&'a str, &'a str, &'a str, &'a str, &'a str)>>(raw_json)
+        .expect(&format!("wrong json format. Context: {}", context))
 }
 
-pub(super) fn extract_fund_list<'a>(
-    raw_response: &String,
-    context: &FetchListContext,
-) -> FundList {
+pub(super) fn extract_fund_list<'a>(raw_response: &String, context: &FetchListContext) -> FundList {
     let raw_list = parse_json(raw_response, context);
     let mut list: FundList = vec![];
     for tup in raw_list {
@@ -149,6 +133,6 @@ mod test {
     #[should_panic]
     fn test_normalize_fund_type_error() {
         let typ = String::from("顾茗");
-        let typ_enum = normalize_fund_type(&typ, &CONTEXT);
+        normalize_fund_type(&typ, &CONTEXT);
     }
 }

@@ -26,10 +26,7 @@ impl EastMoneyService<'_> {
             page: 1,
         };
         match http_result {
-            Ok(result) => match extract_fund_values(&result, &context) {
-                Ok(model) => model,
-                Err(e) => panic!("{}", e),
-            },
+            Ok(result) => extract_fund_values(&result, &context),
             Err(_) => panic!(format!("failed to fetch url {}", url)),
         }
     }
