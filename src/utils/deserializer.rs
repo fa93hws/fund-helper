@@ -182,6 +182,22 @@ pub fn parse_f32_from_str(
     }
 }
 
+pub fn parse_usize_from_str(
+    string: &str,
+    field: &str,
+    context: &dyn Context,
+) -> Result<usize, Box<dyn DeserializationError>> {
+    match string.parse::<usize>() {
+        Ok(val) => Ok(val),
+        Err(_) => Err(Box::new(TypeMismatchError {
+            expected_type: String::from("usize"),
+            got: string.to_string(),
+            field: field.to_string(),
+            context: format!("{}", context),
+        })),
+    }
+}
+
 // date_string is assumed to be in yyyy-mm-dd
 pub fn parse_date_string(
     date_string: &str,

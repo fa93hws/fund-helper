@@ -25,13 +25,21 @@ impl Display for FetchListContext {
     }
 }
 
+#[derive(Debug)]
+pub struct DBInitializationContext {}
+impl Display for DBInitializationContext {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "command: db init.")
+    }
+}
+
 macro_rules! impl_T {
     (for $($t:ty),+) => {
         $(impl Context for $t {})*
     }
 }
 
-impl_T!(for FetchValueContext, FetchListContext, DummyContext);
+impl_T!(for FetchValueContext, FetchListContext, DummyContext, DBInitializationContext);
 
 #[derive(Debug)]
 pub struct DummyContext;
