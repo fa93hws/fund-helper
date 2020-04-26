@@ -35,6 +35,8 @@ struct DockerYML {
 
 pub enum Environment {
     Prod,
+    // TODO Use Test enum
+    #[allow(dead_code)]
     Test,
 }
 pub struct DatabaseService {
@@ -56,7 +58,8 @@ impl DatabaseService {
         let port_binding: Vec<&str> = (&port_raw[..]).split(':').collect();
         let port_string = *port_binding.get(0).expect("wrong port binding");
         let context = DBInitializationContext {};
-        let port_number = parse_usize_from_str(port_string, "port", &context).unwrap();
+        let port_number = parse_usize_from_str(port_string)
+            .expect(&format!("@port_number, Context: {}", context));
 
         DatabaseService {
             user: db_env.environment.user,
