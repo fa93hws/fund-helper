@@ -1,6 +1,6 @@
+use std::error::Error;
 use std::fs;
 use std::io::prelude::*;
-use std::error::Error;
 
 #[cfg(test)]
 #[cfg(windows)]
@@ -26,9 +26,12 @@ mod test {
         match file_result {
             Ok(content) => assert_eq!(
                 content,
-                format!("DROP TABLE IF EXISTS fund_net_values;{}DROP TABLE IF EXISTS fund_info;{}", LINE_ENDING, LINE_ENDING),
+                format!(
+                    "DROP TABLE IF EXISTS fund_net_values;{}DROP TABLE IF EXISTS fund_info;{}",
+                    LINE_ENDING, LINE_ENDING
+                ),
             ),
-            Err(_) => panic!("It should read the file")
+            Err(_) => panic!("It should read the file"),
         }
     }
 }

@@ -37,11 +37,9 @@ impl DatabaseService {
 
         let sql_str = match read_file(INIT_SQL_PATH) {
             Ok(content) => content,
-            Err(_) => panic!("Failed to read file@{}", INIT_SQL_PATH)
+            Err(_) => panic!("Failed to read file@{}", INIT_SQL_PATH),
         };
-        client
-            .batch_execute(&sql_str[..])
-            .await?;
+        client.batch_execute(&sql_str[..]).await?;
         Ok(())
     }
 }
