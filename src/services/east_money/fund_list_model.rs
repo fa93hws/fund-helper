@@ -6,9 +6,19 @@ use crate::utils::context::FetchListContext;
 use serde_json::Value;
 
 #[derive(Debug, PartialEq)]
+pub enum FundType {
+    Mix,
+}
+
+#[derive(Debug, PartialEq)]
 pub struct FundListItem {
     id: String,
     name: String,
+    typ: FundType,
+}
+
+fn normalize_fund_type(typ: &String) -> FundType {
+    FundType::Mix
 }
 
 pub type FundList = Vec<FundListItem>;
@@ -54,7 +64,8 @@ pub fn extract_fund_list(
         }
         let id = deserialize_str(&tup[0], "0(fund-id)", context)?;
         let name = deserialize_str(&tup[2], "2(fund-name)", context)?;
-        list.push(FundListItem { id, name });
+        let typ = deserialize_str(&tup[3], "3(fund-type)", context)?;
+        list.push(FundListItem { id, name, typ: normalize_fund_type(&typ) });
     }
 
     Ok(list)
@@ -72,10 +83,12 @@ mod test {
             FundListItem {
                 id: String::from("000001"),
                 name: String::from("华夏成长混合"),
+                typ: FundType::Mix,
             },
             FundListItem {
                 id: String::from("000002"),
                 name: String::from("华夏成长混合(后端)"),
+                typ: FundType::Mix,
             },
         ];
         match extract_fund_list(&String::from(raw_response), &CONTEXT) {
