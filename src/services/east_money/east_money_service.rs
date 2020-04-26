@@ -38,10 +38,7 @@ impl EastMoneyService<'_> {
         let http_result = self.http_service.get(FETCH_LIST_URL).await;
         let context = FetchListContext {};
         match http_result {
-            Ok(result) => match extract_fund_list(&result, &context) {
-                Ok(fund_list) => fund_list,
-                Err(e) => panic!("{}", e),
-            },
+            Ok(result) => extract_fund_list(&result, &context),
             Err(_) => panic!("failed to fetch list"),
         }
     }

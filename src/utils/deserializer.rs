@@ -106,18 +106,6 @@ impl DeserializationError for TypeMismatchError {
     }
 }
 
-pub fn parse_json_string(
-    raw_json: &String,
-    context: &dyn Context,
-) -> Result<Value, Box<dyn DeserializationError>> {
-    match serde_json::from_str(raw_json) {
-        Ok(object) => Ok(object),
-        Err(_) => Err(Box::new(JsonFormatError {
-            context: format!("{}", context),
-        })),
-    }
-}
-
 pub fn deserialize_str(
     raw_value: &Value,
     field: &str,
