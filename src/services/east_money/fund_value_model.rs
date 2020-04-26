@@ -1,12 +1,14 @@
-use super::super::deserializer::{
-    deserialize_str, deserialize_u64, parse_date_string, parse_f32_from_str, parse_json_string,
-    Error,
-};
 use scraper::{Html, Selector};
 use serde_json::Value;
 
+use super::super::deserializer::{
+    deserialize_str, deserialize_u64, parse_date_string, parse_f32_from_str, parse_json_string,
+    DeserializationError, WrongPrefixError,
+};
+use crate::utils::context::FetchValueContext;
+
 fn transfer_js_to_json(js: String, keys: Vec<&str>) -> String {
-    let mut raw_json: String = String::from(js);
+    let mut raw_json: String = js.to_string();
     for k in keys {
         raw_json = raw_json.replace(&format!("{}:", k), &format!("\"{}\":", k));
     }
@@ -27,34 +29,36 @@ pub struct FundValueModel {
     pub values: Vec<FundValueData>,
 }
 
-fn parse_json(raw_response: &String) -> Result<Value, Error> {
+fn parse_json(
+    raw_response: &String,
+    context: &FetchValueContext,
+) -> Result<Value, Box<dyn DeserializationError>> {
     let prefix = "var apidata=";
     let start_index: usize;
 
     match raw_response.find(prefix) {
         Some(start) => start_index = start + prefix.len(),
         None => {
-            return Err(Error::JsonFormatError(format!(
-                "prefix string is {}",
-                prefix
-            )))
+            return Err(Box::new(WrongPrefixError {
+                prefix: prefix.to_string(),
+                context: format!("{}", context),
+            }))
         }
     }
 
     let end_index = raw_response.len() - 1;
     let raw_js = &raw_response[start_index..end_index];
     let raw_json = transfer_js_to_json(
-        String::from(raw_js),
+        raw_js.to_string(),
         vec!["content", "records", "pages", "curpage"],
     );
-    parse_json_string(&raw_json)
+    parse_json_string(&raw_json, context)
 }
 
-fn build_type_error(typ: &str, field: &str, raw_value: &Value) -> String {
-    format!("Expect {} for {}, but got {}", typ, field, raw_value)
-}
-
-fn parse_values(html: &str) -> Result<Vec<FundValueData>, Error> {
+fn parse_values(
+    html: &str,
+    context: &FetchValueContext,
+) -> Result<Vec<FundValueData>, Box<dyn DeserializationError>> {
     let fragment = Html::parse_fragment(html);
     let row_selector = Selector::parse("tr").unwrap();
     let cell_selector = Selector::parse("td").unwrap();
@@ -68,21 +72,9 @@ fn parse_values(html: &str) -> Result<Vec<FundValueData>, Error> {
             panic!("html content is not correct! {}", html);
         }
         let raw_date = cells[0].inner_html();
-        let date = parse_date_string(
-            &raw_date,
-            format!(
-                "expect yyyy-mm-dd for cells[0], got {}, html is {}",
-                raw_date, html
-            ),
-        )?;
+        let date = parse_date_string(&raw_date, "cells[0]", context)?;
         let raw_value = cells[2].inner_html();
-        let value = parse_f32_from_str(
-            &raw_value,
-            format!(
-                "expect f32 for cells[2], got {}, html is {}",
-                raw_value, html
-            ),
-        )?;
+        let value = parse_f32_from_str(&raw_value, "cells[2]", context)?;
         values.push(FundValueData {
             date,
             real_value: value,
@@ -91,25 +83,16 @@ fn parse_values(html: &str) -> Result<Vec<FundValueData>, Error> {
     Ok(values)
 }
 
-pub fn extract_fund_value(raw_response: &String) -> Result<FundValueModel, Error> {
-    let object = parse_json(&raw_response)?;
-    let content = deserialize_str(
-        &object["content"],
-        build_type_error("string", "content", &object["content"]),
-    )?;
-    let records = deserialize_u64(
-        &object["records"],
-        build_type_error("u64", "records", &object["records"]),
-    )?;
-    let curpage = deserialize_u64(
-        &object["curpage"],
-        build_type_error("u64", "curpage", &object["curpage"]),
-    )?;
-    let pages = deserialize_u64(
-        &object["pages"],
-        build_type_error("u64", "pages", &object["pages"]),
-    )?;
-    let values = parse_values(&content)?;
+pub fn extract_fund_value(
+    raw_response: &String,
+    context: &FetchValueContext,
+) -> Result<FundValueModel, Box<dyn DeserializationError>> {
+    let object = parse_json(&raw_response, context)?;
+    let content = deserialize_str(&object["content"], "content", context)?;
+    let records = deserialize_u64(&object["records"], "records", context)?;
+    let curpage = deserialize_u64(&object["curpage"], "curpage", context)?;
+    let pages = deserialize_u64(&object["pages"], "page", context)?;
+    let values = parse_values(&content, context)?;
     Ok(FundValueModel {
         records,
         curpage,
@@ -121,6 +104,7 @@ pub fn extract_fund_value(raw_response: &String) -> Result<FundValueModel, Error
 #[cfg(test)]
 mod test {
     use super::*;
+
     #[test]
     fn test_deserialize_fund_value() {
         let raw_response = String::from(
@@ -141,10 +125,14 @@ mod test {
                 },
             ],
         };
-        let maybe_model = extract_fund_value(&raw_response);
+        let context = FetchValueContext {
+            id: String::from("id"),
+            page: 0,
+        };
+        let maybe_model = extract_fund_value(&raw_response, &context);
         match maybe_model {
             Ok(model) => assert_eq!(model, expected_fund_value_model),
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
         }
     }
     #[test]
@@ -152,11 +140,14 @@ mod test {
         let raw_response = String::from(
             r#"var apidata={ content:json content,records:2102,pages:211,curpage:1};"#,
         );
-        let maybe_model = extract_fund_value(&raw_response);
+        let context = FetchValueContext {
+            id: String::from("id"),
+            page: 0,
+        };
+        let maybe_model = extract_fund_value(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
-            Err(Error::JsonFormatError(_)) => (),
-            _ => panic!("it should be failed with JsonFormatError"),
+            _ => (),
         }
     }
     #[test]
@@ -164,21 +155,27 @@ mod test {
         let raw_response = String::from(
             r#"var apidata={ content: "json content",records:"2102",pages:211,curpage:1};"#,
         );
-        let maybe_model = extract_fund_value(&raw_response);
+        let context = FetchValueContext {
+            id: String::from("id"),
+            page: 0,
+        };
+        let maybe_model = extract_fund_value(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
-            Err(Error::TypeMismatchError(_)) => (),
-            _ => panic!("it should be failed with TypeMismatchError"),
+            _ => (),
         }
     }
     #[test]
     fn test_deserialize_fund_value_with_wrong_response() {
         let raw_response = String::from("var _apidata={};");
-        let maybe_model = extract_fund_value(&raw_response);
+        let context = FetchValueContext {
+            id: String::from("id"),
+            page: 0,
+        };
+        let maybe_model = extract_fund_value(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
-            Err(Error::JsonFormatError(_)) => (),
-            _ => panic!("it should be failed with JsonFormatError"),
+            _ => (),
         }
     }
 }

@@ -1,4 +1,8 @@
-use super::super::deserializer::{deserialize_array, deserialize_str, parse_json_string, Error};
+use super::super::deserializer::{
+    deserialize_array, deserialize_str, parse_json_string, DeserializationError, TypeMismatchError,
+    WrongPrefixError,
+};
+use crate::utils::context::FetchListContext;
 use serde_json::Value;
 
 #[derive(Debug, PartialEq)]
@@ -9,56 +13,47 @@ pub struct FundListItem {
 
 pub type FundList = Vec<FundListItem>;
 
-fn parse_json(raw_response: &String) -> Result<Value, Error> {
+fn parse_json(
+    raw_response: &String,
+    context: &FetchListContext,
+) -> Result<Value, Box<dyn DeserializationError>> {
     let prefix = "var r = ";
     let start_index: usize;
 
     match raw_response.find(prefix) {
         Some(start) => start_index = start + prefix.len(),
         None => {
-            return Err(Error::JsonFormatError(String::from(
-                "prefix string is not var r = ",
-            )))
+            return Err(Box::new(WrongPrefixError {
+                prefix: prefix.to_string(),
+                context: format!("{}", context),
+            }))
         }
     }
 
     let end_index = raw_response.len() - 1;
     let raw_json = String::from(&raw_response[start_index..end_index]);
-    parse_json_string(&raw_json)
+    parse_json_string(&raw_json, context)
 }
 
-pub fn extract_fund_list(raw_response: &String) -> Result<FundList, Error> {
-    let result = parse_json(raw_response)?;
-    let raw_list = deserialize_array(
-        &result,
-        format!("Expect array for fund list, got {}", raw_response),
-    )?;
+pub fn extract_fund_list(
+    raw_response: &String,
+    context: &FetchListContext,
+) -> Result<FundList, Box<dyn DeserializationError>> {
+    let result = parse_json(raw_response, context)?;
+    let raw_list = deserialize_array(&result, "root", context)?;
     let mut list: FundList = vec![];
     for raw_tup in raw_list {
-        let tup = deserialize_array(
-            raw_tup,
-            format!("Expect array for fund list item, got {}", raw_tup),
-        )?;
+        let tup = deserialize_array(raw_tup, "first level item", context)?;
         if tup.len() != 5 {
-            return Err(Error::TypeMismatchError(format!(
-                "Expect fund list item to have 5 items, got {}",
-                raw_tup
-            )));
+            return Err(Box::new(TypeMismatchError {
+                expected_type: String::from("arr(len = 5)"),
+                got: format!("{}", raw_tup),
+                field: String::from(""),
+                context: format!("{}", context),
+            }));
         }
-        let id = deserialize_str(
-            &tup[0],
-            format!(
-                "Expect first item of fund list item (fund-id) to be string, got {}",
-                tup[0]
-            ),
-        )?;
-        let name = deserialize_str(
-            &tup[2],
-            format!(
-                "Expect third item of fund list item (fund-name) to be string, got {}",
-                tup[2]
-            ),
-        )?;
+        let id = deserialize_str(&tup[0], "0(fund-id)", context)?;
+        let name = deserialize_str(&tup[2], "2(fund-name)", context)?;
         list.push(FundListItem { id, name });
     }
 
@@ -82,7 +77,8 @@ mod test {
                 name: String::from("华夏成长混合(后端)"),
             },
         ];
-        match extract_fund_list(&String::from(raw_response)) {
+        let context = FetchListContext {};
+        match extract_fund_list(&String::from(raw_response), &context) {
             Ok(fund_list) => assert_eq!(fund_list, expected_fund_list),
             Err(_) => panic!("It should be parsed correctly"),
         }
@@ -91,20 +87,30 @@ mod test {
     #[test]
     fn test_extract_fund_list_wrong_id() {
         let raw_response = r#"var r = [[1,"HXCZHH","华夏成长混合","混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
-        match extract_fund_list(&String::from(raw_response)) {
+        let context = FetchListContext {};
+        match extract_fund_list(&String::from(raw_response), &context) {
             Ok(_) => panic!("It should not be parsed correctly"),
-            Err(Error::TypeMismatchError(s)) => assert!(s.contains("fund-id")),
-            _ => panic!("It should throw TypeMismatchError"),
+            Err(_) => (),
         }
     }
 
     #[test]
     fn test_extract_fund_list_wrong_name() {
         let raw_response = r#"var r = [["000001","HXCZHH",123,"混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
-        match extract_fund_list(&String::from(raw_response)) {
+        let context = FetchListContext {};
+        match extract_fund_list(&String::from(raw_response), &context) {
             Ok(_) => panic!("It should not be parsed correctly"),
-            Err(Error::TypeMismatchError(s)) => assert!(s.contains("fund-name")),
-            _ => panic!("It should throw TypeMismatchError"),
+            Err(_) => (),
+        }
+    }
+
+    #[test]
+    fn test_extract_fund_list_wrong_prefix() {
+        let raw_response = r#"var rr = [["000001","HXCZHH",123,"混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
+        let context = FetchListContext {};
+        match extract_fund_list(&String::from(raw_response), &context) {
+            Ok(_) => panic!("It should not be parsed correctly"),
+            Err(_) => (),
         }
     }
 }
