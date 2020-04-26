@@ -1,4 +1,6 @@
-use super::{extract_fund_list, extract_fund_value, FundList, FundValueModel};
+use super::{extract_fund_list, extract_fund_values};
+use crate::models::fund_list::FundList;
+use crate::models::fund_value::FundValueModel;
 use crate::services::http::IHttpService;
 use crate::utils::context::{FetchListContext, FetchValueContext};
 
@@ -24,7 +26,7 @@ impl EastMoneyService<'_> {
             page: 1,
         };
         match http_result {
-            Ok(result) => match extract_fund_value(&result, &context) {
+            Ok(result) => match extract_fund_values(&result, &context) {
                 Ok(model) => model,
                 Err(e) => panic!("{}", e),
             },
@@ -49,7 +51,7 @@ impl EastMoneyService<'_> {
 mod tests {
     extern crate reqwest;
 
-    use super::super::{FundValueData, FundValueModel};
+    use crate::models::fund_value::{FundValueData, FundValueModel};
     use async_trait::async_trait;
     use futures::executor::block_on;
     use std::sync::{Arc, Mutex};

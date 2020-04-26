@@ -1,2 +1,2 @@
 mod fetch;
-pub use fetch::main;
+pub(super) use fetch::main;

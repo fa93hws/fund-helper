@@ -3,13 +3,13 @@ use crate::services::database::DatabaseService;
 use crate::services::east_money::EastMoneyService;
 use crate::services::http::HttpService;
 
-pub struct Services<'a> {
+pub(super) struct Services<'a> {
     pub http_service: &'a HttpService,
     pub east_money_service: &'a EastMoneyService<'a>,
     pub database_service: &'a DatabaseService,
 }
 
-pub fn main(matches: clap::ArgMatches<'_>) {
+pub(crate) fn main(matches: clap::ArgMatches<'_>) {
     let http_service = HttpService::new();
     let east_money_service = EastMoneyService::new(&http_service);
     // TODO: Inject params from docker-compose.yml

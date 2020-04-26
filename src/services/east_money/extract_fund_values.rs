@@ -1,11 +1,12 @@
 use scraper::{Html, Selector};
 use serde_json::Value;
 
-use super::super::deserializer::{
+use crate::models::fund_value::{FundValueData, FundValueModel};
+use crate::utils::context::FetchValueContext;
+use crate::utils::deserializer::{
     deserialize_str, deserialize_u64, parse_date_string, parse_f32_from_str, parse_json_string,
     DeserializationError, WrongPrefixError,
 };
-use crate::utils::context::FetchValueContext;
 
 fn transfer_js_to_json(js: String, keys: Vec<&str>) -> String {
     let mut raw_json: String = js.to_string();
@@ -13,20 +14,6 @@ fn transfer_js_to_json(js: String, keys: Vec<&str>) -> String {
         raw_json = raw_json.replace(&format!("{}:", k), &format!("\"{}\":", k));
     }
     raw_json
-}
-
-#[derive(Debug, PartialEq)]
-pub struct FundValueData {
-    pub date: String,
-    pub real_value: f32,
-}
-
-#[derive(Debug, PartialEq)]
-pub struct FundValueModel {
-    pub records: u64,
-    pub curpage: u64,
-    pub pages: u64,
-    pub values: Vec<FundValueData>,
 }
 
 fn parse_json(
@@ -83,7 +70,7 @@ fn parse_values(
     Ok(values)
 }
 
-pub fn extract_fund_value(
+pub(super) fn extract_fund_values(
     raw_response: &String,
     context: &FetchValueContext,
 ) -> Result<FundValueModel, Box<dyn DeserializationError>> {
@@ -129,7 +116,7 @@ mod test {
             id: String::from("id"),
             page: 0,
         };
-        let maybe_model = extract_fund_value(&raw_response, &context);
+        let maybe_model = extract_fund_values(&raw_response, &context);
         match maybe_model {
             Ok(model) => assert_eq!(model, expected_fund_value_model),
             Err(e) => panic!("{}", e),
@@ -144,7 +131,7 @@ mod test {
             id: String::from("id"),
             page: 0,
         };
-        let maybe_model = extract_fund_value(&raw_response, &context);
+        let maybe_model = extract_fund_values(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
             Err(e) => assert!(e.is_json_error()),
@@ -159,7 +146,7 @@ mod test {
             id: String::from("id"),
             page: 0,
         };
-        let maybe_model = extract_fund_value(&raw_response, &context);
+        let maybe_model = extract_fund_values(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
             Err(e) => assert!(e.is_type_error()),
@@ -172,7 +159,7 @@ mod test {
             id: String::from("id"),
             page: 0,
         };
-        let maybe_model = extract_fund_value(&raw_response, &context);
+        let maybe_model = extract_fund_values(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
             Err(e) => assert!(e.is_prefix_error()),
