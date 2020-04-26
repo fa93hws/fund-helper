@@ -2,25 +2,9 @@ use super::super::deserializer::{
     deserialize_array, deserialize_str, parse_json_string, DeserializationError, TypeMismatchError,
     WrongPrefixError,
 };
+use crate::models::fund_list::{FundList, FundListItem, FundType};
 use crate::utils::context::FetchListContext;
 use serde_json::Value;
-
-#[derive(Debug, PartialEq)]
-pub enum FundType {
-    Mix,
-    Bond,
-    Index,
-    QDII,
-    Stock,
-    NotInterested,
-}
-
-#[derive(Debug, PartialEq)]
-pub struct FundListItem {
-    id: String,
-    name: String,
-    typ: FundType,
-}
 
 fn normalize_fund_type(
     typ: &String,
@@ -45,8 +29,6 @@ fn normalize_fund_type(
         })),
     }
 }
-
-pub type FundList = Vec<FundListItem>;
 
 fn parse_json(
     raw_response: &String,

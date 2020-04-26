@@ -4,6 +4,7 @@ extern crate std;
 use clap::{App, Arg, SubCommand};
 
 mod commands;
+mod models;
 mod services;
 mod utils;
 
