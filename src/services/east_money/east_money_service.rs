@@ -26,7 +26,7 @@ impl EastMoneyService<'_> {
         match http_result {
             Ok(result) => match extract_fund_value(&result, &context) {
                 Ok(model) => model,
-                Err(e) => panic!("{:?}", e),
+                Err(e) => panic!("{}", e),
             },
             Err(_) => panic!(format!("failed to fetch url {}", url)),
         }
@@ -38,7 +38,7 @@ impl EastMoneyService<'_> {
         match http_result {
             Ok(result) => match extract_fund_list(&result, &context) {
                 Ok(fund_list) => fund_list,
-                Err(e) => panic!("{:?}", e),
+                Err(e) => panic!("{}", e),
             },
             Err(_) => panic!("failed to fetch list"),
         }
