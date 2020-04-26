@@ -1,5 +1,5 @@
 use super::{db, fetch};
-use crate::services::database::DatabaseService;
+use crate::services::database::{DatabaseService, Environment};
 use crate::services::east_money::EastMoneyService;
 use crate::services::http::HttpService;
 
@@ -12,8 +12,7 @@ pub(super) struct Services<'a> {
 pub(crate) fn main(matches: clap::ArgMatches<'_>) {
     let http_service = HttpService::new();
     let east_money_service = EastMoneyService::new(&http_service);
-    // TODO: Inject params from docker-compose.yml
-    let database_service = DatabaseService::new("fund-helper", "fund-helper", "fund_helper", 5432);
+    let database_service = DatabaseService::new(Environment::Prod);
     let services = Services {
         http_service: &http_service,
         east_money_service: &east_money_service,
