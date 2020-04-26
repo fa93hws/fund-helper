@@ -58,9 +58,11 @@ fn parse_values(html: &str, context: &FetchValueContext) -> Vec<FundValueData> {
             panic!("html content is not correct! {}", html);
         }
         let raw_date = cells[0].inner_html();
-        let date = parse_date_string(&raw_date, "cells[0]", context).unwrap();
+        let date =
+            parse_date_string(&raw_date).expect(&format!("@cells[0](date), context: {}", context));
         let raw_value = cells[2].inner_html();
-        let value = parse_f32_from_str(&raw_value, "cells[2]", context).unwrap();
+        let value = parse_f32_from_str(&raw_value)
+            .expect(&format!("@cells[2](value), context: {}", context));
         values.push(FundValueData {
             date,
             real_value: value,
