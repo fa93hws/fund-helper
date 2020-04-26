@@ -20,6 +20,11 @@ async fn main() {
                     .multiple(true),
             ),
         )
+        .subcommand(
+            SubCommand::with_name("db")
+                .about("database related execution")
+                .subcommand(SubCommand::with_name("init").about("initialize the database")),
+        )
         .get_matches();
 
     commands::main(matches);
