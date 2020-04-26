@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+#[cfg(test)]
 use mockall::mock;
 use reqwest;
 
@@ -30,6 +31,7 @@ impl IHttpService for HttpService {
     }
 }
 
+#[cfg(test)]
 mock! {
     pub HttpService {
         fn sync_get(&self, url: &str) -> Result<String, HttpError>;

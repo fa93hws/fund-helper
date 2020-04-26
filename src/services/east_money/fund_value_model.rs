@@ -147,7 +147,7 @@ mod test {
         let maybe_model = extract_fund_value(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
-            _ => (),
+            Err(e) => assert!(e.is_json_error()),
         }
     }
     #[test]
@@ -162,7 +162,7 @@ mod test {
         let maybe_model = extract_fund_value(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
-            _ => (),
+            Err(e) => assert!(e.is_type_error()),
         }
     }
     #[test]
@@ -175,7 +175,7 @@ mod test {
         let maybe_model = extract_fund_value(&raw_response, &context);
         match maybe_model {
             Ok(_) => panic!("it should fail"),
-            _ => (),
+            Err(e) => assert!(e.is_prefix_error()),
         }
     }
 }

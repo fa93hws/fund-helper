@@ -4,10 +4,34 @@ use std::fmt::{Debug, Display, Formatter, Result as fmtResult};
 type Value = serde_json::Value;
 
 use crate::utils::context::Context;
-pub trait DeserializationError: Error {}
+
+#[derive(PartialEq)]
+pub enum ErrorKind {
+    Prefix,
+    Json,
+    Type,
+}
+pub trait DeserializationError: Error + 'static {
+    fn get_type(&self) -> ErrorKind;
+}
+
+impl dyn DeserializationError {
+    #[cfg(test)]
+    pub fn is_json_error(&self) -> bool {
+        self.get_type() == ErrorKind::Json
+    }
+    #[cfg(test)]
+    pub fn is_prefix_error(&self) -> bool {
+        self.get_type() == ErrorKind::Prefix
+    }
+    #[cfg(test)]
+    pub fn is_type_error(&self) -> bool {
+        self.get_type() == ErrorKind::Type
+    }
+}
 
 #[derive(Debug)]
-struct JsonFormatError {
+pub struct JsonFormatError {
     context: String,
 }
 impl Display for JsonFormatError {
@@ -24,7 +48,11 @@ impl Error for JsonFormatError {
         None
     }
 }
-impl DeserializationError for JsonFormatError {}
+impl DeserializationError for JsonFormatError {
+    fn get_type(&self) -> ErrorKind {
+        ErrorKind::Json
+    }
+}
 
 #[derive(Debug)]
 pub struct WrongPrefixError {
@@ -45,7 +73,11 @@ impl Error for WrongPrefixError {
         None
     }
 }
-impl DeserializationError for WrongPrefixError {}
+impl DeserializationError for WrongPrefixError {
+    fn get_type(&self) -> ErrorKind {
+        ErrorKind::Prefix
+    }
+}
 
 #[derive(Debug)]
 pub struct TypeMismatchError {
@@ -68,7 +100,11 @@ impl Error for TypeMismatchError {
         None
     }
 }
-impl DeserializationError for TypeMismatchError {}
+impl DeserializationError for TypeMismatchError {
+    fn get_type(&self) -> ErrorKind {
+        ErrorKind::Type
+    }
+}
 
 pub fn parse_json_string(
     raw_json: &String,
@@ -170,10 +206,11 @@ mod test {
     use super::*;
     use crate::utils::context::DummyContext;
 
+    const CONTEXT: DummyContext = DummyContext {};
+
     #[test]
     fn test_parse_f32_from_str_pass() {
-        let context = DummyContext {};
-        let result = parse_f32_from_str("1.2150", "field", &context);
+        let result = parse_f32_from_str("1.2150", "field", &CONTEXT);
         match result {
             Ok(num) => assert_eq!(num, 1.2150),
             Err(_) => panic!("It should be parsed without error"),
@@ -182,8 +219,7 @@ mod test {
 
     #[test]
     fn test_parse_f32_from_str_fail() {
-        let context = DummyContext {};
-        let result = parse_f32_from_str("s1.2150", "number", &context);
+        let result = parse_f32_from_str("s1.2150", "number", &CONTEXT);
         match result {
             Ok(_) => panic!("It should not pass"),
             Err(e) => assert_eq!(
@@ -195,8 +231,7 @@ mod test {
 
     #[test]
     fn test_parse_date_string_pass() {
-        let context = DummyContext {};
-        let result = parse_date_string("1999-02-04", "birthday", &context);
+        let result = parse_date_string("1999-02-04", "birthday", &CONTEXT);
         match result {
             Ok(date) => assert_eq!(date, "1999-02-04"),
             Err(_) => panic!("It should parse date string correctly"),
@@ -205,8 +240,7 @@ mod test {
 
     #[test]
     fn test_parse_date_string_fail() {
-        let context = DummyContext {};
-        let result = parse_date_string("19999-02-04", "birthday", &context);
+        let result = parse_date_string("19999-02-04", "birthday", &CONTEXT);
         match result {
             Ok(_) => panic!("It should not pass"),
             Err(e) => assert_eq!(

@@ -63,6 +63,7 @@ pub fn extract_fund_list(
 #[cfg(test)]
 mod test {
     use super::*;
+    const CONTEXT: FetchListContext = FetchListContext {};
 
     #[test]
     fn test_extract_fund_list_pass() {
@@ -77,8 +78,7 @@ mod test {
                 name: String::from("华夏成长混合(后端)"),
             },
         ];
-        let context = FetchListContext {};
-        match extract_fund_list(&String::from(raw_response), &context) {
+        match extract_fund_list(&String::from(raw_response), &CONTEXT) {
             Ok(fund_list) => assert_eq!(fund_list, expected_fund_list),
             Err(_) => panic!("It should be parsed correctly"),
         }
@@ -87,30 +87,27 @@ mod test {
     #[test]
     fn test_extract_fund_list_wrong_id() {
         let raw_response = r#"var r = [[1,"HXCZHH","华夏成长混合","混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
-        let context = FetchListContext {};
-        match extract_fund_list(&String::from(raw_response), &context) {
+        match extract_fund_list(&String::from(raw_response), &CONTEXT) {
             Ok(_) => panic!("It should not be parsed correctly"),
-            Err(_) => (),
+            Err(e) => assert!(e.is_type_error()),
         }
     }
 
     #[test]
     fn test_extract_fund_list_wrong_name() {
         let raw_response = r#"var r = [["000001","HXCZHH",123,"混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
-        let context = FetchListContext {};
-        match extract_fund_list(&String::from(raw_response), &context) {
+        match extract_fund_list(&String::from(raw_response), &CONTEXT) {
             Ok(_) => panic!("It should not be parsed correctly"),
-            Err(_) => (),
+            Err(e) => assert!(e.is_type_error()),
         }
     }
 
     #[test]
     fn test_extract_fund_list_wrong_prefix() {
         let raw_response = r#"var rr = [["000001","HXCZHH",123,"混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
-        let context = FetchListContext {};
-        match extract_fund_list(&String::from(raw_response), &context) {
+        match extract_fund_list(&String::from(raw_response), &CONTEXT) {
             Ok(_) => panic!("It should not be parsed correctly"),
-            Err(_) => (),
+            Err(e) => assert!(e.is_prefix_error()),
         }
     }
 }
