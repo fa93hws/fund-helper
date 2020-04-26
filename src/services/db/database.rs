@@ -1,4 +1,4 @@
-use tokio_postgres::{NoTls, Error};
+use tokio_postgres::{Error, NoTls};
 
 pub struct DatabaseService {
     user: String,
@@ -32,8 +32,9 @@ impl DatabaseService {
         });
 
         // TODO: Inject sql content from init.sql
-        client.batch_execute(
-            r#"DROP TABLE IF EXISTS fund_net_values;
+        client
+            .batch_execute(
+                r#"DROP TABLE IF EXISTS fund_net_values;
             DROP TABLE IF EXISTS fund_info;
             
             CREATE TABLE fund_info (
@@ -52,7 +53,8 @@ impl DatabaseService {
             );
             CREATE INDEX fund_net_values_value_idx on fund_net_values(value);
             "#,
-        ).await?;
+            )
+            .await?;
         Ok(())
     }
 }
