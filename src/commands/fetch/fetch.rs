@@ -14,7 +14,7 @@ fn fetch_all(services: &Services) {
     println!("{:?}", list_result);
 }
 
-pub fn main(matches: &clap::ArgMatches<'_>, services: &Services) {
+pub(in crate::commands) fn main(matches: &clap::ArgMatches<'_>, services: &Services) {
     if !matches.is_present("fund-id") {
         fetch_all(&services);
     } else if let Some(ids) = matches.values_of("fund-id") {

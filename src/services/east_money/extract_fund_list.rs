@@ -1,9 +1,9 @@
-use super::super::deserializer::{
+use crate::models::fund_list::{FundList, FundListItem, FundType};
+use crate::utils::context::FetchListContext;
+use crate::utils::deserializer::{
     deserialize_array, deserialize_str, parse_json_string, DeserializationError, TypeMismatchError,
     WrongPrefixError,
 };
-use crate::models::fund_list::{FundList, FundListItem, FundType};
-use crate::utils::context::FetchListContext;
 use serde_json::Value;
 
 fn normalize_fund_type(
@@ -52,7 +52,7 @@ fn parse_json(
     parse_json_string(&raw_json, context)
 }
 
-pub fn extract_fund_list(
+pub(super) fn extract_fund_list(
     raw_response: &String,
     context: &FetchListContext,
 ) -> Result<FundList, Box<dyn DeserializationError>> {

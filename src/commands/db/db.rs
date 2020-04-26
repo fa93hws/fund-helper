@@ -8,7 +8,7 @@ fn init_db(services: &Services) {
     }
 }
 
-pub fn main(matches: &clap::ArgMatches<'_>, services: &Services) {
+pub(in crate::commands) fn main(matches: &clap::ArgMatches<'_>, services: &Services) {
     if let Some(_) = matches.subcommand_matches("init") {
         init_db(&services);
     }

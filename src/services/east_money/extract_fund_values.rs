@@ -1,12 +1,12 @@
 use scraper::{Html, Selector};
 use serde_json::Value;
 
-use super::super::deserializer::{
+use crate::models::fund_value::{FundValueData, FundValueModel};
+use crate::utils::context::FetchValueContext;
+use crate::utils::deserializer::{
     deserialize_str, deserialize_u64, parse_date_string, parse_f32_from_str, parse_json_string,
     DeserializationError, WrongPrefixError,
 };
-use crate::models::fund_value::{FundValueData, FundValueModel};
-use crate::utils::context::FetchValueContext;
 
 fn transfer_js_to_json(js: String, keys: Vec<&str>) -> String {
     let mut raw_json: String = js.to_string();
@@ -70,7 +70,7 @@ fn parse_values(
     Ok(values)
 }
 
-pub fn extract_fund_values(
+pub(super) fn extract_fund_values(
     raw_response: &String,
     context: &FetchValueContext,
 ) -> Result<FundValueModel, Box<dyn DeserializationError>> {

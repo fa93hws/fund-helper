@@ -1,2 +1,2 @@
 mod db;
-pub use db::main;
+pub(super) use db::main;
