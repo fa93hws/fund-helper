@@ -6,8 +6,8 @@ pub struct FundValueData {
 
 #[derive(Debug, PartialEq)]
 pub struct FundValueModel {
-    pub records: u64,
-    pub curpage: u64,
-    pub pages: u64,
+    pub records: usize,
+    pub curpage: usize,
+    pub pages: usize,
     pub values: Vec<FundValueData>,
 }
