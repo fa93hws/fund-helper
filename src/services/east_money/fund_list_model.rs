@@ -8,6 +8,11 @@ use serde_json::Value;
 #[derive(Debug, PartialEq)]
 pub enum FundType {
     Mix,
+    Bond,
+    Index,
+    QDII,
+    Stock,
+    NotInterested,
 }
 
 #[derive(Debug, PartialEq)]
@@ -17,8 +22,21 @@ pub struct FundListItem {
     typ: FundType,
 }
 
-fn normalize_fund_type(typ: &String) -> FundType {
-    FundType::Mix
+fn normalize_fund_type(typ: &String, context: &FetchListContext) -> Result<FundType, Box<dyn DeserializationError>> {
+    match &typ[..] {
+        "混合型" | "混合-FOF" => Ok(FundType::Mix),
+        "债券型" | "定开债券" | "债券指数" | "其他创新" | "股票-FOF" => Ok(FundType::Bond),
+        "联接基金" | "股票指数" | "QDII-指数" | "ETF-场内" | "QDII-ETF" => Ok(FundType::Index),
+        "QDII" => Ok(FundType::QDII),
+        "股票型" => Ok(FundType::Stock),
+        "货币型" | "固定收益" | "理财型" | "分级杠杆" | "保本型" => Ok(FundType::NotInterested),
+        _ => Err(Box::new(TypeMismatchError {
+            expected_type: String::from("fund type enum"),
+            got: String::from(typ),
+            field: String::from("cells[3]"),
+            context: format!("{}", context),
+        })),
+    }
 }
 
 pub type FundList = Vec<FundListItem>;
@@ -65,7 +83,8 @@ pub fn extract_fund_list(
         let id = deserialize_str(&tup[0], "0(fund-id)", context)?;
         let name = deserialize_str(&tup[2], "2(fund-name)", context)?;
         let typ = deserialize_str(&tup[3], "3(fund-type)", context)?;
-        list.push(FundListItem { id, name, typ: normalize_fund_type(&typ) });
+        let typ_enum = normalize_fund_type(&typ, context)?;
+        list.push(FundListItem { id, name, typ: typ_enum });
     }
 
     Ok(list)
