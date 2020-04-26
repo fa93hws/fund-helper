@@ -73,7 +73,7 @@ mod test {
         let result = parse_f32_from_str("s1.2150");
         match result {
             Ok(_) => panic!("It should not pass"),
-            Err(e) => assert_eq!(format!("{}", e), "Expect 'float32' but got 's1.2150'."),
+            Err(e) => assert_eq!(format!("{}", e), "Expect type 'float32' but got 's1.2150'."),
         }
     }
 
@@ -93,7 +93,7 @@ mod test {
             Ok(_) => panic!("It should not pass"),
             Err(e) => assert_eq!(
                 format!("{}", e),
-                "Expect 'yyyy-mm-dd' but got '19999-02-04'."
+                "Expect type 'yyyy-mm-dd' but got '19999-02-04'."
             ),
         }
     }

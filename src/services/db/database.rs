@@ -35,6 +35,8 @@ struct DockerYML {
 
 pub enum Environment {
     Prod,
+    // TODO Use Test enum
+    #[allow(dead_code)]
     Test,
 }
 pub struct DatabaseService {
