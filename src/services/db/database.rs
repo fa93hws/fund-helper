@@ -1,11 +1,11 @@
 use serde::Deserialize;
-use tokio_postgres::{Error, NoTls};
+use tokio_postgres::{Error, NoTls,Client};
 
 use crate::utils::context::DBInitializationContext;
 use crate::utils::deserializer::parse_usize_from_str;
 use crate::utils::local_io::read_file;
 
-const INIT_SQL_PATH: &str = "sqls/init.sql";
+const INIT_SQL_PATH: &str = "sqls/init.pgsql";
 
 #[derive(Debug, Deserialize)]
 struct DockerDBEnvironment {
@@ -45,6 +45,7 @@ pub struct DatabaseService {
     db_name: String,
     port: usize,
 }
+
 impl DatabaseService {
     pub fn new(env: Environment) -> Self {
         let content = read_file("docker-compose.yml").expect("failed to read docker compose file");
@@ -68,13 +69,15 @@ impl DatabaseService {
             port: port_number,
         }
     }
-    pub async fn init_db(&self) -> Result<(), Error> {
+}
+
+impl DatabaseService {
+    async fn connect(&self) -> Result<Client, Error> {
         let option = format!(
             "host=0.0.0.0 user={} password={} dbname={} port={}",
             self.user, self.password, self.db_name, self.port
         );
         let (client, connection) = tokio_postgres::connect(&option[..], NoTls).await?;
-
         // The connection object performs the actual communication with the database,
         // so spawn it off to run on its own.
         tokio::spawn(async move {
@@ -82,10 +85,18 @@ impl DatabaseService {
                 eprintln!("connection error: {}", e);
             }
         });
+        Ok(client)
+    }
 
+    pub async fn init_db(&self) -> Result<(), Error> {
+        let client = self.connect().await?;
         let sql_str = read_file(INIT_SQL_PATH).expect("Failed to read INIT_SQL_PATH");
-        client.batch_execute(&sql_str[..]).await?;
-        Ok(())
+        client.batch_execute(&sql_str[..]).await
+    }
+
+    pub async fn execute(&self, sql: &str) -> Result<(), Error> {
+        let client = self.connect().await?;
+        client.batch_execute(sql).await
     }
 }
 
