@@ -1,6 +1,4 @@
 use async_trait::async_trait;
-#[cfg(test)]
-use mockall::mock;
 use reqwest;
 
 pub struct HttpService {}
@@ -11,7 +9,7 @@ impl HttpService {
 }
 
 #[async_trait]
-pub trait IHttpService {
+pub trait CanGetHTTP {
     async fn get(&self, url: &str) -> Result<String, HttpError>;
 }
 
@@ -21,24 +19,13 @@ async fn unwrap_body(url: &str) -> Result<String, reqwest::Error> {
 }
 
 #[async_trait]
-impl IHttpService for HttpService {
+impl CanGetHTTP for HttpService {
     async fn get(&self, url: &str) -> Result<String, HttpError> {
         let body = unwrap_body(url).await;
         match body {
             Ok(result) => Ok(result),
             Err(_) => Err(create_unknown_error(None)),
         }
-    }
-}
-
-#[cfg(test)]
-mock! {
-    pub HttpService {
-        fn sync_get(&self, url: &str) -> Result<String, HttpError>;
-    }
-
-    trait Clone {
-        fn clone(&self) -> Self;
     }
 }
 
