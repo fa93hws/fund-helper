@@ -1,18 +1,18 @@
 use super::{extract_fund_list, extract_fund_values};
 use crate::models::fund_list::FundList;
 use crate::models::fund_value::FundValueModel;
-use crate::services::http::IHttpService;
+use crate::services::http::CanGetHTTP;
 use crate::utils::context::{FetchListContext, FetchValueContext};
 
 const FETCH_FUND_PREFIX: &str = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=";
 const FETCH_LIST_URL: &str = "http://fund.eastmoney.com/js/fundcode_search.js";
 
 pub struct EastMoneyService<'a> {
-    http_service: &'a dyn IHttpService,
+    http_service: &'a dyn CanGetHTTP,
 }
 
 impl EastMoneyService<'_> {
-    pub fn new(http_service: &dyn IHttpService) -> EastMoneyService {
+    pub fn new(http_service: &dyn CanGetHTTP) -> EastMoneyService {
         EastMoneyService { http_service }
     }
 }
@@ -43,39 +43,33 @@ impl EastMoneyService<'_> {
 
 #[cfg(test)]
 mod tests {
-    extern crate reqwest;
-
-    use crate::models::fund_value::{FundValueData, FundValueModel};
     use async_trait::async_trait;
     use futures::executor::block_on;
-    use std::sync::{Arc, Mutex};
 
     use super::EastMoneyService;
-    use crate::services::http::{create_unknown_error, HttpError, IHttpService, MockHttpService};
-
-    #[async_trait]
-    impl IHttpService for MockHttpService {
-        async fn get(&self, url: &str) -> Result<String, HttpError> {
-            self.sync_get(url)
-        }
-    }
+    use crate::models::fund_value::{FundValueData, FundValueModel};
+    use crate::services::http::{create_unknown_error, CanGetHTTP, HttpError};
 
     const FUND_ID: &str = "000123";
 
     #[test]
     fn test_fetch_success() {
-        let mut mock = MockHttpService::new();
-        let expect_url = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123";
-        let got_url_arc = Arc::new(Mutex::new(String::default()));
-        let got_url_arc_clone = Arc::clone(&got_url_arc);
-        let raw_response = String::from(
-            r#"var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-22</td><td class='tor bold'>3.8360</td><td class='tor bold'>3.8360</td><td class='tor bold red'>2.48%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-21</td><td class='tor bold'>3.7430</td><td class='tor bold'>3.7430</td><td class='tor bold grn'>-1.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-20</td><td class='tor bold'>3.7810</td><td class='tor bold'>3.7810</td><td class='tor bold red'>0.43%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></table>",records:2102,pages:211,curpage:1};"#,
-        );
-        mock.expect_sync_get().returning(move |url| {
-            let mut data = got_url_arc_clone.lock().unwrap();
-            *data = url.to_string();
-            Ok(raw_response.clone())
-        });
+        struct FakeHttpService {}
+        #[async_trait]
+        impl CanGetHTTP for FakeHttpService {
+            async fn get(&self, url: &str) -> Result<String, HttpError> {
+                let raw_response = String::from(
+                    r#"var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-22</td><td class='tor bold'>3.8360</td><td class='tor bold'>3.8360</td><td class='tor bold red'>2.48%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-21</td><td class='tor bold'>3.7430</td><td class='tor bold'>3.7430</td><td class='tor bold grn'>-1.01%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-20</td><td class='tor bold'>3.7810</td><td class='tor bold'>3.7810</td><td class='tor bold red'>0.43%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></table>",records:2102,pages:211,curpage:1};"#,
+                );
+                assert_eq!(
+                    url,
+                    "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123"
+                );
+                Ok(raw_response)
+            }
+        }
+
+        let http_service = FakeHttpService {};
         let expected_fund_value_model = FundValueModel {
             curpage: 1,
             pages: 211,
@@ -103,9 +97,8 @@ mod tests {
                 },
             ],
         };
-        let east_money_service = EastMoneyService::new(&mock);
+        let east_money_service = EastMoneyService::new(&http_service);
         let model = block_on(east_money_service.fetch_value(FUND_ID));
-        assert_eq!(*got_url_arc.lock().unwrap(), expect_url);
         assert_eq!(model, expected_fund_value_model);
     }
 
@@ -114,10 +107,16 @@ mod tests {
         expected = "failed to fetch url http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123"
     )]
     fn test_fetch_fail() {
-        let mut mock = MockHttpService::new();
-        let err = create_unknown_error(None);
-        mock.expect_sync_get().return_const(Err(err));
-        let east_money_service = EastMoneyService::new(&mock);
+        struct FakeHttpService {}
+        #[async_trait]
+        impl CanGetHTTP for FakeHttpService {
+            async fn get(&self, _: &str) -> Result<String, HttpError> {
+                Err(create_unknown_error(None))
+            }
+        }
+
+        let http_service = FakeHttpService {};
+        let east_money_service = EastMoneyService::new(&http_service);
         block_on(east_money_service.fetch_value(FUND_ID));
     }
 }

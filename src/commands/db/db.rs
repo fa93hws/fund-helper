@@ -1,4 +1,4 @@
-use crate::services::database::{DatabaseService, Environment};
+use crate::services::database::{CanInitDB, DatabaseService, Environment};
 
 async fn init_db() {
     let database_service = DatabaseService::new(Environment::Prod);

@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use serde::Deserialize;
 use tokio_postgres::{Client, Error, NoTls};
 
@@ -87,14 +88,28 @@ impl DatabaseService {
         });
         Ok(client)
     }
+}
 
-    pub async fn init_db(&self) -> Result<(), Error> {
+#[async_trait]
+pub trait CanInitDB {
+    async fn init_db(&self) -> Result<(), Error>;
+}
+#[async_trait]
+impl CanInitDB for DatabaseService {
+    async fn init_db(&self) -> Result<(), Error> {
         let client = self.connect().await?;
         let sql_str = read_file(INIT_SQL_PATH).expect("Failed to read INIT_SQL_PATH");
         client.batch_execute(&sql_str[..]).await
     }
+}
 
-    pub async fn execute(&self, sql: &str) -> Result<(), Error> {
+#[async_trait]
+pub trait CanExecuteSQL {
+    async fn execute(&self, sql: &str) -> Result<(), Error>;
+}
+#[async_trait]
+impl CanExecuteSQL for DatabaseService {
+    async fn execute(&self, sql: &str) -> Result<(), Error> {
         let client = self.connect().await?;
         client.batch_execute(sql).await
     }

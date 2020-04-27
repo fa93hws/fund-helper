@@ -1,4 +1,4 @@
-use crate::services::database::DatabaseService;
+use crate::services::database::CanExecuteSQL;
 
 const TABLE_NAME: &str = "fund_info";
 const MIX_TYPE_NAME: &str = "混合";
@@ -51,11 +51,11 @@ pub struct FundListItem {
 pub type FundList = Vec<FundListItem>;
 
 pub struct FundListDAO<'a> {
-    data_base_service: &'a DatabaseService,
+    data_base_service: &'a dyn CanExecuteSQL,
 }
 
 impl<'a> FundListDAO<'a> {
-    pub fn new(data_base_service: &'a DatabaseService) -> Self {
+    pub fn new(data_base_service: &'a dyn CanExecuteSQL) -> Self {
         FundListDAO { data_base_service }
     }
 }
@@ -73,10 +73,51 @@ impl<'a> FundListDAO<'a> {
                 )
             })
             .collect();
-        let sql = format!("{}{}", insert_sql_prefix, value_parts.join(","));
+        let sql = format!("{}{};", insert_sql_prefix, value_parts.join(","));
         match self.data_base_service.execute(&sql).await {
             Err(e) => panic!("{:?}", e),
             _ => (),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use async_trait::async_trait;
+    use futures::executor::block_on;
+    use tokio_postgres::Error;
+
+    #[test]
+    fn test_insert_into_db_sql_text() {
+        struct FakeDBService {}
+        #[async_trait]
+        impl CanExecuteSQL for FakeDBService {
+            async fn execute(&self, sql: &str) -> Result<(), Error> {
+                assert_eq!(
+                    sql,
+                    "INSERT INTO fund_info (id, name, type) VALUES ('000001', 'guming', '指数'),('000011', 'chenwenxin', '股票');"
+                );
+                Ok(())
+            }
+        }
+
+        let data_base_service = FakeDBService {};
+        let fund_list_dao = FundListDAO {
+            data_base_service: &data_base_service,
+        };
+        let fund_list: FundList = vec![
+            FundListItem {
+                id: "000001".to_string(),
+                name: "guming".to_string(),
+                typ: FundType::Index,
+            },
+            FundListItem {
+                id: "000011".to_string(),
+                name: "chenwenxin".to_string(),
+                typ: FundType::Stock,
+            },
+        ];
+        block_on(fund_list_dao.insert_into_db(&fund_list));
     }
 }
