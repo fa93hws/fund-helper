@@ -6,7 +6,7 @@ use crate::utils::context::DBInitializationContext;
 use crate::utils::deserializer::parse_usize_from_str;
 use crate::utils::local_io::read_file;
 
-const INIT_SQL_PATH: &str = "sqls/init.pgsql";
+const INIT_SQL_PATH: &str = "sqls/init.sql";
 
 #[derive(Debug, Deserialize)]
 struct DockerDBEnvironment {

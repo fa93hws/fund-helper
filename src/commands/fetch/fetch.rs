@@ -14,7 +14,7 @@ async fn fetch_one(id: &str) {
 }
 
 async fn fetch_all() {
-    println!("fetching all!");
+    println!("fetching list");
     let http_service = HttpService::new();
     let east_money_service = EastMoneyService::new(&http_service);
     let database_service = DatabaseService::new(Environment::Prod);
@@ -22,6 +22,7 @@ async fn fetch_all() {
     let fund_service = FundListService::new(&east_money_service, &fund_list_dao);
 
     let fund_list = fund_service.fetch().await;
+    println!("list fetched");
     fund_service.write_to_db(&fund_list).await;
 }
 

@@ -73,7 +73,7 @@ impl<'a> FundListDAO<'a> {
                 )
             })
             .collect();
-        let sql = format!("{}{};", insert_sql_prefix, value_parts.join(","));
+        let sql = format!("{}{} ON CONFLICT (id) DO NOTHING;", insert_sql_prefix, value_parts.join(","));
         match self.data_base_service.execute(&sql).await {
             Err(e) => panic!("{:?}", e),
             _ => (),
@@ -96,7 +96,7 @@ mod test {
             async fn execute(&self, sql: &str) -> Result<(), Error> {
                 assert_eq!(
                     sql,
-                    "INSERT INTO fund_info (id, name, type) VALUES ('000001', 'guming', '指数'),('000011', 'chenwenxin', '股票');"
+                    "INSERT INTO fund_info (id, name, type) VALUES ('000001', 'guming', '指数'),('000011', 'chenwenxin', '股票') ON CONFLICT (id) DO NOTHING;"
                 );
                 Ok(())
             }
