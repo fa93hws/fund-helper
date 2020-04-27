@@ -1,5 +1,6 @@
 extern crate clap;
 extern crate std;
+use futures::executor::block_on;
 
 use clap::{App, Arg, SubCommand};
 
@@ -28,5 +29,5 @@ async fn main() {
         )
         .get_matches();
 
-    commands::main(matches);
+    block_on(commands::main(matches));
 }
