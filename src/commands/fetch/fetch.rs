@@ -1,26 +1,36 @@
-use crate::commands::Services;
-use futures::executor::block_on;
+use crate::models::fund_list::FundListDAO;
+use crate::services::database::{DatabaseService, Environment};
+use crate::services::east_money::EastMoneyService;
+use crate::services::http::HttpService;
+use crate::services::{FundListService, FundValueService};
 
-fn fetch_one(id: &str, services: &Services) {
+async fn fetch_one(id: &str) {
     println!("fetching fund: {}", id);
-    let result = services.east_money_service.fetch_value(id);
-    let fund_value_model = block_on(result);
-    println!("{:?}", fund_value_model);
+    let http_service = HttpService::new();
+    let east_money_service = EastMoneyService::new(&http_service);
+    let fund_value_service = FundValueService::new(&east_money_service);
+
+    fund_value_service.fetch(id, 1).await;
 }
 
-fn fetch_all(services: &Services) {
+async fn fetch_all() {
     println!("fetching all!");
-    let list_result = block_on(services.east_money_service.fetch_list());
-    block_on(services.fund_list_dao.insert_into_db(&list_result));
-    println!("{:?}", list_result);
+    let http_service = HttpService::new();
+    let east_money_service = EastMoneyService::new(&http_service);
+    let database_service = DatabaseService::new(Environment::Prod);
+    let fund_list_dao = FundListDAO::new(&database_service);
+    let fund_service = FundListService::new(&east_money_service, &fund_list_dao);
+
+    let fund_list = fund_service.fetch().await;
+    fund_service.write_to_db(&fund_list).await;
 }
 
-pub(in crate::commands) fn main(matches: &clap::ArgMatches<'_>, services: &Services) {
+pub(in crate::commands) async fn main(matches: &clap::ArgMatches<'_>) {
     if !matches.is_present("fund-id") {
-        fetch_all(&services);
+        fetch_all().await;
     } else if let Some(ids) = matches.values_of("fund-id") {
         for id in ids {
-            fetch_one(id, &services);
+            fetch_one(id).await;
         }
     }
 }

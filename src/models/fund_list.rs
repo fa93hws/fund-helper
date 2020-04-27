@@ -1,5 +1,4 @@
 use crate::services::database::DatabaseService;
-use std::error::Error;
 
 const TABLE_NAME: &str = "fund_info";
 const MIX_TYPE_NAME: &str = "混合";

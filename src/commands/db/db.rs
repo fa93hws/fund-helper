@@ -1,15 +1,13 @@
-use crate::commands::Services;
-use futures::executor::block_on;
+use crate::services::database::{DatabaseService, Environment};
 
-fn init_db(services: &Services) {
-    match block_on(services.database_service.init_db()) {
-        Ok(_) => println!("database initialized"),
-        Err(e) => panic!("{:?}", e),
-    }
+async fn init_db() {
+    let database_service = DatabaseService::new(Environment::Prod);
+
+    database_service.init_db().await.unwrap();
 }
 
-pub(in crate::commands) fn main(matches: &clap::ArgMatches<'_>, services: &Services) {
+pub(in crate::commands) async fn main(matches: &clap::ArgMatches<'_>) {
     if let Some(_) = matches.subcommand_matches("init") {
-        init_db(&services);
+        init_db().await;
     }
 }
