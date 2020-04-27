@@ -73,7 +73,11 @@ impl<'a> FundListDAO<'a> {
                 )
             })
             .collect();
-        let sql = format!("{}{} ON CONFLICT (id) DO NOTHING;", insert_sql_prefix, value_parts.join(","));
+        let sql = format!(
+            "{}{} ON CONFLICT (id) DO NOTHING;",
+            insert_sql_prefix,
+            value_parts.join(",")
+        );
         match self.data_base_service.execute(&sql).await {
             Err(e) => panic!("{:?}", e),
             _ => (),
