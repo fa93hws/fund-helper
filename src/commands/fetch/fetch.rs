@@ -11,6 +11,7 @@ fn fetch_one(id: &str, services: &Services) {
 fn fetch_all(services: &Services) {
     println!("fetching all!");
     let list_result = block_on(services.east_money_service.fetch_list());
+    block_on(services.fund_list_dao.insert_into_db(&list_result));
     println!("{:?}", list_result);
 }
 
