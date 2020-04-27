@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use tokio_postgres::{Error, NoTls,Client};
+use tokio_postgres::{Client, Error, NoTls};
 
 use crate::utils::context::DBInitializationContext;
 use crate::utils::deserializer::parse_usize_from_str;

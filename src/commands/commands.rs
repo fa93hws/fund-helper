@@ -1,8 +1,8 @@
 use super::{db, fetch};
+use crate::models::fund_list::FundListDAO;
 use crate::services::database::{DatabaseService, Environment};
 use crate::services::east_money::EastMoneyService;
 use crate::services::http::HttpService;
-use crate::models::fund_list::FundListDAO;
 
 // TODO Refactor the services to be more proper
 pub(super) struct Services<'a> {

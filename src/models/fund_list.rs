@@ -1,5 +1,5 @@
-use std::error::Error;
 use crate::services::database::DatabaseService;
+use std::error::Error;
 
 const TABLE_NAME: &str = "fund_info";
 const MIX_TYPE_NAME: &str = "混合";
@@ -51,7 +51,6 @@ pub struct FundListItem {
 
 pub type FundList = Vec<FundListItem>;
 
-
 pub struct FundListDAO<'a> {
     data_base_service: &'a DatabaseService,
 }
@@ -65,14 +64,20 @@ impl<'a> FundListDAO<'a> {
 impl<'a> FundListDAO<'a> {
     pub async fn insert_into_db(&self, fund_list: &FundList) {
         let insert_sql_prefix = format!("INSERT INTO {} (id, name, type) VALUES ", TABLE_NAME);
-        let value_parts: Vec<String> = fund_list.into_iter().map(|fund_info_item| {
-            let fund_type_name = to_type_name(&fund_info_item.typ);
-            format!("('{}', '{}', '{}')", fund_info_item.id, fund_info_item.name, fund_type_name)
-        }).collect();
+        let value_parts: Vec<String> = fund_list
+            .into_iter()
+            .map(|fund_info_item| {
+                let fund_type_name = to_type_name(&fund_info_item.typ);
+                format!(
+                    "('{}', '{}', '{}')",
+                    fund_info_item.id, fund_info_item.name, fund_type_name
+                )
+            })
+            .collect();
         let sql = format!("{}{}", insert_sql_prefix, value_parts.join(","));
         match self.data_base_service.execute(&sql).await {
             Err(e) => panic!("{:?}", e),
             _ => (),
         }
-    }   
+    }
 }
