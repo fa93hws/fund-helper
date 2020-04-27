@@ -48,7 +48,10 @@ fn parse_values(html: &str, context: &FetchValueContext) -> Vec<FundValueData> {
     let row_selector = Selector::parse("tr").unwrap();
     let cell_selector = Selector::parse("td").unwrap();
     let mut values: Vec<FundValueData> = vec![];
-    let rows = fragment.select(&row_selector);
+    let rows: Vec<scraper::element_ref::ElementRef> = fragment.select(&row_selector).collect();
+    if rows.len() == 0 {
+        panic!("No tr found in html. Context: {}", context);
+    }
     for tr in rows {
         let cells = tr.select(&cell_selector).collect::<Vec<_>>();
         if cells.len() == 0 {
@@ -67,9 +70,6 @@ fn parse_values(html: &str, context: &FetchValueContext) -> Vec<FundValueData> {
             date,
             real_value: value,
         })
-    }
-    if values.len() == 0 {
-        panic!("No tr found in html. Context: {}", context);
     }
     values
 }
