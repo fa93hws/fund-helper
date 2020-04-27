@@ -28,7 +28,7 @@ fn parse_json(raw_response: &String, context: &FetchValueContext) -> RawJsonResp
     match raw_response.find(prefix) {
         Some(start) => start_index = start + prefix.len(),
         None => panic!(
-            "prefix is wrong, expect 'var apidata='. Context: {:}",
+            "prefix is wrong, expect 'var apidata='. Context: {}",
             context
         ),
     }
@@ -49,8 +49,8 @@ fn parse_values(html: &str, context: &FetchValueContext) -> Vec<FundValueData> {
     let cell_selector = Selector::parse("td").unwrap();
     let mut values: Vec<FundValueData> = vec![];
     let rows: Vec<scraper::element_ref::ElementRef> = fragment.select(&row_selector).collect();
-    if rows.len() == 0 {
-        panic!("No tr found in html. Context: {}", context);
+    if rows.len() < 2 {
+        panic!("Less than 2 tr found in html. Context: {}", context);
     }
     for tr in rows {
         let cells = tr.select(&cell_selector).collect::<Vec<_>>();
@@ -120,8 +120,11 @@ mod test {
         let model = extract_fund_values(&raw_response, &context);
         assert_eq!(model, expected_fund_value_model);
     }
+
     #[test]
-    #[should_panic]
+    #[should_panic(
+        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0: Error(\"expected value\", line: 1, column: 13)"
+    )]
     fn test_deserialize_fund_value_with_json_error() {
         let raw_response = String::from(
             r#"var apidata={ content:json content,records:2102,pages:211,curpage:1};"#,
@@ -132,8 +135,11 @@ mod test {
         };
         extract_fund_values(&raw_response, &context);
     }
+
     #[test]
-    #[should_panic]
+    #[should_panic(
+        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0: Error(\"invalid type: string \\\"2102\\\", expected usize\", line: 1, column: 44)"
+    )]
     fn test_deserialize_fund_value_with_type_error() {
         let raw_response = String::from(
             r#"var apidata={ content: "json content",records:"2102",pages:211,curpage:1};"#,
@@ -144,8 +150,11 @@ mod test {
         };
         extract_fund_values(&raw_response, &context);
     }
+
     #[test]
-    #[should_panic]
+    #[should_panic(
+        expected = "Less than 2 tr found in html. Context: command: fetch fund value. fund-id: id, page-number: 0"
+    )]
     fn test_deserialize_fund_value_with_wrong_html() {
         let raw_response = String::from(
             r#"var apidata={ content: "json content",records:2102,pages:211,curpage:1};"#,
@@ -156,8 +165,11 @@ mod test {
         };
         extract_fund_values(&raw_response, &context);
     }
+
     #[test]
-    #[should_panic]
+    #[should_panic(
+        expected = "prefix is wrong, expect 'var apidata='. Context: command: fetch fund value. fund-id: id, page-number: 0"
+    )]
     fn test_deserialize_fund_value_with_wrong_response() {
         let raw_response = String::from("var _apidata={};");
         let context = FetchValueContext {
