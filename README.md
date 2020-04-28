@@ -1,4 +1,4 @@
-![GithubCI](https://github.com/fa93hws/fund-helper/workflows/build/badge.svg)
+![GithubCI](https://github.com/fa93hws/fund-helper/workflows/Rust/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # fund-helper
