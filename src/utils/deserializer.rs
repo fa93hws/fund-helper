@@ -1,6 +1,6 @@
+use chrono::NaiveDate;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter, Result as fmtResult};
-use chrono::NaiveDate;
 
 #[derive(Debug)]
 pub struct TypeMismatchError {
