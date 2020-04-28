@@ -1,6 +1,6 @@
-use regex::Regex;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter, Result as fmtResult};
+use chrono::NaiveDate;
 
 #[derive(Debug)]
 pub struct TypeMismatchError {
@@ -43,15 +43,13 @@ pub fn parse_usize_from_str(string: &str) -> Result<usize, TypeMismatchError> {
 }
 
 // date_string is assumed to be in yyyy-mm-dd
-pub fn parse_date_string(date_string: &str) -> Result<String, TypeMismatchError> {
-    let re = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
-    if re.is_match(date_string) {
-        Ok(date_string.to_string())
-    } else {
-        Err(TypeMismatchError {
+pub fn parse_date_string(date_string: &str) -> Result<i64, TypeMismatchError> {
+    match NaiveDate::parse_from_str(date_string, "%Y-%m-%d") {
+        Ok(date) => Ok(date.and_hms(0, 0, 0).timestamp()),
+        Err(_) => Err(TypeMismatchError {
             expected_type: String::from("yyyy-mm-dd"),
             got: date_string.to_string(),
-        })
+        }),
     }
 }
 
@@ -81,7 +79,7 @@ mod test {
     fn test_parse_date_string_pass() {
         let result = parse_date_string("1999-02-04");
         match result {
-            Ok(date) => assert_eq!(date, "1999-02-04"),
+            Ok(date) => assert_eq!(date, 918086400),
             Err(_) => panic!("It should parse date string correctly"),
         }
     }

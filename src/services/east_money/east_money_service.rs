@@ -76,23 +76,28 @@ mod tests {
             records: 2102,
             values: vec![
                 FundValueData {
-                    date: String::from("2020-04-24"),
+                    // 2020-04-24,
+                    date: 1587711600,
                     real_value: 3.7510,
                 },
                 FundValueData {
-                    date: String::from("2020-04-23"),
+                    // 2020-04-23,
+                    date: 1587625200,
                     real_value: 3.7950,
                 },
                 FundValueData {
-                    date: String::from("2020-04-22"),
+                    // 2020-04-22,
+                    date: 1587538800,
                     real_value: 3.8360,
                 },
                 FundValueData {
-                    date: String::from("2020-04-21"),
+                    // 2020-04-21,
+                    date: 1587452400,
                     real_value: 3.7430,
                 },
                 FundValueData {
-                    date: String::from("2020-04-20"),
+                    // 2020-04-20,
+                    date: 1587366000,
                     real_value: 3.7810,
                 },
             ],
