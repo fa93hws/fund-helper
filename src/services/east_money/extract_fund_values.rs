@@ -63,11 +63,13 @@ fn parse_values(html: &str, context: &FetchValueContext) -> Vec<FundValueData> {
         let raw_date = cells[0].inner_html();
         let date =
             parse_date_string(&raw_date).expect(&format!("@cells[0](date), context: {}", context));
+        // The market closed at 3 P.M. Time zone is GMT + 8
+        let market_end_date = date + 15 * 3600 - 8 * 3600;
         let raw_value = cells[2].inner_html();
         let value = parse_f32_from_str(&raw_value)
             .expect(&format!("@cells[2](value), context: {}", context));
         values.push(FundValueData {
-            date,
+            date: market_end_date,
             real_value: value,
         })
     }
@@ -104,11 +106,13 @@ mod test {
             records: 2102,
             values: vec![
                 FundValueData {
-                    date: String::from("2020-04-24"),
+                    // 2020-04-24
+                    date: 1587711600,
                     real_value: 3.7510,
                 },
                 FundValueData {
-                    date: String::from("2020-04-23"),
+                    // 2020-04-23
+                    date: 1587625200,
                     real_value: 3.7950,
                 },
             ],
