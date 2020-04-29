@@ -1,5 +1,5 @@
-use serde::Deserialize;
 use postgres::{Client, Error, NoTls};
+use serde::Deserialize;
 
 use crate::utils::context::DBInitializationContext;
 use crate::utils::deserializer::parse_usize_from_str;

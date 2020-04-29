@@ -1,8 +1,7 @@
 use reqwest::blocking;
 use reqwest::Error;
 
-pub struct HttpService {
-}
+pub struct HttpService {}
 impl HttpService {
     pub fn new() -> HttpService {
         HttpService {}

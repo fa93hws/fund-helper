@@ -1,6 +1,6 @@
+use super::FundValueResponse;
 use super::{extract_fund_list, extract_fund_values};
 use crate::models::fund_list::FundList;
-use super::FundValueResponse;
 use crate::services::http::CanGetHTTP;
 use crate::utils::context::{FetchListContext, FetchValueContext};
 
@@ -20,7 +20,10 @@ impl EastMoneyService<'_> {
 impl EastMoneyService<'_> {
     pub fn fetch_value(&self, id: &str, page: usize) -> FundValueResponse {
         println!("fetching {}@page{}", id, page);
-        let url = format!("{}?type=lsjz&code={}&page={}&per=20", FETCH_FUND_PREFIX, id, page);
+        let url = format!(
+            "{}?type=lsjz&code={}&page={}&per=20",
+            FETCH_FUND_PREFIX, id, page
+        );
         let http_result = self.http_service.get(&url);
         println!("got responses for {}@page{}", id, page);
         let context = FetchValueContext {
