@@ -61,7 +61,7 @@ impl<'a> FundListDAO<'a> {
 }
 
 impl<'a> FundListDAO<'a> {
-    pub async fn insert_into_db(&self, fund_list: &FundList) {
+    pub fn insert_into_db(&self, fund_list: &FundList) {
         let insert_sql_prefix = format!("INSERT INTO {} (id, name, type) VALUES ", TABLE_NAME);
         let value_parts: Vec<String> = fund_list
             .into_iter()
@@ -78,7 +78,7 @@ impl<'a> FundListDAO<'a> {
             insert_sql_prefix,
             value_parts.join(",")
         );
-        match self.data_base_service.execute(&sql).await {
+        match self.data_base_service.execute(&sql) {
             Err(e) => panic!("{:?}", e),
             _ => (),
         }
@@ -88,16 +88,13 @@ impl<'a> FundListDAO<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use async_trait::async_trait;
-    use futures::executor::block_on;
-    use tokio_postgres::Error;
+    use postgres::Error;
 
     #[test]
     fn test_insert_into_db_sql_text() {
         struct FakeDBService {}
-        #[async_trait]
         impl CanExecuteSQL for FakeDBService {
-            async fn execute(&self, sql: &str) -> Result<(), Error> {
+            fn execute(&self, sql: &str) -> Result<(), Error> {
                 assert_eq!(
                     sql,
                     "INSERT INTO fund_info (id, name, type) VALUES ('000001', 'guming', '指数'),('000011', 'chenwenxin', '股票') ON CONFLICT (id) DO NOTHING;"
@@ -122,6 +119,6 @@ mod test {
                 typ: FundType::Stock,
             },
         ];
-        block_on(fund_list_dao.insert_into_db(&fund_list));
+        fund_list_dao.insert_into_db(&fund_list);
     }
 }

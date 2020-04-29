@@ -1,7 +1,7 @@
 use scraper::{Html, Selector};
 use serde::Deserialize;
 
-use crate::models::fund_value::{FundValueData, FundValueModel};
+use crate::models::fund_value::FundValueData;
 use crate::utils::context::FetchValueContext;
 use crate::utils::deserializer::{parse_date_string, parse_f32_from_str};
 
@@ -11,6 +11,14 @@ struct RawJsonResponse {
     records: usize,
     pages: usize,
     curpage: usize,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct FundValueResponse {
+    pub records: usize,
+    pub curpage: usize,
+    pub pages: usize,
+    pub values: Vec<FundValueData>,
 }
 
 fn transfer_js_to_json(js: String, keys: Vec<&str>) -> String {
@@ -79,11 +87,11 @@ fn parse_values(html: &str, context: &FetchValueContext) -> Vec<FundValueData> {
 pub(super) fn extract_fund_values(
     raw_response: &String,
     context: &FetchValueContext,
-) -> FundValueModel {
+) -> FundValueResponse {
     let raw_json_response = parse_json(&raw_response, context);
     let html_content = raw_json_response.content;
     let values = parse_values(&html_content, context);
-    FundValueModel {
+    FundValueResponse {
         records: raw_json_response.records,
         curpage: raw_json_response.curpage,
         pages: raw_json_response.pages,
@@ -100,7 +108,7 @@ mod test {
         let raw_response = String::from(
             r#"var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></tbody></table>",records:2102,pages:211,curpage:1};"#,
         );
-        let expected_fund_value_model = FundValueModel {
+        let expected_fund_value_model = FundValueResponse {
             curpage: 1,
             pages: 211,
             records: 2102,
@@ -127,7 +135,7 @@ mod test {
 
     #[test]
     #[should_panic(
-        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0: Error(\"expected value\", line: 1, column: 13)"
+        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0"
     )]
     fn test_deserialize_fund_value_with_json_error() {
         let raw_response = String::from(
@@ -142,7 +150,7 @@ mod test {
 
     #[test]
     #[should_panic(
-        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0: Error(\"invalid type: string \\\"2102\\\", expected usize\", line: 1, column: 44)"
+        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 2"
     )]
     fn test_deserialize_fund_value_with_type_error() {
         let raw_response = String::from(
@@ -150,7 +158,7 @@ mod test {
         );
         let context = FetchValueContext {
             id: String::from("id"),
-            page: 0,
+            page: 2,
         };
         extract_fund_values(&raw_response, &context);
     }

@@ -1,4 +1,4 @@
-use crate::models::fund_value::FundValueModel;
+use crate::models::fund_value::FundValueData;
 use crate::services::east_money::EastMoneyService;
 
 pub struct FundValueService<'a> {
@@ -12,7 +12,13 @@ impl<'a> FundValueService<'a> {
 }
 
 impl<'a> FundValueService<'a> {
-    pub async fn fetch(&self, id: &str, _: usize) -> FundValueModel {
-        self.east_money_service.fetch_value(id).await
+    pub fn fetch(&self, id: &str, _: usize) -> Vec<FundValueData> {
+        // TODO Change to multithreading
+        let pages = self.east_money_service.fetch_value(id, 1).pages;
+        let values = (1..=pages).fold(vec![], |mut acc, page| {
+            acc.extend(self.east_money_service.fetch_value(id, page).values);
+            acc
+        });
+        values
     }
 }

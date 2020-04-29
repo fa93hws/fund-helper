@@ -1,5 +1,5 @@
-use async_trait::async_trait;
-use reqwest;
+use reqwest::blocking;
+use reqwest::Error;
 
 pub struct HttpService {}
 impl HttpService {
@@ -8,23 +8,24 @@ impl HttpService {
     }
 }
 
-#[async_trait]
 pub trait CanGetHTTP {
-    async fn get(&self, url: &str) -> Result<String, HttpError>;
+    fn get(&self, url: &str) -> Result<String, HttpError>;
 }
 
-async fn unwrap_body(url: &str) -> Result<String, reqwest::Error> {
-    let text = reqwest::get(url).await?.text().await?;
+fn unwrap_body(url: &str) -> Result<String, Error> {
+    let text = blocking::get(url)?.text()?;
     Ok(text)
 }
 
-#[async_trait]
 impl CanGetHTTP for HttpService {
-    async fn get(&self, url: &str) -> Result<String, HttpError> {
-        let body = unwrap_body(url).await;
+    fn get(&self, url: &str) -> Result<String, HttpError> {
+        let body = unwrap_body(url);
         match body {
             Ok(result) => Ok(result),
-            Err(_) => Err(create_unknown_error(None)),
+            Err(_) => {
+                println!("error!");
+                Err(create_unknown_error(None))
+            }
         }
     }
 }
