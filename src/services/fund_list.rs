@@ -1,4 +1,4 @@
-use crate::models::fund_list::{FundList, FundListDAO};
+use crate::models::fund_list::{FundList, FundListDAO, FundListItem};
 use crate::services::east_money::EastMoneyService;
 
 pub struct FundListService<'a> {
@@ -25,5 +25,9 @@ impl<'a> FundListService<'a> {
             Ok(_) => (),
             Err(e) => panic!("{:?}", e),
         };
+    }
+
+    pub async fn find_fund_info(&self, id: &str) -> FundListItem {
+        self.fund_list_dao.query_fund_with_id(id).await.unwrap()
     }
 }

@@ -96,13 +96,36 @@ impl<'a> FundListDAO<'a> {
 
         self.data_base_service.execute(&sql, &params).await
     }
+
+    pub async fn query_fund_with_id(&self, id: &str) -> Result<FundListItem, Error> {
+        let row_result = self
+            .data_base_service
+            .query_one(
+                &format!("SELECT name, type from {} WHERE id = $1", TABLE_NAME),
+                &[&id],
+            )
+            .await;
+        match row_result {
+            Ok(row) => {
+                let name: String = row.get("name");
+                let typ_str: &str = row.get("type");
+                let typ_enum = to_type_enum(typ_str);
+                Ok(FundListItem {
+                    id: id.to_string(),
+                    name,
+                    typ: typ_enum,
+                })
+            }
+            Err(e) => Err(e),
+        }
+    }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use async_trait::async_trait;
-    use tokio_postgres::Error;
+    use tokio_postgres::{Error, Row};
 
     #[tokio::main]
     #[test]
@@ -129,6 +152,13 @@ mod test {
                 }
                 Ok(1)
             }
+            async fn query_one(
+                &self,
+                _sql: &str,
+                _param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Row, Error> {
+                panic!("It should not be called")
+            }
         }
 
         let data_base_service = FakeDBService {};
@@ -151,5 +181,33 @@ mod test {
             Ok(_) => (),
             Err(_) => panic!("it should not throw"),
         };
+    }
+
+    #[tokio::main]
+    #[test]
+    #[should_panic(expected = "this is expected")]
+    async fn test_query_fund_with_id_sql_test() {
+        struct FakeDBService {}
+        #[async_trait]
+        impl CanExecuteSQL for FakeDBService {
+            async fn execute(&self, _: &str, __: &[&(dyn ToSql + Sync)]) -> Result<u64, Error> {
+                Ok(1)
+            }
+            async fn query_one(
+                &self,
+                sql: &str,
+                param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Row, Error> {
+                assert_eq!(sql, "SELECT name, type from fund_info WHERE id = $1");
+                assert_eq!(format!("{:?}", param[0]), "\"123456\"");
+                panic!("this is expected")
+            }
+        }
+
+        let data_base_service = FakeDBService {};
+        let fund_list_dao = FundListDAO {
+            data_base_service: &data_base_service,
+        };
+        let _ = fund_list_dao.query_fund_with_id("123456").await;
     }
 }
