@@ -59,7 +59,7 @@ mod test {
     use super::*;
     use async_trait::async_trait;
     use chrono::NaiveDate;
-    use tokio_postgres::Error;
+    use tokio_postgres::{Error, Row};
 
     #[tokio::main]
     #[test]
@@ -83,6 +83,13 @@ mod test {
                 assert_eq!(format!("{:?}", params[4]), "1989-09-12T07:00:00");
                 assert_eq!(format!("{:?}", params[5]), "1.24");
                 Ok(1)
+            }
+            async fn query_one(
+                &self,
+                _sql: &str,
+                _param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Row, Error> {
+                panic!("It should not be called")
             }
         }
 
