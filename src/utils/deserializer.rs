@@ -43,9 +43,9 @@ pub fn parse_usize_from_str(string: &str) -> Result<usize, TypeMismatchError> {
 }
 
 // date_string is assumed to be in yyyy-mm-dd
-pub fn parse_date_string(date_string: &str) -> Result<i64, TypeMismatchError> {
+pub fn parse_date_string(date_string: &str) -> Result<NaiveDate, TypeMismatchError> {
     match NaiveDate::parse_from_str(date_string, "%Y-%m-%d") {
-        Ok(date) => Ok(date.and_hms(0, 0, 0).timestamp()),
+        Ok(date) => Ok(date),
         Err(_) => Err(TypeMismatchError {
             expected_type: String::from("yyyy-mm-dd"),
             got: date_string.to_string(),
@@ -79,7 +79,7 @@ mod test {
     fn test_parse_date_string_pass() {
         let result = parse_date_string("1999-02-04");
         match result {
-            Ok(date) => assert_eq!(date, 918086400),
+            Ok(date) => assert_eq!(date, NaiveDate::from_ymd(1999, 2, 4)),
             Err(_) => panic!("It should parse date string correctly"),
         }
     }

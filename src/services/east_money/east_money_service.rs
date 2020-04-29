@@ -1,6 +1,5 @@
-use super::{extract_fund_list, extract_fund_values};
+use super::{extract_fund_list, extract_fund_values, FundValueResponse};
 use crate::models::fund_list::FundList;
-use crate::models::fund_value::FundValueModel;
 use crate::services::http::CanGetHTTP;
 use crate::utils::context::{FetchListContext, FetchValueContext};
 
@@ -18,7 +17,7 @@ impl EastMoneyService<'_> {
 }
 
 impl EastMoneyService<'_> {
-    pub async fn fetch_value(&self, id: &str, page: usize) -> FundValueModel {
+    pub async fn fetch_value(&self, id: &str, page: usize) -> FundValueResponse {
         let url = format!(
             "{}?type=lsjz&code={}&page={}&per=20",
             FETCH_FUND_PREFIX, id, page
@@ -46,10 +45,12 @@ impl EastMoneyService<'_> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use async_trait::async_trait;
+    use chrono::NaiveDate;
 
     use super::EastMoneyService;
-    use crate::models::fund_value::{FundValueData, FundValueModel};
+    use crate::models::fund_value::FundValueData;
     use crate::services::http::{create_unknown_error, CanGetHTTP, HttpError};
 
     const FUND_ID: &str = "000123";
@@ -73,34 +74,29 @@ mod tests {
         }
 
         let http_service = FakeHttpService {};
-        let expected_fund_value_model = FundValueModel {
+        let expected_fund_value_model = FundValueResponse {
             curpage: 1,
             pages: 211,
             records: 2102,
             values: vec![
                 FundValueData {
-                    // 2020-04-24,
-                    date: 1587711600,
+                    date: NaiveDate::from_ymd(2020, 04, 24).and_hms(7, 0, 0),
                     real_value: 3.7510,
                 },
                 FundValueData {
-                    // 2020-04-23,
-                    date: 1587625200,
+                    date: NaiveDate::from_ymd(2020, 04, 23).and_hms(7, 0, 0),
                     real_value: 3.7950,
                 },
                 FundValueData {
-                    // 2020-04-22,
-                    date: 1587538800,
+                    date: NaiveDate::from_ymd(2020, 04, 22).and_hms(7, 0, 0),
                     real_value: 3.8360,
                 },
                 FundValueData {
-                    // 2020-04-21,
-                    date: 1587452400,
+                    date: NaiveDate::from_ymd(2020, 04, 21).and_hms(7, 0, 0),
                     real_value: 3.7430,
                 },
                 FundValueData {
-                    // 2020-04-20,
-                    date: 1587366000,
+                    date: NaiveDate::from_ymd(2020, 04, 20).and_hms(7, 0, 0),
                     real_value: 3.7810,
                 },
             ],

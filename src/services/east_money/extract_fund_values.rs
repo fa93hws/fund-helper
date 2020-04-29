@@ -1,7 +1,7 @@
 use scraper::{Html, Selector};
 use serde::Deserialize;
 
-use crate::models::fund_value::{FundValueData, FundValueModel};
+use crate::models::fund_value::FundValueData;
 use crate::utils::context::FetchValueContext;
 use crate::utils::deserializer::{parse_date_string, parse_f32_from_str};
 
@@ -11,6 +11,14 @@ struct RawJsonResponse {
     records: usize,
     pages: usize,
     curpage: usize,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct FundValueResponse {
+    pub records: usize,
+    pub curpage: usize,
+    pub pages: usize,
+    pub values: Vec<FundValueData>,
 }
 
 fn transfer_js_to_json(js: String, keys: Vec<&str>) -> String {
@@ -63,13 +71,12 @@ fn parse_values(html: &str, context: &FetchValueContext) -> Vec<FundValueData> {
         let raw_date = cells[0].inner_html();
         let date =
             parse_date_string(&raw_date).expect(&format!("@cells[0](date), context: {}", context));
-        // The market closed at 3 P.M. Time zone is GMT + 8
-        let market_end_date = date + 15 * 3600 - 8 * 3600;
         let raw_value = cells[2].inner_html();
         let value = parse_f32_from_str(&raw_value)
             .expect(&format!("@cells[2](value), context: {}", context));
         values.push(FundValueData {
-            date: market_end_date,
+            // The market closed at 3 P.M. Time zone is GMT + 8
+            date: date.and_hms(7, 0, 0),
             real_value: value,
         })
     }
@@ -79,11 +86,11 @@ fn parse_values(html: &str, context: &FetchValueContext) -> Vec<FundValueData> {
 pub(super) fn extract_fund_values(
     raw_response: &String,
     context: &FetchValueContext,
-) -> FundValueModel {
+) -> FundValueResponse {
     let raw_json_response = parse_json(&raw_response, context);
     let html_content = raw_json_response.content;
     let values = parse_values(&html_content, context);
-    FundValueModel {
+    FundValueResponse {
         records: raw_json_response.records,
         curpage: raw_json_response.curpage,
         pages: raw_json_response.pages,
@@ -94,25 +101,24 @@ pub(super) fn extract_fund_values(
 #[cfg(test)]
 mod test {
     use super::*;
+    use chrono::NaiveDate;
 
     #[test]
     fn test_deserialize_fund_value() {
         let raw_response = String::from(
             r#"var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first'>净值日期</th><th>单位净值</th><th>累计净值</th><th>日增长率</th><th>申购状态</th><th>赎回状态</th><th class='tor last'>分红送配</th></tr></thead><tbody><tr><td>2020-04-24</td><td class='tor bold'>3.7510</td><td class='tor bold'>3.7510</td><td class='tor bold grn'>-1.16%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr><tr><td>2020-04-23</td><td class='tor bold'>3.7950</td><td class='tor bold'>3.7950</td><td class='tor bold grn'>-1.07%</td><td>开放申购</td><td>开放赎回</td><td class='red unbold'></td></tr></tbody></table>",records:2102,pages:211,curpage:1};"#,
         );
-        let expected_fund_value_model = FundValueModel {
+        let expected_fund_value_model = FundValueResponse {
             curpage: 1,
             pages: 211,
             records: 2102,
             values: vec![
                 FundValueData {
-                    // 2020-04-24
-                    date: 1587711600,
+                    date: NaiveDate::from_ymd(2020, 04, 24).and_hms(7, 0, 0),
                     real_value: 3.7510,
                 },
                 FundValueData {
-                    // 2020-04-23
-                    date: 1587625200,
+                    date: NaiveDate::from_ymd(2020, 04, 23).and_hms(7, 0, 0),
                     real_value: 3.7950,
                 },
             ],

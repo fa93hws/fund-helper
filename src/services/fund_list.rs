@@ -21,6 +21,9 @@ impl<'a> FundListService<'a> {
     }
 
     pub async fn write_to_db(&self, fund_list: &FundList) {
-        self.fund_list_dao.insert_into_db(&fund_list).await;
+        match self.fund_list_dao.insert_into_db(&fund_list).await {
+            Ok(_) => (),
+            Err(e) => panic!("{:?}", e),
+        };
     }
 }
