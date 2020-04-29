@@ -1,11 +1,11 @@
 use super::{db, fetch};
 
-pub(crate) fn main(matches: clap::ArgMatches<'_>) {
+pub(crate) async fn main(matches: clap::ArgMatches<'_>) {
     if let Some(ref matches) = matches.subcommand_matches("fetch") {
-        fetch::main(matches);
+        fetch::main(matches).await;
     }
 
     if let Some(ref matches) = matches.subcommand_matches("db") {
-        db::main(matches);
+        db::main(matches).await;
     }
 }

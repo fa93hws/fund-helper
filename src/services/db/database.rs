@@ -1,5 +1,6 @@
-use postgres::{Client, Error, NoTls};
+use async_trait::async_trait;
 use serde::Deserialize;
+use tokio_postgres::{Client, Error, NoTls};
 
 use crate::utils::context::DBInitializationContext;
 use crate::utils::deserializer::parse_usize_from_str;
@@ -72,33 +73,45 @@ impl DatabaseService {
 }
 
 impl DatabaseService {
-    fn connect(&self) -> Result<Client, Error> {
+    async fn connect(&self) -> Result<Client, Error> {
         let option = format!(
             "host=0.0.0.0 user={} password={} dbname={} port={}",
             self.user, self.password, self.db_name, self.port
         );
-        Client::connect(&option, NoTls)
+        let (client, connection) = tokio_postgres::connect(&option[..], NoTls).await?;
+        // The connection object performs the actual communication with the database,
+        // so spawn it off to run on its own.
+        tokio::spawn(async move {
+            if let Err(e) = connection.await {
+                eprintln!("connection error: {}", e);
+            }
+        });
+        Ok(client)
     }
 }
 
+#[async_trait]
 pub trait CanInitDB {
-    fn init_db(&self) -> Result<(), Error>;
+    async fn init_db(&self) -> Result<(), Error>;
 }
+#[async_trait]
 impl CanInitDB for DatabaseService {
-    fn init_db(&self) -> Result<(), Error> {
-        let mut client = self.connect()?;
+    async fn init_db(&self) -> Result<(), Error> {
+        let client = self.connect().await?;
         let sql_str = read_file(INIT_SQL_PATH).expect("Failed to read INIT_SQL_PATH");
-        client.batch_execute(&sql_str)
+        client.batch_execute(&sql_str[..]).await
     }
 }
 
+#[async_trait]
 pub trait CanExecuteSQL {
-    fn execute(&self, sql: &str) -> Result<(), Error>;
+    async fn execute(&self, sql: &str) -> Result<(), Error>;
 }
+#[async_trait]
 impl CanExecuteSQL for DatabaseService {
-    fn execute(&self, sql: &str) -> Result<(), Error> {
-        let mut client = self.connect()?;
-        client.batch_execute(sql)
+    async fn execute(&self, sql: &str) -> Result<(), Error> {
+        let client = self.connect().await?;
+        client.batch_execute(sql).await
     }
 }
 

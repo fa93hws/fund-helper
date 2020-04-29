@@ -16,11 +16,11 @@ impl<'a> FundListService<'a> {
 }
 
 impl<'a> FundListService<'a> {
-    pub fn fetch(&self) -> FundList {
-        self.east_money_service.fetch_list()
+    pub async fn fetch(&self) -> FundList {
+        self.east_money_service.fetch_list().await
     }
 
-    pub fn write_to_db(&self, fund_list: &FundList) {
-        self.fund_list_dao.insert_into_db(&fund_list);
+    pub async fn write_to_db(&self, fund_list: &FundList) {
+        self.fund_list_dao.insert_into_db(&fund_list).await;
     }
 }
