@@ -1,5 +1,6 @@
 extern crate clap;
 extern crate std;
+use futures::executor::block_on;
 
 use clap::{App, Arg, SubCommand};
 
@@ -8,7 +9,8 @@ mod models;
 mod services;
 mod utils;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let matches = App::new("fund-helper")
         .version("0.1.0")
         .author("Eric W. <wjun0912@gmail.com>")
@@ -27,5 +29,5 @@ fn main() {
         )
         .get_matches();
 
-    commands::main(matches);
+    block_on(commands::main(matches));
 }
