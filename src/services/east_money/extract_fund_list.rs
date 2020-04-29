@@ -75,7 +75,7 @@ mod test {
 
     #[test]
     #[should_panic(
-        expected = "wrong json format. Context: command: fetch fund list.: Error(\"invalid type: integer `1`, expected a borrowed string\", line: 1, column: 3)"
+        expected = "wrong json format."
     )]
     fn test_extract_fund_list_wrong_id() {
         let raw_response = r#"var r = [[1,"HXCZHH","华夏成长混合","混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
@@ -84,7 +84,7 @@ mod test {
 
     #[test]
     #[should_panic(
-        expected = "wrong json format. Context: command: fetch fund list.: Error(\"invalid type: integer `123`, expected a borrowed string\", line: 1, column: 23)"
+        expected = "wrong json format."
     )]
     fn test_extract_fund_list_wrong_name() {
         let raw_response = r#"var r = [["000001","HXCZHH",123,"混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
@@ -93,7 +93,7 @@ mod test {
 
     #[test]
     #[should_panic(
-        expected = "Wrong prefix, expected \'var r = \'. Context: command: fetch fund list."
+        expected = "Wrong prefix, expected \'var r = \'."
     )]
     fn test_extract_fund_list_wrong_prefix() {
         let raw_response = r#"var rr = [["000001","HXCZHH",123,"混合型","HUAXIACHENGZHANGHUNHE"],["000002","HXCZHH","华夏成长混合(后端)","混合型","HUAXIACHENGZHANGHUNHE"]];"#;
@@ -137,7 +137,7 @@ mod test {
 
     #[test]
     #[should_panic(
-        expected = "Unknown fund type, got \'顾茗\'. Context: command: fetch fund list."
+        expected = "Unknown fund type, got \'顾茗\'."
     )]
     fn test_normalize_fund_type_error() {
         let typ = String::from("顾茗");
