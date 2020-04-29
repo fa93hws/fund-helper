@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use serde::Deserialize;
+use tokio_postgres::types::ToSql;
 use tokio_postgres::{Client, Error, NoTls};
 
 use crate::utils::context::DBInitializationContext;
@@ -105,13 +106,13 @@ impl CanInitDB for DatabaseService {
 
 #[async_trait]
 pub trait CanExecuteSQL {
-    async fn execute(&self, sql: &str) -> Result<(), Error>;
+    async fn execute(&self, sql: &str, param: &[&(dyn ToSql + Sync)]) -> Result<u64, Error>;
 }
 #[async_trait]
 impl CanExecuteSQL for DatabaseService {
-    async fn execute(&self, sql: &str) -> Result<(), Error> {
+    async fn execute(&self, sql: &str, param: &[&(dyn ToSql + Sync)]) -> Result<u64, Error> {
         let client = self.connect().await?;
-        client.batch_execute(sql).await
+        client.execute(sql, param).await
     }
 }
 

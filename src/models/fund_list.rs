@@ -1,3 +1,6 @@
+use tokio_postgres::types::ToSql;
+use tokio_postgres::Error;
+
 use crate::services::database::CanExecuteSQL;
 
 const TABLE_NAME: &str = "fund_info";
@@ -18,7 +21,7 @@ pub enum FundType {
     NotInterested,
 }
 
-fn to_type_name(typ: &FundType) -> &'static str {
+fn to_type_name(typ: &FundType) -> &str {
     match typ {
         FundType::Mix => MIX_TYPE_NAME,
         FundType::Bond => BOND_TYPE_NAME,
@@ -61,27 +64,37 @@ impl<'a> FundListDAO<'a> {
 }
 
 impl<'a> FundListDAO<'a> {
-    pub async fn insert_into_db(&self, fund_list: &FundList) {
+    pub async fn insert_into_db(&self, fund_list: &'a FundList) -> Result<u64, Error> {
         let insert_sql_prefix = format!("INSERT INTO {} (id, name, type) VALUES ", TABLE_NAME);
-        let value_parts: Vec<String> = fund_list
+        let type_names: Vec<&str> = fund_list
             .into_iter()
-            .map(|fund_info_item| {
-                let fund_type_name = to_type_name(&fund_info_item.typ);
-                format!(
-                    "('{}', '{}', '{}')",
-                    fund_info_item.id, fund_info_item.name, fund_type_name
-                )
+            .map(|item| to_type_name(&item.typ))
+            .collect();
+        let mut params: Vec<&(dyn ToSql + Sync)> = vec![];
+        let sql_fragments: Vec<String> = fund_list
+            .into_iter()
+            .enumerate()
+            .map(|(idx, item)| {
+                let param_count = params.len();
+                let sql_fragment = format!(
+                    "(${}, ${}, ${})",
+                    param_count + 1,
+                    param_count + 2,
+                    param_count + 3,
+                );
+                params.push(&item.id);
+                params.push(&item.name);
+                params.push(&type_names[idx]);
+                sql_fragment
             })
             .collect();
         let sql = format!(
-            "{}{} ON CONFLICT (id) DO NOTHING;",
+            "{}{} ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, type= EXCLUDED.type;",
             insert_sql_prefix,
-            value_parts.join(",")
+            sql_fragments.join(",")
         );
-        match self.data_base_service.execute(&sql).await {
-            Err(e) => panic!("{:?}", e),
-            _ => (),
-        }
+
+        self.data_base_service.execute(&sql, &params).await
     }
 }
 
@@ -93,16 +106,28 @@ mod test {
 
     #[tokio::main]
     #[test]
-    async fn test_insert_into_db_sql_text() {
+    async fn test_insert_fund_list_into_db_sql_text() {
         struct FakeDBService {}
         #[async_trait]
         impl CanExecuteSQL for FakeDBService {
-            async fn execute(&self, sql: &str) -> Result<(), Error> {
+            async fn execute(
+                &self,
+                sql: &str,
+                params: &[&(dyn ToSql + Sync)],
+            ) -> Result<u64, Error> {
                 assert_eq!(
                     sql,
-                    "INSERT INTO fund_info (id, name, type) VALUES ('000001', 'guming', '指数'),('000011', 'chenwenxin', '股票') ON CONFLICT (id) DO NOTHING;"
+                    "INSERT INTO fund_info (id, name, type) VALUES ($1, $2, $3),($4, $5, $6) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, type= EXCLUDED.type;"
                 );
-                Ok(())
+                let expected_params =
+                    vec!["000001", "guming", "指数", "000011", "chenwenxin", "股票"];
+                assert_eq!(expected_params.len(), params.len());
+                for idx in 0..params.len() {
+                    let got = format!("{:?}", params[idx]);
+                    let expected = format!("\"{}\"", expected_params[idx]);
+                    assert_eq!(got, expected);
+                }
+                Ok(1)
             }
         }
 
@@ -122,6 +147,9 @@ mod test {
                 typ: FundType::Stock,
             },
         ];
-        fund_list_dao.insert_into_db(&fund_list);
+        match fund_list_dao.insert_into_db(&fund_list).await {
+            Ok(_) => (),
+            Err(_) => panic!("it should not throw"),
+        };
     }
 }

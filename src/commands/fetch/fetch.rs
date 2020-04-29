@@ -1,4 +1,5 @@
 use crate::models::fund_list::FundListDAO;
+use crate::models::fund_value::FundValueDAO;
 use crate::services::database::{DatabaseService, Environment};
 use crate::services::east_money::EastMoneyService;
 use crate::services::http::HttpService;
@@ -8,9 +9,11 @@ async fn fetch_one(id: &str) {
     println!("fetching fund: {}", id);
     let http_service = HttpService::new();
     let east_money_service = EastMoneyService::new(&http_service);
-    let fund_value_service = FundValueService::new(&east_money_service);
+    let database_service = DatabaseService::new(Environment::Prod);
+    let fund_value_dao = FundValueDAO::new(&database_service);
+    let fund_value_service = FundValueService::new(&east_money_service, &fund_value_dao);
 
-    fund_value_service.fetch(id, 1).await;
+    fund_value_service.fetch_and_update_db(id).await;
 }
 
 async fn fetch_all() {
