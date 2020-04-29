@@ -127,7 +127,7 @@ mod test {
 
     #[test]
     #[should_panic(
-        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0: Error(\"expected value\", line: 1, column: 13)"
+        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0"
     )]
     fn test_deserialize_fund_value_with_json_error() {
         let raw_response = String::from(
@@ -142,7 +142,7 @@ mod test {
 
     #[test]
     #[should_panic(
-        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0: Error(\"invalid type: string \\\"2102\\\", expected usize\", line: 1, column: 44)"
+        expected = "Failed to deserialize json. Context: command: fetch fund value. fund-id: id, page-number: 0"
     )]
     fn test_deserialize_fund_value_with_type_error() {
         let raw_response = String::from(

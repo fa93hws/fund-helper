@@ -4,7 +4,7 @@ use crate::models::fund_value::FundValueModel;
 use crate::services::http::CanGetHTTP;
 use crate::utils::context::{FetchListContext, FetchValueContext};
 
-const FETCH_FUND_PREFIX: &str = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=";
+const FETCH_FUND_PREFIX: &str = "http://fund.eastmoney.com/f10/F10DataApi.aspx";
 const FETCH_LIST_URL: &str = "http://fund.eastmoney.com/js/fundcode_search.js";
 
 pub struct EastMoneyService<'a> {
@@ -18,12 +18,15 @@ impl EastMoneyService<'_> {
 }
 
 impl EastMoneyService<'_> {
-    pub async fn fetch_value(&self, id: &str) -> FundValueModel {
-        let url = format!("{}{}", FETCH_FUND_PREFIX, id);
+    pub async fn fetch_value(&self, id: &str, page: usize) -> FundValueModel {
+        let url = format!(
+            "{}?type=lsjz&code={}&page={}&per=20",
+            FETCH_FUND_PREFIX, id, page
+        );
         let http_result = self.http_service.get(&url).await;
         let context = FetchValueContext {
             id: id.to_string(),
-            page: 1,
+            page,
         };
         match http_result {
             Ok(result) => extract_fund_values(&result, &context),
@@ -44,7 +47,6 @@ impl EastMoneyService<'_> {
 #[cfg(test)]
 mod tests {
     use async_trait::async_trait;
-    use futures::executor::block_on;
 
     use super::EastMoneyService;
     use crate::models::fund_value::{FundValueData, FundValueModel};
@@ -52,8 +54,9 @@ mod tests {
 
     const FUND_ID: &str = "000123";
 
+    #[tokio::main]
     #[test]
-    fn test_fetch_success() {
+    async fn test_fetch_success() {
         struct FakeHttpService {}
         #[async_trait]
         impl CanGetHTTP for FakeHttpService {
@@ -63,7 +66,7 @@ mod tests {
                 );
                 assert_eq!(
                     url,
-                    "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123"
+                    "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123&page=3&per=20"
                 );
                 Ok(raw_response)
             }
@@ -103,15 +106,16 @@ mod tests {
             ],
         };
         let east_money_service = EastMoneyService::new(&http_service);
-        let model = block_on(east_money_service.fetch_value(FUND_ID));
+        let model = east_money_service.fetch_value(FUND_ID, 3).await;
         assert_eq!(model, expected_fund_value_model);
     }
 
+    #[tokio::main]
     #[test]
     #[should_panic(
-        expected = "failed to fetch url http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123"
+        expected = "failed to fetch url http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=000123&page=2&per=20"
     )]
-    fn test_fetch_fail() {
+    async fn test_fetch_fail() {
         struct FakeHttpService {}
         #[async_trait]
         impl CanGetHTTP for FakeHttpService {
@@ -122,6 +126,6 @@ mod tests {
 
         let http_service = FakeHttpService {};
         let east_money_service = EastMoneyService::new(&http_service);
-        block_on(east_money_service.fetch_value(FUND_ID));
+        east_money_service.fetch_value(FUND_ID, 2).await;
     }
 }

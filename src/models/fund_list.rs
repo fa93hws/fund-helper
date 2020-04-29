@@ -89,11 +89,11 @@ impl<'a> FundListDAO<'a> {
 mod test {
     use super::*;
     use async_trait::async_trait;
-    use futures::executor::block_on;
     use tokio_postgres::Error;
 
+    #[tokio::main]
     #[test]
-    fn test_insert_into_db_sql_text() {
+    async fn test_insert_into_db_sql_text() {
         struct FakeDBService {}
         #[async_trait]
         impl CanExecuteSQL for FakeDBService {
@@ -122,6 +122,6 @@ mod test {
                 typ: FundType::Stock,
             },
         ];
-        block_on(fund_list_dao.insert_into_db(&fund_list));
+        fund_list_dao.insert_into_db(&fund_list);
     }
 }

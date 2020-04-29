@@ -13,6 +13,6 @@ impl<'a> FundValueService<'a> {
 
 impl<'a> FundValueService<'a> {
     pub async fn fetch(&self, id: &str, _: usize) -> FundValueModel {
-        self.east_money_service.fetch_value(id).await
+        self.east_money_service.fetch_value(id, 1).await
     }
 }
