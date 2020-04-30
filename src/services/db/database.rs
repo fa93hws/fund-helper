@@ -108,6 +108,7 @@ impl CanInitDB for DatabaseService {
 pub trait CanExecuteSQL {
     async fn execute(&self, sql: &str, param: &[&(dyn ToSql + Sync)]) -> Result<u64, Error>;
     async fn query_one(&self, sql: &str, param: &[&(dyn ToSql + Sync)]) -> Result<Row, Error>;
+    async fn query(&self, sql: &str, param: &[&(dyn ToSql + Sync)]) -> Result<Vec<Row>, Error>;
 }
 #[async_trait]
 impl CanExecuteSQL for DatabaseService {
@@ -119,6 +120,11 @@ impl CanExecuteSQL for DatabaseService {
     async fn query_one(&self, sql: &str, param: &[&(dyn ToSql + Sync)]) -> Result<Row, Error> {
         let client = self.connect().await?;
         client.query_one(sql, param).await
+    }
+
+    async fn query(&self, sql: &str, param: &[&(dyn ToSql + Sync)]) -> Result<Vec<Row>, Error> {
+        let client = self.connect().await?;
+        client.query(sql, param).await
     }
 }
 
