@@ -1,6 +1,7 @@
 use chrono::NaiveDateTime;
+use std::f32;
 use tokio_postgres::types::ToSql;
-use tokio_postgres::{Error, Row};
+use tokio_postgres::Error;
 
 use crate::services::database::CanExecuteSQL;
 
