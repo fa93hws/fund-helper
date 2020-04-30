@@ -1,6 +1,6 @@
 use futures::future::join_all;
 
-use crate::models::fund_value::FundValueDAO;
+use crate::models::fund_value::{FundValueDAO, FundValueData, Order};
 use crate::services::east_money::EastMoneyService;
 
 pub struct FundValueService<'a> {
@@ -18,6 +18,17 @@ impl<'a> FundValueService<'a> {
 }
 
 impl<'a> FundValueService<'a> {
+    pub async fn get_values_for_regression(&self, id: &str) -> Vec<FundValueData> {
+        match self
+            .fund_value_dao
+            .find_values_with_id(id, Order::Asc)
+            .await
+        {
+            Ok(values) => values,
+            Err(e) => panic!("{:?}", e),
+        }
+    }
+
     pub async fn fetch_and_update_db(&self, id: &str) {
         let pages = self.east_money_service.fetch_value(id, 1).await.pages;
         let mut promises = vec![];

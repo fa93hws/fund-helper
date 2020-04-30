@@ -1,5 +1,6 @@
 use chrono::NaiveDateTime;
 use tokio_postgres::types::ToSql;
+use tokio_postgres::{Error, Row};
 
 use crate::services::database::CanExecuteSQL;
 
@@ -20,6 +21,11 @@ impl<'a> FundValueDAO<'a> {
     pub fn new(data_base_service: &'a dyn CanExecuteSQL) -> Self {
         FundValueDAO { data_base_service }
     }
+}
+
+pub enum Order {
+    Asc,
+    Desc,
 }
 
 impl<'a> FundValueDAO<'a> {
@@ -50,6 +56,34 @@ impl<'a> FundValueDAO<'a> {
         match self.data_base_service.execute(&sql, &params).await {
             Err(e) => panic!("{:?}", e),
             _ => (),
+        }
+    }
+
+    pub async fn find_values_with_id(
+        &self,
+        id: &str,
+        order: Order,
+    ) -> Result<Vec<FundValueData>, Error> {
+        let order_method = match order {
+            Order::Asc => "ASC",
+            Order::Desc => "DESC",
+        };
+        let sql = format!(
+            "SELECT value, time FROM {} WHERE id = $1 order by time {}",
+            TABLE_NAME, order_method
+        );
+        match self.data_base_service.query(&sql, &[&id]).await {
+            Ok(rows) => {
+                let values: Vec<FundValueData> = rows
+                    .into_iter()
+                    .map(|row| FundValueData {
+                        date: row.get("time"),
+                        real_value: row.get("value"),
+                    })
+                    .collect();
+                Ok(values)
+            }
+            Err(e) => Err(e),
         }
     }
 }
@@ -91,6 +125,13 @@ mod test {
             ) -> Result<Row, Error> {
                 panic!("It should not be called")
             }
+            async fn query(
+                &self,
+                _sql: &str,
+                _param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Vec<Row>, Error> {
+                panic!("It should not be called")
+            }
         }
 
         let data_base_service = FakeDBService {};
@@ -108,5 +149,93 @@ mod test {
             },
         ];
         fund_value_dao.insert_into_db("123456", &fund_values).await;
+    }
+
+    #[tokio::main]
+    #[test]
+    #[should_panic(expected = "This panic is expected to avoid return a result")]
+    async fn test_find_value_with_id_sql_text_asc() {
+        struct FakeDBService {}
+        #[async_trait]
+        impl CanExecuteSQL for FakeDBService {
+            async fn execute(
+                &self,
+                _sql: &str,
+                _params: &[&(dyn ToSql + Sync)],
+            ) -> Result<u64, Error> {
+                panic!("It should not be called")
+            }
+            async fn query_one(
+                &self,
+                _sql: &str,
+                _param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Row, Error> {
+                panic!("It should not be called")
+            }
+            async fn query(
+                &self,
+                sql: &str,
+                param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Vec<Row>, Error> {
+                assert_eq!(
+                    sql,
+                    "SELECT value, time FROM fund_net_values WHERE id = $1 order by time ASC"
+                );
+                assert_eq!(format!("{:?}", param[0]), "\"123456\"",);
+                panic!("This panic is expected to avoid return a result")
+            }
+        }
+
+        let data_base_service = FakeDBService {};
+        let fund_value_dao = FundValueDAO {
+            data_base_service: &data_base_service,
+        };
+        let _ = fund_value_dao
+            .find_values_with_id("123456", Order::Asc)
+            .await;
+    }
+
+    #[tokio::main]
+    #[test]
+    #[should_panic(expected = "This panic is expected to avoid return a result")]
+    async fn test_find_value_with_id_sql_text_desc() {
+        struct FakeDBService {}
+        #[async_trait]
+        impl CanExecuteSQL for FakeDBService {
+            async fn execute(
+                &self,
+                _sql: &str,
+                _params: &[&(dyn ToSql + Sync)],
+            ) -> Result<u64, Error> {
+                panic!("It should not be called")
+            }
+            async fn query_one(
+                &self,
+                _sql: &str,
+                _param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Row, Error> {
+                panic!("It should not be called")
+            }
+            async fn query(
+                &self,
+                sql: &str,
+                param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Vec<Row>, Error> {
+                assert_eq!(
+                    sql,
+                    "SELECT value, time FROM fund_net_values WHERE id = $1 order by time DESC"
+                );
+                assert_eq!(format!("{:?}", param[0]), "\"123456\"",);
+                panic!("This panic is expected to avoid return a result")
+            }
+        }
+
+        let data_base_service = FakeDBService {};
+        let fund_value_dao = FundValueDAO {
+            data_base_service: &data_base_service,
+        };
+        let _ = fund_value_dao
+            .find_values_with_id("123456", Order::Desc)
+            .await;
     }
 }

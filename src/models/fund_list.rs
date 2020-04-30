@@ -159,6 +159,13 @@ mod test {
             ) -> Result<Row, Error> {
                 panic!("It should not be called")
             }
+            async fn query(
+                &self,
+                _sql: &str,
+                _param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Vec<Row>, Error> {
+                panic!("It should not be called")
+            }
         }
 
         let data_base_service = FakeDBService {};
@@ -201,6 +208,13 @@ mod test {
                 assert_eq!(sql, "SELECT name, type from fund_info WHERE id = $1");
                 assert_eq!(format!("{:?}", param[0]), "\"123456\"");
                 panic!("this is expected")
+            }
+            async fn query(
+                &self,
+                _sql: &str,
+                _param: &[&(dyn ToSql + Sync)],
+            ) -> Result<Vec<Row>, Error> {
+                panic!("It should not be called")
             }
         }
 

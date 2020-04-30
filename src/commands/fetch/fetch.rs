@@ -35,7 +35,7 @@ async fn fetch_all() {
     fund_list_service.write_to_db(&fund_list).await;
 }
 
-pub(in crate::commands) async fn main(matches: &clap::ArgMatches<'_>) {
+pub async fn main(matches: &clap::ArgMatches<'_>) {
     if !matches.is_present("fund-id") {
         fetch_all().await;
     } else if let Some(ids) = matches.values_of("fund-id") {

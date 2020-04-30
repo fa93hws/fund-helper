@@ -26,6 +26,13 @@ async fn main() {
                 .about("database related execution")
                 .subcommand(SubCommand::with_name("init").about("initialize the database")),
         )
+        .subcommand(
+            SubCommand::with_name("reg-test")
+                .about("run regression test")
+                .arg(Arg::with_name("fund-id").help("id of the fund"))
+                .subcommand(SubCommand::with_name("avg"))
+                .about("average strategy"),
+        )
         .get_matches();
 
     commands::main(matches).await;
