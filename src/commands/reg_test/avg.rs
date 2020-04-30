@@ -55,7 +55,9 @@ fn regression_test_with_average(data: &Vec<FundValueData>, buy_period: usize, se
             money = 0.0;
         }
     }
-    money = if shares < 1e-10 { money } else {
+    money = if shares < 1e-10 {
+        money
+    } else {
         data.last().unwrap().real_value * shares
     };
     println!("{}", money);
