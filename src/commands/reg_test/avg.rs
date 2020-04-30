@@ -1,3 +1,5 @@
+use chrono::NaiveDateTime;
+
 use crate::models::fund_list::FundListDAO;
 use crate::models::fund_value::{FundValueDAO, FundValueData};
 use crate::services::database::{DatabaseService, Environment};
@@ -32,7 +34,10 @@ fn min(values: &Vec<f32>) -> f32 {
 // 持有多头头寸时，如果当日收盘价低于前 {sell_period} 日的最低价时，平掉多头仓位
 // 当持有任何仓位时，如果价格触及止损线则平仓止损。
 fn regression_test_with_average(data: &Vec<FundValueData>, buy_period: usize, sell_period: usize) {
+    let mut money = 100.0;
+    let mut shares = 0.0;
     for idx in buy_period..data.len() {
+        let current_value = data[idx].real_value;
         let data_buy_period = &data[(idx - buy_period)..idx];
         let values_buy_period: Vec<f32> =
             data_buy_period.into_iter().map(|x| x.real_value).collect();
@@ -41,7 +46,19 @@ fn regression_test_with_average(data: &Vec<FundValueData>, buy_period: usize, se
             data_sell_period.into_iter().map(|x| x.real_value).collect();
         let max_buy_period = max(&values_buy_period);
         let min_sell_period = min(&values_sell_period);
+        if shares > 1e-10 && current_value < min_sell_period * 0.99 {
+            money = shares * current_value;
+            shares = 0.0;
+        }
+        if shares < 1e-10 && current_value > max_buy_period * 1.01 {
+            shares = money / current_value;
+            money = 0.0;
+        }
     }
+    money = if shares < 1e-10 { money } else {
+        data.last().unwrap().real_value * shares
+    };
+    println!("{}", money);
 }
 
 pub async fn test_with_avg(id: &str) {
@@ -59,8 +76,7 @@ pub async fn test_with_avg(id: &str) {
         fund_info.name, fund_info.id, fund_info.typ
     );
     let fund_values = fund_value_service.get_values_for_regression(id).await;
-    println!("{:?}", fund_values);
-    println!("{}", fund_values[0].date.timestamp());
+    regression_test_with_average(&fund_values, 50, 10);
 }
 
 #[cfg(test)]
@@ -81,6 +97,22 @@ mod test {
         let nums: Vec<f32> = vec![];
         let got = calculate_average(&nums);
         let expected = 0.0;
+        assert_approx_eq!(got, expected, 1e-10);
+    }
+
+    #[test]
+    fn test_max() {
+        let nums: Vec<f32> = vec![1.0, 1.25, 2.5, -2.65, 10.5, -2.0, -15.0, 0.0];
+        let got = max(&nums);
+        let expected = 10.5;
+        assert_approx_eq!(got, expected, 1e-10);
+    }
+
+    #[test]
+    fn test_min() {
+        let nums: Vec<f32> = vec![1.0, 1.25, 2.5, -2.65, 10.5, -2.0, -15.0, 0.0];
+        let got = min(&nums);
+        let expected = -15.0;
         assert_approx_eq!(got, expected, 1e-10);
     }
 }
