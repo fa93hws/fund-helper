@@ -1,5 +1,4 @@
 use chrono::NaiveDateTime;
-use std::f32;
 use tokio_postgres::types::ToSql;
 use tokio_postgres::Error;
 
