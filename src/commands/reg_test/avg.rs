@@ -16,14 +16,16 @@ fn calculate_average(values: &Vec<f32>) -> f32 {
 }
 
 fn max(values: &Vec<f32>) -> f32 {
-    values
-        .into_iter()
-        .fold(std::f32::MIN, |acc, cur| if acc > *cur { acc } else { *cur })
+    values.into_iter().fold(
+        std::f32::MIN,
+        |acc, cur| if acc > *cur { acc } else { *cur },
+    )
 }
 fn min(values: &Vec<f32>) -> f32 {
-    values
-        .into_iter()
-        .fold(std::f32::MAX, |acc, cur| if acc < *cur { acc } else { *cur })
+    values.into_iter().fold(
+        std::f32::MAX,
+        |acc, cur| if acc < *cur { acc } else { *cur },
+    )
 }
 
 // 在没有任何头寸时，如果当日的收盘价高于前 {buy_period} 日的最高价，则做多
