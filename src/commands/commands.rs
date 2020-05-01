@@ -1,4 +1,4 @@
-use super::{db, fetch, reg_test};
+use super::{db, fetch, reg_test, server};
 
 pub(crate) async fn main(matches: clap::ArgMatches<'_>) {
     if let Some(ref matches) = matches.subcommand_matches("fetch") {
@@ -11,5 +11,9 @@ pub(crate) async fn main(matches: clap::ArgMatches<'_>) {
 
     if let Some(ref matches) = matches.subcommand_matches("reg-test") {
         reg_test::main(matches).await;
+    }
+
+    if let Some(_) = matches.subcommand_matches("server") {
+        server::main().await;
     }
 }
