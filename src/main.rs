@@ -27,6 +27,10 @@ async fn main() {
                 .subcommand(SubCommand::with_name("init").about("initialize the database")),
         )
         .subcommand(
+            SubCommand::with_name("server")
+                .about("start the server")
+        )
+        .subcommand(
             SubCommand::with_name("reg-test")
                 .about("run regression test")
                 .arg(Arg::with_name("fund-id").help("id of the fund"))

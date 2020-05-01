@@ -18,6 +18,8 @@ serde = { version = "1.0", features = ["derive"] }
 tokio-postgres = { version = "0.5.3", features = ["with-chrono-0_4"] }
 serde_yaml = "0.8"
 chrono = "0.4"
+actix-web = "2"
+actix-rt = "1"
 
 [dev-dependencies]
 assert_approx_eq = "1.1.0"
