@@ -24,7 +24,13 @@ impl<'a> FundValueService<'a> {
             .find_values_with_id(id, Order::Asc)
             .await
         {
-            Ok(values) => values,
+            Ok(values) => {
+                if values.len() > 0 {
+                    values
+                } else {
+                    panic!("no fund value data found for id: {}, please fetch the value first", id);
+                }
+            },
             Err(e) => panic!("{:?}", e),
         }
     }
