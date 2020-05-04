@@ -35,11 +35,11 @@ fn min(values: &Vec<f32>) -> f32 {
 // 当持有任何仓位时，如果价格触及止损线则平仓止损。
 fn regression_test_with_average(data: &Vec<FundValueData>, buy_period: usize, sell_period: usize) {
     let initial_money = 100.0;
-    let mut buy_count = 0.0;
+    let mut buy_count = 0;
     let mut money = initial_money;
     let mut shares = 0.0;
     for idx in buy_period..data.len() {
-        if data[idx].date <= data[idx-1].date {
+        if data[idx].date <= data[idx - 1].date {
             panic!("data is not in order!");
         }
         let current_value = data[idx].real_value;
@@ -56,7 +56,7 @@ fn regression_test_with_average(data: &Vec<FundValueData>, buy_period: usize, se
             shares = 0.0;
         }
         if shares < 1e-10 && current_value > max_buy_period {
-            buy_count += 1.0;
+            buy_count += 1;
             shares = money / current_value;
             money = 0.0;
         }
@@ -66,10 +66,14 @@ fn regression_test_with_average(data: &Vec<FundValueData>, buy_period: usize, se
     } else {
         data.last().unwrap().real_value * shares
     };
-    let num_years = (data.last().unwrap().date.timestamp() - data.first().unwrap().date.timestamp()) as f32 / 365.0 / 3600.0 / 24.0;
+    let num_years = (data.last().unwrap().date.timestamp() - data.first().unwrap().date.timestamp())
+        as f32
+        / 365.0
+        / 3600.0
+        / 24.0;
     let arr = ((money / initial_money).powf(1.0 / num_years) - 1.0) * 100.0;
     println!("Arr: {}% (不含手续费)", arr);
-    println!("出手次数: {}/年", buy_count / num_years);
+    println!("出手次数: {}/年", buy_count as f32 / num_years);
 }
 
 pub async fn test_with_avg(id: &str) {

@@ -28,9 +28,12 @@ impl<'a> FundValueService<'a> {
                 if values.len() > 0 {
                     values
                 } else {
-                    panic!("no fund value data found for id: {}, please fetch the value first", id);
+                    panic!(
+                        "no fund value data found for id: {}, please fetch the value first",
+                        id
+                    );
                 }
-            },
+            }
             Err(e) => panic!("{:?}", e),
         }
     }
