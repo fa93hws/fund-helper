@@ -1,28 +1,7 @@
-// TODO Refactor to result type
-export const enum ResultKind {
-  OK,
-  ERROR,
-}
-
-export const enum ErrorKind {
-  NOT_FOUND,
-  UNKNOWN_ERROR,
-  REQUEST_FAIL,
-}
-
-export type ResultType =
-  | {
-      kind: ResultKind.OK;
-      data: any;
-    }
-  | {
-      kind: ResultKind.ERROR;
-      errorKind: ErrorKind;
-      error?: Error;
-    };
+import { Result } from '../utils/result-type';
 
 export interface CanFetchFundValue {
-  fetchFundValues(id: string): Promise<ResultType>;
+  fetchFundValues(id: string): Promise<Result<any>>;
 }
 
 export class FundValueService implements CanFetchFundValue {
@@ -38,27 +17,25 @@ export class FundValueService implements CanFetchFundValue {
         : (this.fetch = fetch);
   }
 
-  async fetchFundValues(id: string): Promise<ResultType> {
+  async fetchFundValues(id: string): Promise<Result<any>> {
     try {
       const response = await this.fetch(this.URL + id);
       switch (response.status) {
         case 404:
-          return { kind: ResultKind.ERROR, errorKind: ErrorKind.NOT_FOUND };
+          return { kind: 'error', error: new Error(`找不到基金ID=${id}`) };
         case 200: {
           const data = await response.json();
-          return { kind: ResultKind.OK, data };
+          return { kind: 'ok', data };
         }
         default:
           return {
-            kind: ResultKind.ERROR,
-            errorKind: ErrorKind.UNKNOWN_ERROR,
-            error: new Error(`unknown status code = ${response.status}`),
+            kind: 'error',
+            error: new Error(`未知状态码 ${response.status}`),
           };
       }
     } catch (e) {
       return {
-        kind: ResultKind.ERROR,
-        errorKind: ErrorKind.REQUEST_FAIL,
+        kind: 'error',
         error: e,
       };
     }

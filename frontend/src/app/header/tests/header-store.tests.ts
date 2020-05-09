@@ -1,17 +1,23 @@
 import { HeaderStore } from '../header-store';
+import { Result } from '../../../utils/result-type';
+import { CanFetchFundValue } from '../../../services/fund-value-service';
 
 describe('HeaderStore', () => {
-  const fakeService = {
-    fetchFundValues: jest.fn(),
+  jest.useFakeTimers();
+  const mockFetchFundValues = jest.fn<Promise<Result<string>>, [string]>();
+  const fakeService: CanFetchFundValue = {
+    fetchFundValues: mockFetchFundValues,
   };
-  it('set input id to empty string by default', () => {
-    const store = new HeaderStore(fakeService);
-    expect(store.idInput).toEqual('');
+
+  beforeEach(() => {
+    mockFetchFundValues.mockRestore();
   });
 
-  it('set info to unknowns by default', () => {
+  it('has these default values', () => {
     const store = new HeaderStore(fakeService);
+    expect(store.idInput).toEqual('');
     expect(store.info).toBeUndefined();
+    expect(store.errorMessage).toBeUndefined();
   });
 
   it('set the input id to given value', () => {
@@ -28,5 +34,50 @@ describe('HeaderStore', () => {
       name: 'guming',
       type: 'crystal',
     });
+  });
+
+  it('send the requests through fund value service', async () => {
+    mockFetchFundValues.mockReturnValueOnce(
+      Promise.resolve({ kind: 'ok', data: 'hanasaki' }),
+    );
+    const store = new HeaderStore(fakeService);
+    store.setIdInput('guming');
+    await store.fetchValue();
+    expect(mockFetchFundValues).toHaveBeenCalledWith('guming');
+  });
+
+  it('display message if error encountered', async () => {
+    mockFetchFundValues.mockReturnValueOnce(
+      Promise.resolve({ kind: 'error', error: new Error('error!') }),
+    );
+    const store = new HeaderStore(fakeService);
+    store.setIdInput('guming');
+    await store.fetchValue();
+    expect(store.errorMessage).toEqual('error!');
+  });
+
+  it('dismiss message after timeout', async () => {
+    mockFetchFundValues.mockReturnValueOnce(
+      Promise.resolve({ kind: 'error', error: new Error('error!') }),
+    );
+    const store = new HeaderStore(fakeService, 1000);
+    store.setIdInput('guming');
+    await store.fetchValue();
+    jest.advanceTimersByTime(999);
+    expect(store.errorMessage).toEqual('error!');
+    jest.advanceTimersByTime(2);
+    expect(store.errorMessage).toBeUndefined();
+  });
+
+  it('clear error message before the request', async () => {
+    mockFetchFundValues.mockReturnValueOnce(
+      Promise.resolve({ kind: 'ok', data: 'hanasaki' }),
+    );
+    const store = new HeaderStore(fakeService);
+    store.setIdInput('guming');
+    store.errorMessage = 'error!';
+    const p = store.fetchValue();
+    expect(store.errorMessage).toBeUndefined();
+    await p;
   });
 });

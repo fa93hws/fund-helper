@@ -2,7 +2,7 @@ import * as React from 'react';
 import { storiesOf } from '@storybook/react';
 import { text } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
-import { ResultKind, ResultType } from '../../../services/fund-value-service';
+import { Result } from '../../../utils/result-type';
 import { Header, createHeader } from '../header';
 import { FundInfo } from '../header-store';
 
@@ -29,9 +29,9 @@ storiesOf('app.header', module)
       fetchFundValues: async (id: string) => {
         action('fetch')(id);
         return {
-          kind: ResultKind.OK,
+          kind: 'ok',
           data: [],
-        } as ResultType;
+        } as Result<any>;
       },
     };
     const HeaderImpl = createHeader(fakeFundValueService);
