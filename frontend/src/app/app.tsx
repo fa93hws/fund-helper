@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { computed } from 'mobx';
+import SnackBar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
+import { observer } from 'mobx-react';
 import { createHeader } from './header/header';
-import { HeaderStore } from './header/header-store';
-import { FundValueService, FundValues } from '../services/fund-value-service';
+import { FundValueService } from '../services/fund-value-service';
 import { createKLine } from './k-line/k-line';
 import { AppStore } from './app-store';
 import styles from './app.css';
@@ -10,9 +12,16 @@ import styles from './app.css';
 type AppProps = {
   Header: React.ComponentType;
   KLine: React.ComponentType;
+  errorMessage: string | undefined;
 };
-const App = React.memo(({ Header, KLine }: AppProps) => (
+const App = React.memo(({ Header, KLine, errorMessage }: AppProps) => (
   <div>
+    <SnackBar
+      open={errorMessage != null}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+    >
+      <Alert severity="error">{errorMessage}</Alert>
+    </SnackBar>
     <Header />
     <div className={styles.kLineWrapper}>
       <KLine />
@@ -21,14 +30,14 @@ const App = React.memo(({ Header, KLine }: AppProps) => (
 ));
 
 export function createApp() {
-  const appStore = new AppStore();
-
-  const setFundInfo = (info: FundValues) => appStore.setFundInfo(info);
   const fundValueService = new FundValueService();
-  const headerStore = new HeaderStore({ fundValueService, setFundInfo });
-  const Header = createHeader(headerStore);
+  const appStore = new AppStore({ fundValueService });
+  const values = computed(() => appStore.values);
+  const fetchValues = async (id: string) => appStore.fetchValue(id);
 
-  const fundValue = computed(() => appStore.fundInfo);
-  const KLine = createKLine(fundValue);
-  return () => <App Header={Header} KLine={KLine} />;
+  const Header = createHeader(fetchValues, values);
+  const KLine = createKLine(values);
+  return observer(() => (
+    <App Header={Header} KLine={KLine} errorMessage={appStore.errorMessage} />
+  ));
 }

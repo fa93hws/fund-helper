@@ -3,7 +3,7 @@ import { Result } from '../utils/result-type';
 export type FundValues = {
   id: string;
   name: string;
-  type: string;
+  typ: string;
   values: {
     date: number;
     real_value: number;
