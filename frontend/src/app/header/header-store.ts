@@ -1,9 +1,5 @@
 import { observable, action } from 'mobx';
-import {
-  ErrorKind,
-  ResultKind,
-  CanFetchFundValue,
-} from '../../services/fund-value-service';
+import { CanFetchFundValue } from '../../services/fund-value-service';
 
 export type FundInfo = {
   id: string;
@@ -12,7 +8,10 @@ export type FundInfo = {
 };
 
 export class HeaderStore {
-  constructor(private readonly fundValueService: CanFetchFundValue) {}
+  constructor(
+    private readonly fundValueService: CanFetchFundValue,
+    private readonly alertTimeout: number = 5000,
+  ) {}
 
   @observable.ref
   idInput = '';
@@ -39,26 +38,11 @@ export class HeaderStore {
   async fetchValue() {
     this.closeErrorAlert();
     const response = await this.fundValueService.fetchFundValues(this.idInput);
-    if (response.kind === ResultKind.OK) {
+    if (response.kind === 'ok') {
       // eslint-disable-next-line
       console.log(response.data);
     } else {
-      const errorMsg = this.getErrorMessage(response.errorKind, this.idInput);
-      this.displayErrorMessage(errorMsg, 1000);
-    }
-  }
-
-  private getErrorMessage(errorKind: ErrorKind, id: string): string {
-    switch (errorKind) {
-      case ErrorKind.NOT_FOUND:
-        return `找不到基金ID=${id}`;
-      case ErrorKind.REQUEST_FAIL:
-        return '请求失败';
-      case ErrorKind.UNKNOWN_ERROR:
-        return '未知错误';
-      default:
-        // TODO Use unreachable exception
-        throw new Error('unreachable code');
+      this.displayErrorMessage(response.error.message, this.alertTimeout);
     }
   }
 
