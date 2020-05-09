@@ -1,3 +1,4 @@
+/* eslint-disable */
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -19,6 +20,7 @@ module.exports = {
       {
         test: /\.(ts|tsx)$/,
         loader: 'ts-loader',
+        options: { transpileOnly: true },
       },
       {
         test: /\.css$/,
@@ -51,6 +53,9 @@ module.exports = {
     inline: true,
     hot: true,
     port: 8081,
+    proxy: {
+      '/api_v1': 'http://localhost:8080',
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({ template: 'index.html' }),

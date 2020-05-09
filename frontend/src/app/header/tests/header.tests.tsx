@@ -11,6 +11,7 @@ describe('Header', () => {
         info={undefined}
         onIdChange={jest.fn()}
         onSubmit={jest.fn()}
+        errorMessage={undefined}
       />,
     ).toMatchRenderedSnapshot();
   });
@@ -24,6 +25,21 @@ describe('Header', () => {
           info={info}
           onIdChange={jest.fn()}
           onSubmit={jest.fn()}
+          errorMessage={undefined}
+        />,
+      ),
+    ).toMatchSnapshot();
+  });
+
+  it('renders header with error message', () => {
+    expect(
+      render(
+        <Header
+          idInput=""
+          info={undefined}
+          onIdChange={jest.fn()}
+          onSubmit={jest.fn()}
+          errorMessage="errorMessage"
         />,
       ),
     ).toMatchSnapshot();
@@ -37,6 +53,7 @@ describe('Header', () => {
         info={undefined}
         onIdChange={onChange}
         onSubmit={jest.fn()}
+        errorMessage={undefined}
       />,
     );
     component.find('input').simulate('change');

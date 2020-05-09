@@ -1,23 +1,27 @@
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import AppBar from '@material-ui/core/AppBar';
+import Alert from '@material-ui/lab/Alert';
 import InputBase from '@material-ui/core/InputBase';
 import ToolBar from '@material-ui/core/Toolbar';
+import Snackbar from '@material-ui/core/Snackbar';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Typography from '@material-ui/core/Typography';
 import SearchIcon from '@material-ui/icons/Search';
 import { FundInfo, HeaderStore } from './header-store';
 import styles from './header.css';
+import { CanFetchFundValue } from '../../services/fund-value-service';
 
 type HeaderProps = {
   idInput: string;
   info: FundInfo | undefined;
   onIdChange: (id: string) => void;
   onSubmit: () => void;
+  errorMessage: string | undefined;
 };
 
 export const Header = React.memo(
-  ({ idInput, info, onSubmit, onIdChange }: HeaderProps) => {
+  ({ idInput, info, onSubmit, onIdChange, errorMessage }: HeaderProps) => {
     const handleSubmit = React.useCallback(
       (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -27,13 +31,16 @@ export const Header = React.memo(
     );
     const handleIdChange = React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
-        const id = e.target.value;
-        onIdChange(id);
+        onIdChange(e.target.value);
       },
       [onIdChange],
     );
+
     return (
       <AppBar position="static" className={styles.bar}>
+        <Snackbar open={errorMessage != null}>
+          <Alert severity="error">{errorMessage}</Alert>
+        </Snackbar>
         <ToolBar>
           <form onSubmit={handleSubmit}>
             <InputBase
@@ -62,9 +69,11 @@ export const Header = React.memo(
   },
 );
 
-export function createHeader() {
-  const store = new HeaderStore();
-  const onSubmit = () => undefined;
+export function createHeader(fundValueService: CanFetchFundValue) {
+  const store = new HeaderStore(fundValueService);
+  const onSubmit = () => {
+    store.fetchValue();
+  };
   const onIdChange = (id: string) => store.setIdInput(id);
   return observer(() => (
     <Header
@@ -72,6 +81,7 @@ export function createHeader() {
       info={store.info}
       onSubmit={onSubmit}
       onIdChange={onIdChange}
+      errorMessage={store.errorMessage}
     />
   ));
 }
