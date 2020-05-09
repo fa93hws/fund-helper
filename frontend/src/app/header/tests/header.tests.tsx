@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { mount, render } from 'enzyme';
-import { Header } from '../header';
-import { FundInfo } from '../header-store';
-import { FundValues } from '../../../services/fund-value-service';
+import { Header, FundInfo } from '../header';
 
 describe('Header', () => {
   it('renders header without fund info and input', () => {
@@ -12,7 +10,6 @@ describe('Header', () => {
         info={undefined}
         onIdChange={jest.fn()}
         onSubmit={jest.fn()}
-        errorMessage={undefined}
       />,
     ).toMatchRenderedSnapshot();
   });
@@ -21,7 +18,7 @@ describe('Header', () => {
     const info: FundInfo = {
       id: 'hanasaki',
       name: 'guming',
-      type: 'crystal',
+      typ: 'crystal',
     };
     expect(
       render(
@@ -30,21 +27,6 @@ describe('Header', () => {
           info={info}
           onIdChange={jest.fn()}
           onSubmit={jest.fn()}
-          errorMessage={undefined}
-        />,
-      ),
-    ).toMatchSnapshot();
-  });
-
-  it('renders header with error message', () => {
-    expect(
-      render(
-        <Header
-          idInput=""
-          info={undefined}
-          onIdChange={jest.fn()}
-          onSubmit={jest.fn()}
-          errorMessage="errorMessage"
         />,
       ),
     ).toMatchSnapshot();
@@ -58,7 +40,6 @@ describe('Header', () => {
         info={undefined}
         onIdChange={onChange}
         onSubmit={jest.fn()}
-        errorMessage={undefined}
       />,
     );
     component.find('input').simulate('change');

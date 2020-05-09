@@ -1,12 +1,49 @@
 import { action, observable } from 'mobx';
-import { FundValues } from '../services/fund-value-service';
+import { CanFetchFundValue, FundValues } from '../services/fund-value-service';
 
 export class AppStore {
+  private readonly fundValueService: CanFetchFundValue;
+
+  private readonly alertTimeout: number;
+
+  private alertTimer: number | undefined = undefined;
+
+  constructor({
+    fundValueService,
+    alertTimeout = 5000,
+  }: {
+    fundValueService: CanFetchFundValue;
+    alertTimeout?: number;
+  }) {
+    this.fundValueService = fundValueService;
+    this.alertTimeout = alertTimeout;
+  }
+
   @observable.ref
-  fundInfo: FundValues | undefined = undefined;
+  values: FundValues | undefined = undefined;
+
+  @observable.ref
+  errorMessage: string | undefined = undefined;
 
   @action
-  setFundInfo(fundInfo: FundValues) {
-    this.fundInfo = fundInfo;
+  async fetchValue(id: string) {
+    this.closeErrorAlert();
+    const response = await this.fundValueService.fetchFundValues(id);
+    if (response.kind === 'ok') {
+      this.values = response.data;
+    } else {
+      this.displayErrorMessage(response.error.message, this.alertTimeout);
+    }
+  }
+
+  private closeErrorAlert() {
+    this.errorMessage = undefined;
+    window.clearTimeout(this.alertTimer);
+  }
+
+  // timeout in ms
+  private displayErrorMessage(message: string, timeout: number) {
+    this.errorMessage = message;
+    this.alertTimer = window.setTimeout(() => this.closeErrorAlert(), timeout);
   }
 }

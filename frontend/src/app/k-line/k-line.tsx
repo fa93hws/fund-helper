@@ -1,15 +1,13 @@
-import * as React from 'react';
-import { observer } from 'mobx-react';
-import { IComputedValue } from 'mobx';
 import Container from '@material-ui/core/Container';
+import * as React from 'react';
+import { IComputedValue } from 'mobx';
+import { observer } from 'mobx-react';
 import { FundValues } from '../../services/fund-value-service';
 
-const KLine = React.memo(
-  ({ fundInfo }: { fundInfo: FundValues | undefined }) => (
-    <Container>{fundInfo == null ? '123' : JSON.stringify(fundInfo)}</Container>
-  ),
-);
+const KLine = React.memo(({ values }: { values: FundValues | undefined }) => (
+  <Container>{values == null ? '123' : JSON.stringify(values)}</Container>
+));
 
-export function createKLine(fundInfo: IComputedValue<FundValues | undefined>) {
-  return observer(() => <KLine fundInfo={fundInfo.get()} />);
+export function createKLine(values: IComputedValue<FundValues | undefined>) {
+  return observer(() => <KLine values={values.get()} />);
 }
