@@ -1,5 +1,8 @@
-import { observable, action } from 'mobx';
-import { CanFetchFundValue } from '../../services/fund-value-service';
+import { action, observable } from 'mobx';
+import {
+  CanFetchFundValue,
+  FundValues,
+} from '../../services/fund-value-service';
 
 export type FundInfo = {
   id: string;
@@ -8,10 +11,11 @@ export type FundInfo = {
 };
 
 export class HeaderStore {
-  constructor(
-    private readonly fundValueService: CanFetchFundValue,
-    private readonly alertTimeout: number = 5000,
-  ) {}
+  private readonly fundValueService: CanFetchFundValue;
+
+  private readonly alertTimeout: number;
+
+  private readonly setFundInfo: (info: FundValues) => void;
 
   @observable.ref
   idInput = '';
@@ -23,6 +27,20 @@ export class HeaderStore {
   errorMessage: string | undefined = undefined;
 
   private alertTimer: number | undefined = undefined;
+
+  constructor({
+    fundValueService,
+    alertTimeout = 5000,
+    setFundInfo,
+  }: {
+    fundValueService: CanFetchFundValue;
+    alertTimeout?: number;
+    setFundInfo: (info: FundValues) => void;
+  }) {
+    this.fundValueService = fundValueService;
+    this.alertTimeout = alertTimeout;
+    this.setFundInfo = setFundInfo;
+  }
 
   @action
   setIdInput(input: string) {
@@ -39,8 +57,9 @@ export class HeaderStore {
     this.closeErrorAlert();
     const response = await this.fundValueService.fetchFundValues(this.idInput);
     if (response.kind === 'ok') {
-      // eslint-disable-next-line
-      console.log(response.data);
+      const { data } = response;
+      this.setInfo({ id: data.id, name: data.name, type: data.type });
+      this.setFundInfo(data);
     } else {
       this.displayErrorMessage(response.error.message, this.alertTimeout);
     }
