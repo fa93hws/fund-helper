@@ -3,9 +3,10 @@
     "strict": true,
     "module": "esNext",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "ESNext",
     "jsx": "react",
     "baseUrl": "./",
+    "experimentalDecorators": true,
     "skipLibCheck": true
   }
 }

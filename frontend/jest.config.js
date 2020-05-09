@@ -9,7 +9,9 @@ module.exports = {
   },
   snapshotSerializers: ['enzyme-to-json/serializer', 'jest-serializer-html'],
   globals: {
+    tsConfig: 'tsconfig.test.json',
     'ts-jest': {
+      isolatedModules: true,
       diagnostics: {
         ignoreCodes: [151001],
       },
