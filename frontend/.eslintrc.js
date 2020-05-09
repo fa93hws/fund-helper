@@ -40,14 +40,14 @@ module.exports = {
     // import
     'import/prefer-default-export': 'off',
     'import/no-default-export': 'error',
-    '@typescript-eslint/explicit-function-return-type': 'off',
     'import/extensions': 'off',
-    'no-useless-constructor': 'off',
     'import/no-unresolved': 'off',
-    'no-unused-expressions': 'off',
-    '@typescript-eslint/no-namespace': 'off',
-
     'import/no-extraneous-dependencies': 'off',
+
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-namespace': 'off',
+    'no-useless-constructor': 'off',
+    'no-unused-expressions': 'off',
     'react/display-name': 'off',
     'no-console': 'error',
     'class-methods-use-this': 'off',

@@ -1,16 +1,15 @@
-import { observer } from 'mobx-react';
 import * as React from 'react';
-import AppBar from '@material-ui/core/AppBar';
 import Alert from '@material-ui/lab/Alert';
-import InputBase from '@material-ui/core/InputBase';
-import ToolBar from '@material-ui/core/Toolbar';
-import Snackbar from '@material-ui/core/Snackbar';
+import AppBar from '@material-ui/core/AppBar';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Typography from '@material-ui/core/Typography';
+import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
-import { FundInfo, HeaderStore } from './header-store';
+import Snackbar from '@material-ui/core/Snackbar';
+import ToolBar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import { observer } from 'mobx-react';
+import { HeaderStore, FundInfo } from './header-store';
 import styles from './header.css';
-import { CanFetchFundValue } from '../../services/fund-value-service';
 
 type HeaderProps = {
   idInput: string;
@@ -69,8 +68,7 @@ export const Header = React.memo(
   },
 );
 
-export function createHeader(fundValueService: CanFetchFundValue) {
-  const store = new HeaderStore(fundValueService);
+export function createHeader(store: HeaderStore) {
   const onSubmit = () => {
     store.fetchValue();
   };

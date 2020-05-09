@@ -1,7 +1,17 @@
 import { Result } from '../utils/result-type';
 
+export type FundValues = {
+  id: string;
+  name: string;
+  type: string;
+  values: {
+    date: number;
+    real_value: number;
+  }[];
+};
+
 export interface CanFetchFundValue {
-  fetchFundValues(id: string): Promise<Result<any>>;
+  fetchFundValues(id: string): Promise<Result<FundValues>>;
 }
 
 export class FundValueService implements CanFetchFundValue {
@@ -17,7 +27,7 @@ export class FundValueService implements CanFetchFundValue {
         : (this.fetch = fetch);
   }
 
-  async fetchFundValues(id: string): Promise<Result<any>> {
+  async fetchFundValues(id: string): Promise<Result<FundValues>> {
     try {
       const response = await this.fetch(this.URL + id);
       switch (response.status) {

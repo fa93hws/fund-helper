@@ -1,4 +1,4 @@
-import { unwrap, Result } from '../result-type';
+import { Result, unwrap } from '../result-type';
 
 describe('Result', () => {
   it('unwrap the data if no error', () => {

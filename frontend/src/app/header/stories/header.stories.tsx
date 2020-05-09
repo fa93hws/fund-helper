@@ -1,10 +1,11 @@
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
 import { text } from '@storybook/addon-knobs';
-import { action } from '@storybook/addon-actions';
-import { Result } from '../../../utils/result-type';
 import { Header, createHeader } from '../header';
-import { FundInfo } from '../header-store';
+import { HeaderStore, FundInfo } from '../header-store';
+import { FundValues } from '../../../services/fund-value-service';
+import { Result } from '../../../utils/result-type';
 
 storiesOf('app.header', module)
   .add('header (stateless)', () => {
@@ -30,10 +31,14 @@ storiesOf('app.header', module)
         action('fetch')(id);
         return {
           kind: 'ok',
-          data: [],
-        } as Result<any>;
+          data: {},
+        } as Result<FundValues>;
       },
     };
-    const HeaderImpl = createHeader(fakeFundValueService);
+    const store = new HeaderStore({
+      fundValueService: fakeFundValueService,
+      setFundInfo: action('set fund info'),
+    });
+    const HeaderImpl = createHeader(store);
     return <HeaderImpl />;
   });
