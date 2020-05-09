@@ -14,7 +14,7 @@ async fn fetch_one(id: &str) {
     let fund_list_dao = FundListDAO::new(&database_service);
     let fund_list_service = FundListService::new(&east_money_service, &fund_list_dao);
 
-    let fund_info = fund_list_service.find_fund_info(id).await;
+    let fund_info = fund_list_service.find_fund_info(id).await.unwrap();
     println!(
         "Fetching fund for {}@{} ({:?})",
         fund_info.name, fund_info.id, fund_info.typ

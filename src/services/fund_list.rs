@@ -27,7 +27,7 @@ impl<'a> FundListService<'a> {
         };
     }
 
-    pub async fn find_fund_info(&self, id: &str) -> FundListItem {
-        self.fund_list_dao.query_fund_with_id(id).await.unwrap()
+    pub async fn find_fund_info(&self, id: &str) -> Result<FundListItem, ()> {
+        self.fund_list_dao.query_fund_with_id(id).await
     }
 }

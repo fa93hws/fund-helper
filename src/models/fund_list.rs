@@ -21,7 +21,7 @@ pub enum FundType {
     NotInterested,
 }
 
-fn to_type_name(typ: &FundType) -> &str {
+pub fn to_type_name(typ: &FundType) -> &str {
     match typ {
         FundType::Mix => MIX_TYPE_NAME,
         FundType::Bond => BOND_TYPE_NAME,
@@ -97,7 +97,7 @@ impl<'a> FundListDAO<'a> {
         self.data_base_service.execute(&sql, &params).await
     }
 
-    pub async fn query_fund_with_id(&self, id: &str) -> Result<FundListItem, Error> {
+    pub async fn query_fund_with_id(&self, id: &str) -> Result<FundListItem, ()> {
         let row_result = self
             .data_base_service
             .query_one(
@@ -116,7 +116,7 @@ impl<'a> FundListDAO<'a> {
                     typ: typ_enum,
                 })
             }
-            Err(e) => Err(e),
+            Err(e) => Err(()),
         }
     }
 }
