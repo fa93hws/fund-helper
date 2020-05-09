@@ -1,5 +1,3 @@
-use chrono::NaiveDateTime;
-
 use crate::models::fund_list::FundListDAO;
 use crate::models::fund_value::{FundValueDAO, FundValueData};
 use crate::services::database::{DatabaseService, Environment};
@@ -85,7 +83,7 @@ pub async fn test_with_avg(id: &str) {
     let fund_list_dao = FundListDAO::new(&database_service);
     let fund_list_service = FundListService::new(&east_money_service, &fund_list_dao);
 
-    let fund_info = fund_list_service.find_fund_info(id).await;
+    let fund_info = fund_list_service.find_fund_info(id).await.unwrap();
     println!(
         "Performing regression test for {}@{} ({:?}) with average index",
         fund_info.name, fund_info.id, fund_info.typ

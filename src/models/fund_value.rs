@@ -1,4 +1,5 @@
 use chrono::NaiveDateTime;
+use serde::Serialize;
 use tokio_postgres::types::ToSql;
 use tokio_postgres::Error;
 
@@ -6,9 +7,19 @@ use crate::services::database::CanExecuteSQL;
 
 const TABLE_NAME: &str = "fund_net_values";
 
-#[derive(Debug, PartialEq)]
+mod my_date_format {
+    pub fn serialize<S>(date: &chrono::NaiveDateTime, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_i64(date.timestamp())
+    }
+}
+
+#[derive(Debug, PartialEq, Serialize)]
 pub struct FundValueData {
     // Timestamp in seconds
+    #[serde(with = "my_date_format")]
     pub date: NaiveDateTime,
     pub real_value: f32,
 }
