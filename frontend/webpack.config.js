@@ -39,7 +39,7 @@ module.exports = {
               localsConvention: 'camelCaseOnly',
               importLoaders: 0,
               sourceMap: true,
-            }
+            },
           },
         ],
       },

@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Header renders header with fund info and input 1`] = `
+<header
+  class="MuiPaper-root MuiAppBar-root MuiAppBar-positionStatic MuiAppBar-colorPrimary MuiPaper-elevation4"
+>
+  <div
+    class="MuiToolbar-root MuiToolbar-regular MuiToolbar-gutters"
+  >
+    <form>
+      <div
+        class="MuiInputBase-root MuiInputBase-adornedStart MuiInputBase-marginDense"
+        style="color:white"
+      >
+        <div
+          class="MuiInputAdornment-root MuiInputAdornment-positionStart"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+            />
+          </svg>
+        </div>
+        <input
+          class="MuiInputBase-input MuiInputBase-inputAdornedStart MuiInputBase-inputMarginDense"
+          placeholder="基金ID"
+          type="text"
+          value="cwx"
+        />
+      </div>
+    </form>
+    <div>
+      <h6
+        class="MuiTypography-root MuiTypography-h6"
+      >
+        guming@hanasaki (crystal)
+      </h6>
+    </div>
+  </div>
+</header>
+`;
+
+exports[`Header renders header without fund info and input 1`] = `
+<header
+  class="MuiPaper-root MuiAppBar-root MuiAppBar-positionStatic MuiAppBar-colorPrimary MuiPaper-elevation4"
+>
+  <div
+    class="MuiToolbar-root MuiToolbar-regular MuiToolbar-gutters"
+  >
+    <form>
+      <div
+        class="MuiInputBase-root MuiInputBase-adornedStart MuiInputBase-marginDense"
+        style="color:white"
+      >
+        <div
+          class="MuiInputAdornment-root MuiInputAdornment-positionStart"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+            />
+          </svg>
+        </div>
+        <input
+          class="MuiInputBase-input MuiInputBase-inputAdornedStart MuiInputBase-inputMarginDense"
+          placeholder="基金ID"
+          type="text"
+          value=""
+        />
+      </div>
+    </form>
+    <div />
+  </div>
+</header>
+`;
