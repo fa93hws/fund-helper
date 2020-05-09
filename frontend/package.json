@@ -4,16 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --ci",
     "build": "webpack",
     "dev": "webpack-dev-server",
+    "format": "prettier --check **/*",
     "lint": "eslint \"{conf,src,tools}/**/*.ts{,x}\"",
     "lint:ts": "tsc --noEmit",
-    "format": "prettier --check **/*"
+    "storybook": "start-storybook --config-dir=storybook",
+    "test": "jest --ci"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@storybook/addon-actions": "^5.3.18",
+    "@storybook/addon-knobs": "^5.3.18",
+    "@storybook/addons": "^5.3.18",
+    "@storybook/react": "^5.3.18",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/jest": "^25.2.1",
@@ -23,6 +28,7 @@
     "@types/webpack-dev-server": "^3.10.1",
     "@typescript-eslint/eslint-plugin": "^2.31.0",
     "@typescript-eslint/parser": "^2.31.0",
+    "babel-loader": "^8.1.0",
     "css-loader": "^3.5.3",
     "css-modules-typescript-loader": "^4.0.0",
     "enzyme": "^3.11.0",
