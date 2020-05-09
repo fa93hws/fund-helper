@@ -1,5 +1,6 @@
 backend/target
 frontend/target
+frontend/coverage
 target
 frontend/node_modules
 .idea
