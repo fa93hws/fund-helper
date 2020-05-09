@@ -6,6 +6,6 @@
     "target": "es5",
     "jsx": "react",
     "baseUrl": "./",
-    "skipLibCheck": true,
+    "skipLibCheck": true
   }
 }
