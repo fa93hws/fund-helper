@@ -1,0 +1,23 @@
+.container {
+  padding: 8px 0;
+  display: flex;
+  justify-content: space-around;
+}
+
+.slider {
+  width: 40%;
+}
+
+.sliderTitle {
+  justify-content: center;
+  display: flex;
+}
+
+.helpIcon {
+  transform: scale(0.5);
+  transform-origin: 0% 0%;
+}
+
+.helpIcon:hover {
+  cursor: pointer;
+}

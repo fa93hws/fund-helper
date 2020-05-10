@@ -3,7 +3,7 @@ import * as React from 'react';
 import { IComputedValue, reaction } from 'mobx';
 import { observer } from 'mobx-react';
 import { FundValues } from '../../services/fund-value-service';
-import { Plotter } from './plot/plot';
+import { Plotter, Markup } from './plot/plot';
 import styles from './k-line.css';
 
 type KLineProperty = {
@@ -12,21 +12,24 @@ type KLineProperty = {
 
 const KLine = React.memo(({ onMounted }: KLineProperty) => {
   return (
-    <Container>
+    <Container className={styles.container}>
       <div ref={onMounted} className={styles.plot} />
     </Container>
   );
 });
 
-export function createKLine(values: IComputedValue<FundValues | undefined>) {
+export function createKLine(
+  values: IComputedValue<FundValues | undefined>,
+  makrups: IComputedValue<Markup[]>,
+) {
   let plotter: Plotter;
   const onMounted = (element: HTMLDivElement) => {
     plotter = new Plotter(element);
   };
   reaction(
-    () => values.get(),
-    (fundValues) => {
-      fundValues && plotter.drawLine(fundValues);
+    () => ({ fundValues: values.get(), plotMarkups: makrups.get() }),
+    ({ fundValues, plotMarkups }) => {
+      fundValues && plotter.drawLine(fundValues, plotMarkups);
     },
     { fireImmediately: true },
   );
