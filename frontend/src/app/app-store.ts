@@ -1,5 +1,6 @@
 import { action, observable } from 'mobx';
 import { CanFetchFundValue, FundValues } from '../services/fund-value-service';
+import { Markup } from './k-line/plot/plot';
 
 export class AppStore {
   private readonly fundValueService: CanFetchFundValue;
@@ -19,14 +20,13 @@ export class AppStore {
     this.alertTimeout = alertTimeout;
   }
 
-  @observable.ref
-  values: FundValues | undefined = undefined;
+  @observable.ref values: FundValues | undefined = undefined;
 
-  @observable.ref
-  errorMessage: string | undefined = undefined;
+  @observable.ref errorMessage: string | undefined = undefined;
 
-  @action
-  async fetchValue(id: string) {
+  @observable.ref markups: Markup[] = [];
+
+  @action async fetchValue(id: string) {
     this.closeErrorAlert();
     const response = await this.fundValueService.fetchFundValues(id);
     if (response.kind === 'ok') {
@@ -34,6 +34,10 @@ export class AppStore {
     } else {
       this.displayErrorMessage(response.error.message, this.alertTimeout);
     }
+  }
+
+  @action setMarkups(markups: Markup[]) {
+    this.markups = markups;
   }
 
   private closeErrorAlert() {
