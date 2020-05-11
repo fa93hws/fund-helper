@@ -51,6 +51,7 @@ module.exports = {
     'react/display-name': 'off',
     'no-console': 'error',
     'class-methods-use-this': 'off',
+    'no-continue': 'off',
   },
   overrides: [
     {
