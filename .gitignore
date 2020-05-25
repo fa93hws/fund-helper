@@ -3,6 +3,8 @@ frontend/target
 frontend/coverage
 target
 frontend/node_modules
+backend-ts/node_modules
+backend-ts/dist
 .idea
 *.iml
 .DS_Store
