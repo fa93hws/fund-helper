@@ -1,0 +1,40 @@
+name: Backend
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - backend-ts/**
+      - .github/workflows/backend.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - backend-ts/**
+      - .github/workflows/backend.yml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        with:
+          path: backend-ts/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('backend-ts/package-lock.json') }}
+      - name: Install node_modules
+        run: npm ci
+        working-directory: backend-ts
+      - name: Format
+        run: npm run format
+        working-directory: backend-ts
+      - name: Lint
+        run: npm run lint
+        working-directory: backend-ts
+      - name: Type check
+        run: npm run lint:ts
+        working-directory: backend-ts
+      - name: Build
+        run: npm run build
+        working-directory: backend-ts
