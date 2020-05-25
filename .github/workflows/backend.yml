@@ -38,3 +38,6 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: backend-ts
+      - name: Start docker image
+        run: docker-compose up -d
+        working-directory: backend-ts
