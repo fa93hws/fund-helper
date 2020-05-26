@@ -6,6 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     FundValuesModule,
   );
+  app.setGlobalPrefix('api/v1');
   await app.listen(3000);
 }
 
