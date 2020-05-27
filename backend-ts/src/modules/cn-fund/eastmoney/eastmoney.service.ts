@@ -4,7 +4,11 @@ import { of, Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Result } from '../../../utils/result-type';
 import { transformResponse } from '../../../utils/http-result';
-import { deserializeValue, deserializeList, FundValueResponse } from './deserialize-response';
+import {
+  deserializeValue,
+  deserializeList,
+  FundValueResponse,
+} from './deserialize-response';
 import type { FundBasicInfo } from '../values.dto';
 
 @Injectable()
@@ -25,20 +29,25 @@ export class EastMoneyService {
   }
 
   private handleRequestException(e: any) {
-    return of(Result.createError({
-      statusCode: -1,
-      statusText: 'Did not get response from the backend server',
-      error: e,
-    }));
+    return of(
+      Result.createError({
+        statusCode: -1,
+        statusText: 'Did not get response from the backend server',
+        error: e,
+      }),
+    );
   }
 
-  getValues(fundId: string, page: number): Observable<Result.T<FundValueResponse, any>> {
+  getValues(
+    fundId: string,
+    page: number,
+  ): Observable<Result.T<FundValueResponse, any>> {
     return this.httpService
       .get(
         `http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=${fundId}&page=${page}&per=20`,
       )
       .pipe(
-        map(response =>
+        map((response) =>
           this.maybeFilterResponseError(response, deserializeValue),
         ),
         catchError(this.handleRequestException),
@@ -46,9 +55,13 @@ export class EastMoneyService {
   }
 
   getList(): Observable<Result.T<FundBasicInfo[], any>> {
-    return this.httpService.get('http://fund.eastmoney.com/js/fundcode_search.js').pipe(
-      map(response => this.maybeFilterResponseError(response, deserializeList)),
-      catchError(this.handleRequestException),
-    )
+    return this.httpService
+      .get('http://fund.eastmoney.com/js/fundcode_search.js')
+      .pipe(
+        map((response) =>
+          this.maybeFilterResponseError(response, deserializeList),
+        ),
+        catchError(this.handleRequestException),
+      );
   }
 }

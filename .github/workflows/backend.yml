@@ -35,6 +35,9 @@ jobs:
       - name: Type check
         run: npm run lint:ts
         working-directory: backend-ts
+      - name: Unit test
+        run: npm run test
+        working-directory: backend-ts
       - name: Build
         run: npm run build
         working-directory: backend-ts
