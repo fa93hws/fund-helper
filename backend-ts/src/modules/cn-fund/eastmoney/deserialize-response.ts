@@ -9,7 +9,7 @@ export type FundValueResponse = {
   values: FundValue[];
   curPage: number;
   pages: number;
-}
+};
 
 export function deserializeValue(
   valueResponse: unknown,
@@ -32,14 +32,14 @@ export function deserializeValue(
   const pages = context.apidata?.pages;
   if (typeof pages !== 'number') {
     return Result.createError(
-      new Error('Failed to get apidata.pages as number')
-    )
+      new Error('Failed to get apidata.pages as number'),
+    );
   }
   const curPage = context.apidata?.curpage;
   if (typeof curPage !== 'number') {
     return Result.createError(
-      new Error('Failed to get apidata.curpage as number')
-    )
+      new Error('Failed to get apidata.curpage as number'),
+    );
   }
   try {
     const values = tryExtractValuesFromHTML(context.apidata.content);
@@ -54,15 +54,13 @@ function tryExtractValuesFromHTML(
 ): { date: Date; value: number }[] {
   const $ = cheerio.load(html);
   const rows = $('tbody>tr').toArray();
-  const values = rows.map(row => {
+  const values = rows.map((row) => {
     const dateStr = row.children[0]?.children[0]?.data;
-    if (typeof dateStr !== 'string' || !/\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+    if (typeof dateStr !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       throw new Error(`type of date is not in yyyy-mm-dd, html: ${html}`);
     }
     // Market closes at 15:00 (GMT+8)
-    const date = utc(dateStr)
-      .add(7, 'hours')
-      .toDate();
+    const date = utc(dateStr).add(7, 'hours').toDate();
     const valueStr = row.children[2]?.children[0]?.data;
     if (typeof valueStr !== 'string' || isNaN(parseFloat(valueStr))) {
       throw new Error(
@@ -75,7 +73,9 @@ function tryExtractValuesFromHTML(
   return values;
 }
 
-export function deserializeList(listResponse: unknown): Result.T<FundBasicInfo[]> {
+export function deserializeList(
+  listResponse: unknown,
+): Result.T<FundBasicInfo[]> {
   if (typeof listResponse !== 'string') {
     return Result.createError(new Error('valueResponse is not string!'));
   }
@@ -83,9 +83,7 @@ export function deserializeList(listResponse: unknown): Result.T<FundBasicInfo[]
   vm.createContext(context);
   vm.runInContext(listResponse, context);
   if (!Array.isArray(context.r)) {
-    return Result.createError(
-      new Error('Failed to get r in context as array'),
-    );
+    return Result.createError(new Error('Failed to get r in context as array'));
   }
   try {
     const list = tryExtractFundBasicInfos(context.r);
@@ -101,7 +99,9 @@ function tryExtractFundBasicInfos(rawList: unknown[]): FundBasicInfo[] {
       throw new Error(`rawInfo must be an array, got ${rawInfo}`);
     }
     if (rawInfo.length !== 5) {
-      throw new Error(`rawInfo should have 5 element, got ${rawInfo.length} from [${rawInfo}]`);
+      throw new Error(
+        `rawInfo should have 5 element, got ${rawInfo.length} from [${rawInfo}]`,
+      );
     }
     const id = rawInfo[0];
     if (typeof id !== 'string') {
@@ -113,18 +113,20 @@ function tryExtractFundBasicInfos(rawList: unknown[]): FundBasicInfo[] {
     }
     const typeStr = rawInfo[3];
     if (typeof typeStr !== 'string') {
-      throw new Error(`typeStr should be string, got ${typeStr} from [${rawInfo}]`);
+      throw new Error(
+        `typeStr should be string, got ${typeStr} from [${rawInfo}]`,
+      );
     }
     return {
       id,
       name,
       type: getFundTypeFromStr(typeStr),
-    }
-  })
+    };
+  });
 }
 
 function getFundTypeFromStr(typeStr: string): FundType {
-  switch(typeStr) {
+  switch (typeStr) {
     case '混合型':
     case '混合-FOF':
       return FundType.混合;
