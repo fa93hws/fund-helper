@@ -4,8 +4,8 @@ import { of, Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Result } from '../../../utils/result-type';
 import { transformResponse } from '../../../utils/http-result';
-import { deserializeValue, deserializeList } from './deserialize-response';
-import type { FundValue, FundBasicInfo } from '../values.dto';
+import { deserializeValue, deserializeList, FundValueResponse } from './deserialize-response';
+import type { FundBasicInfo } from '../values.dto';
 
 @Injectable()
 export class EastMoneyService {
@@ -32,10 +32,10 @@ export class EastMoneyService {
     }));
   }
 
-  getValues(fundId: string): Observable<Result.T<FundValue[], any>> {
+  getValues(fundId: string, page: number): Observable<Result.T<FundValueResponse, any>> {
     return this.httpService
       .get(
-        `http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=${fundId}`,
+        `http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=${fundId}&page=${page}&per=20`,
       )
       .pipe(
         map(response =>

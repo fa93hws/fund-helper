@@ -5,9 +5,19 @@ import { Result } from '../../../utils/result-type';
 import type { FundValue, FundBasicInfo } from '../values.dto';
 import { FundType } from '../values.dto';
 
+export type FundValueResponse = {
+  values: FundValue[];
+  curPage: number;
+  pages: number;
+}
+
 export function deserializeValue(
   valueResponse: unknown,
-): Result.T<FundValue[]> {
+): Result.T<{
+  values: FundValue[];
+  curPage: number;
+  pages: number;
+}> {
   if (typeof valueResponse !== 'string') {
     return Result.createError(new Error('valueResponse is not string!'));
   }
@@ -16,12 +26,24 @@ export function deserializeValue(
   vm.runInContext(valueResponse, context);
   if (typeof context.apidata?.content !== 'string') {
     return Result.createError(
-      new Error('Failed to get apidata in context as string'),
+      new Error('Failed to get apidata.content as string'),
     );
+  }
+  const pages = context.apidata?.pages;
+  if (typeof pages !== 'number') {
+    return Result.createError(
+      new Error('Failed to get apidata.pages as number')
+    )
+  }
+  const curPage = context.apidata?.curpage;
+  if (typeof curPage !== 'number') {
+    return Result.createError(
+      new Error('Failed to get apidata.curpage as number')
+    )
   }
   try {
     const values = tryExtractValuesFromHTML(context.apidata.content);
-    return Result.createOk(values);
+    return Result.createOk({ values, curPage, pages });
   } catch (e) {
     return Result.createError(e);
   }
