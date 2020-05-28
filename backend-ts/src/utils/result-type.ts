@@ -21,4 +21,15 @@ export namespace Result {
     }
     throw result.error;
   }
+
+  export function mapData<R, E, S>(
+    result: T<R, E>,
+    fn: (data: R) => S,
+  ): T<S, E> {
+    if (result.kind === 'error') {
+      return result;
+    }
+    const newData = fn(result.data);
+    return createOk(newData);
+  }
 }

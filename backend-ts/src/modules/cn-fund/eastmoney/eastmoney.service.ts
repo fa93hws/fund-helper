@@ -13,7 +13,7 @@ import type { FundBasicInfo } from '../values.dto';
 
 @Injectable()
 export class EastMoneyService {
-  constructor(private httpService: HttpService) {
+  constructor(private readonly httpService: HttpService) {
     this.handleRequestException = this.handleRequestException.bind(this);
   }
 
