@@ -1,5 +1,6 @@
 import { of } from 'rxjs';
 import type { EastMoneyService } from '../eastmoney/eastmoney.service';
+import type { PGService } from '../../../services/database/pg.service';
 import { FundValueService } from '../values.service';
 
 describe('valuesService', () => {
@@ -10,7 +11,9 @@ describe('valuesService', () => {
     getList: fakeEastMoneyGetList,
     getValues: fakeEastMoneyGetValues,
   } as any) as EastMoneyService;
-  const fakeService = new FundValueService(fakeEastMoneyService);
+
+  const pgService = ({} as any) as PGService;
+  const fakeService = new FundValueService(fakeEastMoneyService, pgService);
 
   beforeEach(() => {
     fakeEastMoneyGetValues.mockRestore();

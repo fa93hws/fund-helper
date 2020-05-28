@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { EastMoneyService } from './eastmoney/eastmoney.service';
 import { Result } from '../../utils/result-type';
+import { PGService } from '../../services/database/pg.service';
+import { tableNames } from '../../services/database/pg.constant';
 import { FundValue } from './values.dto';
 
 @Injectable()
 export class FundValueService {
-  constructor(private eastMoneyService: EastMoneyService) {}
+  constructor(
+    private readonly eastMoneyService: EastMoneyService,
+    private readonly pgService: PGService,
+  ) {}
 
   async getValues(fundId: string): Promise<Result.T<FundValue[], any>> {
     const firstFundValueResult = await this.eastMoneyService
