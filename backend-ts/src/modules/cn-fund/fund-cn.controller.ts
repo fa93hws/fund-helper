@@ -4,11 +4,11 @@ import {
   InternalServerErrorException,
   Param,
 } from '@nestjs/common';
-import { FundValueService } from './values.service';
+import { FundCNService } from './fund-cn.service';
 
 @Controller()
-export class FundValuesController {
-  constructor(private fundValueService: FundValueService) {}
+export class FundCNController {
+  constructor(private fundValueService: FundCNService) {}
 
   @Get('cn-fund/:id')
   async getFundValues(@Param('id') fundId: string) {

@@ -17,7 +17,7 @@ describe('EastMoneyService', () => {
     fakeGet.mockRestore();
   });
 
-  describe('getValues', () => {
+  describe('getValueAtPage', () => {
     it('calls the corresponding api', async () => {
       fakeGet.mockReturnValue(
         of({
@@ -25,7 +25,7 @@ describe('EastMoneyService', () => {
           data: fakeValueResponseRaw,
         }),
       );
-      await fakeService.getValues('id', 2).toPromise();
+      await fakeService.getValueAtPage('id', 2).toPromise();
       expect(fakeGet).toBeCalledWith(
         'http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=id&page=2&per=20',
       );
@@ -38,7 +38,7 @@ describe('EastMoneyService', () => {
           data: fakeValueResponseRaw,
         }),
       );
-      const result = await fakeService.getValues('id', 2).toPromise();
+      const result = await fakeService.getValueAtPage('id', 2).toPromise();
       expect(result).toEqual({
         kind: 'ok',
         data: fakeValueResponseParsed,
@@ -52,7 +52,7 @@ describe('EastMoneyService', () => {
           data: 'var a = {}',
         }),
       );
-      const result = await fakeService.getValues('id', 2).toPromise();
+      const result = await fakeService.getValueAtPage('id', 2).toPromise();
       if (result.kind === 'error') {
         expect(result.error).toMatchInlineSnapshot(
           `[Error: Failed to get apidata.content as string]`,
@@ -71,7 +71,7 @@ describe('EastMoneyService', () => {
           data: 'wrong!',
         }),
       );
-      const result = await fakeService.getValues('id', 2).toPromise();
+      const result = await fakeService.getValueAtPage('id', 2).toPromise();
       expect(result).toEqual({
         kind: 'error',
         error: {
@@ -79,6 +79,112 @@ describe('EastMoneyService', () => {
           statusText: 'service unavailable',
           error: 'wrong!',
         },
+      });
+    });
+  });
+
+  describe('getValues', () => {
+    const fakeEastMoneyGetValueAtPage = jest.fn();
+    const fakeService = new EastMoneyService(fakeHttpService);
+    fakeService.getValueAtPage = fakeEastMoneyGetValueAtPage;
+
+    beforeEach(() => {
+      fakeEastMoneyGetValueAtPage.mockRestore();
+    });
+
+    it('returns values if there is only one page', async () => {
+      fakeEastMoneyGetValueAtPage.mockReturnValueOnce(
+        of({
+          kind: 'ok',
+          data: {
+            values: [{ date: 1, value: 1.23 }],
+            pages: 1,
+          },
+        }),
+      );
+      const values = await fakeService.getValues('id');
+      expect(fakeEastMoneyGetValueAtPage).toBeCalledWith('id', 1);
+      expect(values).toEqual({
+        kind: 'ok',
+        data: [{ date: 1, value: 1.23 }],
+      });
+    });
+
+    it('returns values directly if there is only one page', async () => {
+      fakeEastMoneyGetValueAtPage.mockReturnValueOnce(
+        of({
+          kind: 'ok',
+          data: {
+            values: [{ date: 1, value: 1.23 }],
+            pages: 1,
+          },
+        }),
+      );
+      const values = await fakeService.getValues('id');
+      expect(fakeEastMoneyGetValueAtPage).toBeCalledWith('id', 1);
+      expect(values).toEqual({
+        kind: 'ok',
+        data: [{ date: 1, value: 1.23 }],
+      });
+    });
+
+    it('accumulates values from all pages', async () => {
+      fakeEastMoneyGetValueAtPage.mockImplementation(
+        (id: string, page: number) =>
+          of({
+            kind: 'ok',
+            data: {
+              values: [
+                { date: page, value: 2 * page },
+                { date: page * 2, value: 4 * page },
+              ],
+              pages: 3,
+            },
+          }),
+      );
+      const values = await fakeService.getValues('id');
+      expect(fakeEastMoneyGetValueAtPage).toHaveBeenNthCalledWith(1, 'id', 1);
+      expect(fakeEastMoneyGetValueAtPage).toHaveBeenNthCalledWith(2, 'id', 2);
+      expect(fakeEastMoneyGetValueAtPage).toHaveBeenNthCalledWith(3, 'id', 3);
+      expect(values).toEqual({
+        kind: 'ok',
+        data: [
+          { date: 1, value: 2 },
+          { date: 2, value: 4 },
+          { date: 2, value: 4 },
+          { date: 4, value: 8 },
+          { date: 3, value: 6 },
+          { date: 6, value: 12 },
+        ],
+      });
+    });
+
+    it('returns error if any of the request fails', async () => {
+      fakeEastMoneyGetValueAtPage.mockImplementation(
+        (id: string, page: number) => {
+          if (page === 2) {
+            return of({
+              kind: 'error',
+              error: 'err',
+            });
+          }
+          return of({
+            kind: 'ok',
+            data: {
+              values: [{ date: 1, value: 1.23 }],
+              pages: 4,
+            },
+          });
+        },
+      );
+      const values = await fakeService.getValues('id');
+      expect(fakeEastMoneyGetValueAtPage).toHaveBeenNthCalledWith(1, 'id', 1);
+      expect(fakeEastMoneyGetValueAtPage).toHaveBeenNthCalledWith(2, 'id', 2);
+      expect(fakeEastMoneyGetValueAtPage).toHaveBeenNthCalledWith(3, 'id', 3);
+      expect(fakeEastMoneyGetValueAtPage).toHaveBeenNthCalledWith(4, 'id', 4);
+      expect(values).toEqual({
+        kind: 'error',
+        error: 'err',
       });
     });
   });

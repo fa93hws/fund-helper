@@ -9,7 +9,7 @@ import {
   deserializeList,
   FundValueResponse,
 } from './deserialize-response';
-import type { FundBasicInfo } from '../values.dto';
+import type { FundCNBasicInfo, FundCNValue } from '../fund-cn.dto';
 
 @Injectable()
 export class EastMoneyService {
@@ -38,7 +38,7 @@ export class EastMoneyService {
     );
   }
 
-  getValues(
+  getValueAtPage(
     fundId: string,
     page: number,
   ): Observable<Result.T<FundValueResponse, any>> {
@@ -54,7 +54,32 @@ export class EastMoneyService {
       );
   }
 
-  getList(): Observable<Result.T<FundBasicInfo[], any>> {
+  async getValues(fundId: string) {
+    const firstFundValueResult = await this.getValueAtPage(
+      fundId,
+      1,
+    ).toPromise();
+    if (firstFundValueResult.kind === 'error') {
+      return firstFundValueResult;
+    }
+    const { pages } = firstFundValueResult.data;
+    // page starts from 2, because 1 has been received before
+    const valueResultPromises = new Array(pages - 1)
+      .fill(0)
+      .map((_, idx) => this.getValueAtPage(fundId, idx + 2).toPromise());
+    const valueResults = await Promise.all(valueResultPromises);
+    const values: FundCNValue[] = firstFundValueResult.data.values;
+    for (let idx = 0; idx < valueResults.length; idx += 1) {
+      const valueResult = valueResults[idx];
+      if (valueResult.kind === 'error') {
+        return valueResult;
+      }
+      values.push(...valueResult.data.values);
+    }
+    return Result.createOk(values);
+  }
+
+  getList(): Observable<Result.T<FundCNBasicInfo[], any>> {
     return this.httpService
       .get('http://fund.eastmoney.com/js/fundcode_search.js')
       .pipe(

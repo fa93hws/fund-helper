@@ -3,42 +3,20 @@ import { EastMoneyService } from './eastmoney/eastmoney.service';
 import { Result } from '../../utils/result-type';
 import { PGService, SelectStatement } from '../../services/database/pg.service';
 import { tableNames } from '../../services/database/pg.constant';
-import { FundValue, FundBasicInfo } from './values.dto';
+import { FundCNValue, FundCNBasicInfo } from './fund-cn.dto';
 
 @Injectable()
-export class FundValueService {
+export class FundCNService {
   constructor(
     private readonly eastMoneyService: EastMoneyService,
     private readonly pgService: PGService,
   ) {}
 
-  async getValues(fundId: string): Promise<Result.T<FundValue[], any>> {
-    const firstFundValueResult = await this.eastMoneyService
-      .getValues(fundId, 1)
-      .toPromise();
-    if (firstFundValueResult.kind === 'error') {
-      return firstFundValueResult;
-    }
-    const { pages } = firstFundValueResult.data;
-    // page starts from 2, because 1 has been received before
-    const valueResultPromises = new Array(pages - 1)
-      .fill(0)
-      .map((_, idx) =>
-        this.eastMoneyService.getValues(fundId, idx + 2).toPromise(),
-      );
-    const valueResults = await Promise.all(valueResultPromises);
-    const values: FundValue[] = firstFundValueResult.data.values;
-    for (let idx = 0; idx < valueResults.length; idx += 1) {
-      const valueResult = valueResults[idx];
-      if (valueResult.kind === 'error') {
-        return valueResult;
-      }
-      values.push(...valueResult.data.values);
-    }
-    return Result.createOk(values);
+  async getValues(fundId: string): Promise<Result.T<FundCNValue[], any>> {
+    return this.eastMoneyService.getValues(fundId);
   }
 
-  async getList(): Promise<Result.T<FundBasicInfo[], any>> {
+  async getList(): Promise<Result.T<FundCNBasicInfo[], any>> {
     const listResponseResult = await this.eastMoneyService
       .getList()
       .toPromise();
@@ -83,13 +61,13 @@ export class FundValueService {
     return insertResult;
   }
 
-  async getFundInfo(id: string): Promise<Result.T<FundBasicInfo, any>> {
+  async getFundInfo(id: string): Promise<Result.T<FundCNBasicInfo, any>> {
     const queryStatement: SelectStatement = {
       fields: ['id', 'name', 'type'],
       tableName: tableNames.fundCnList,
       where: 'id = $1',
     };
-    const queryResult = await this.pgService.select<FundBasicInfo>(
+    const queryResult = await this.pgService.select<FundCNBasicInfo>(
       queryStatement,
       [id],
     );
@@ -108,7 +86,7 @@ export class FundValueService {
     if (getListResult.kind === 'error') {
       return getListResult;
     }
-    const queryAgainResult = await this.pgService.select<FundBasicInfo>(
+    const queryAgainResult = await this.pgService.select<FundCNBasicInfo>(
       queryStatement,
       [id],
     );

@@ -1,9 +1,9 @@
-export type FundValue = {
+export type FundCNValue = {
   date: Date;
   value: number;
 };
 
-export const enum FundType {
+export const enum FundCNType {
   '混合' = '混合',
   '股票' = '股票',
   '债券' = '债券',
@@ -11,8 +11,8 @@ export const enum FundType {
   '其他' = '其他',
 }
 
-export type FundBasicInfo = {
+export type FundCNBasicInfo = {
   id: string;
   name: string;
-  type: FundType;
+  type: FundCNType;
 };

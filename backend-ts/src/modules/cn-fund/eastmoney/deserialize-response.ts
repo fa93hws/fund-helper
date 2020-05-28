@@ -2,11 +2,11 @@ import * as vm from 'vm';
 import * as cheerio from 'cheerio';
 import { utc } from 'moment';
 import { Result } from '../../../utils/result-type';
-import type { FundValue, FundBasicInfo } from '../values.dto';
-import { FundType } from '../values.dto';
+import type { FundCNValue, FundCNBasicInfo } from '../fund-cn.dto';
+import { FundCNType } from '../fund-cn.dto';
 
 export type FundValueResponse = {
-  values: FundValue[];
+  values: FundCNValue[];
   curPage: number;
   pages: number;
 };
@@ -14,7 +14,7 @@ export type FundValueResponse = {
 export function deserializeValue(
   valueResponse: unknown,
 ): Result.T<{
-  values: FundValue[];
+  values: FundCNValue[];
   curPage: number;
   pages: number;
 }> {
@@ -75,7 +75,7 @@ function tryExtractValuesFromHTML(
 
 export function deserializeList(
   listResponse: unknown,
-): Result.T<FundBasicInfo[]> {
+): Result.T<FundCNBasicInfo[]> {
   if (typeof listResponse !== 'string') {
     return Result.createError(new Error('valueResponse is not string!'));
   }
@@ -93,7 +93,7 @@ export function deserializeList(
   }
 }
 
-function tryExtractFundBasicInfos(rawList: unknown[]): FundBasicInfo[] {
+function tryExtractFundBasicInfos(rawList: unknown[]): FundCNBasicInfo[] {
   return rawList.map((rawInfo) => {
     if (!Array.isArray(rawInfo)) {
       throw new Error(`rawInfo must be an array, got ${rawInfo}`);
@@ -125,32 +125,32 @@ function tryExtractFundBasicInfos(rawList: unknown[]): FundBasicInfo[] {
   });
 }
 
-function getFundTypeFromStr(typeStr: string): FundType {
+function getFundTypeFromStr(typeStr: string): FundCNType {
   switch (typeStr) {
     case '混合型':
     case '混合-FOF':
-      return FundType.混合;
+      return FundCNType.混合;
     case '债券型':
     case '定开债券':
     case '债券指数':
-      return FundType.债券;
+      return FundCNType.债券;
     case '联接基金':
     case '股票指数':
     case 'QDII-指数':
     case 'ETF-场内':
     case 'QDII-ETF':
-      return FundType.指数;
+      return FundCNType.指数;
     case '货币型':
     case '理财型':
     case '固定收益':
     case '分级杠杆':
     case '保本型':
     case '其他创新':
-      return FundType.其他;
+      return FundCNType.其他;
     case 'QDII':
     case '股票型':
     case '股票-FOF':
-      return FundType.股票;
+      return FundCNType.股票;
     default:
       throw new Error(`unknown fund type ${typeStr}`);
   }
