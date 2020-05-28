@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { FundValuesController } from './values.controller';
+import { FundCNController } from './fund-cn.controller';
 import { EastMoneyModule } from './eastmoney/eastmoney.module';
-import { FundValueService } from './values.service';
+import { FundCNService } from './fund-cn.service';
 import { createPGServiceFactory } from '../../services/database/pg.factory';
 import { PGService } from '../../services/database/pg.service';
 
 @Module({
   imports: [EastMoneyModule],
-  controllers: [FundValuesController],
+  controllers: [FundCNController],
   providers: [
-    FundValueService,
+    FundCNService,
     {
       provide: PGService,
       useFactory: createPGServiceFactory,
     },
   ],
 })
-export class FundValuesModule {}
+export class FundCNModule {}
