@@ -102,4 +102,8 @@ export class PGService {
       return Result.createError(e);
     }
   }
+
+  async execute<T>(sql: string, params?: any[]) {
+    return this.pool.query<T>(sql, params);
+  }
 }
