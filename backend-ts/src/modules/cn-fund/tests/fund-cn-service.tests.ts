@@ -48,7 +48,7 @@ describe('valuesService', () => {
         expect(fakePgInsert).toBeCalledWith(
           {
             fields: ['id', 'name', 'type'],
-            tableName: 'fund_info',
+            tableName: 'cn_fund_infos',
             values: [
               ['$1', '$2', '$3'],
               ['$4', '$5', '$6'],
@@ -121,7 +121,7 @@ describe('valuesService', () => {
       expect(fakePgSelect).toBeCalledWith(
         {
           fields: ['id', 'name', 'type'],
-          tableName: 'fund_info',
+          tableName: 'cn_fund_infos',
           where: 'id = $1',
         },
         ['123'],

@@ -1,4 +1,5 @@
+// To be sync with scripts/init-db/init-db.sql
 export const tableNames = {
-  fundCnValues: 'fund_net_values',
-  fundCnList: 'fund_info',
+  fundCnValues: 'cn_fund_values',
+  fundCnList: 'cn_fund_infos',
 };
