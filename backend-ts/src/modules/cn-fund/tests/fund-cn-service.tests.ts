@@ -79,6 +79,7 @@ describe('valuesService', () => {
         done.fail('it should not fail');
       }
     });
+
     it('returns error if request fails', async () => {
       fakeEastMoneyGetList.mockReturnValueOnce(
         of({
@@ -93,6 +94,7 @@ describe('valuesService', () => {
       });
       expect(fakePgInsert).not.toBeCalled();
     });
+
     it('returns error if update fails', async () => {
       fakeEastMoneyGetList.mockReturnValueOnce(
         of({
@@ -132,6 +134,7 @@ describe('valuesService', () => {
         ['123'],
       );
     });
+
     it('sends the request and update DB if not found in the db at the first time', async () => {
       fakePgSelect.mockReturnValueOnce({
         kind: 'ok',
@@ -163,6 +166,7 @@ describe('valuesService', () => {
       expect(fakeEastMoneyGetList).toBeCalled();
       expect(fakePgInsert).toBeCalled();
     });
+
     it('returns error if not found in second trial', async (done) => {
       fakePgSelect.mockReturnValue({
         kind: 'ok',
@@ -183,9 +187,7 @@ describe('valuesService', () => {
         expect(fakePgSelect).toBeCalledTimes(2);
         expect(fakeEastMoneyGetList).toBeCalled();
         expect(fakePgInsert).toBeCalled();
-        expect(result.error).toMatchInlineSnapshot(
-          `[Error: 0 or multiple results found for fundId=123]`,
-        );
+        expect(result.error).toEqual('NOT_FOUND');
         done();
       } else {
         done.fail('it should fail');

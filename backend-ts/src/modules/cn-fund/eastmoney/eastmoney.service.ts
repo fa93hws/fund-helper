@@ -45,44 +45,16 @@ export class EastMoneyService {
     page: number,
   ): Observable<Result.T<FundValueResponse, any>> {
     const url = `http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=${fundId}&page=${page}&per=20`;
-    this.logService.info(
-      `fetching fund values for fundId=${fundId} at page ${page}`,
-      { fundId, page, url },
-    );
+    this.logService.info('fetching fund values from remote', { url });
     return this.httpService.get(url).pipe(
-      map((response) => {
-        const result = this.maybeFilterResponseError(
-          response,
-          deserializeValue,
-        );
-        if (result.kind === 'ok') {
-          this.logService.info(
-            `fund values for fundId=${fundId} at page ${page} fetched`,
-            { fundId, page },
-          );
-        } else {
-          this.logService.error(
-            `fail to fetch fund values for fundId=${fundId} at page ${page}`,
-            { fundId, page, error: result.error },
-          );
-        }
-        return result;
-      }),
-      catchError((error) => {
-        this.logService.error(
-          `fail to fetch fund values for fundId=${fundId} at page ${page}`,
-          { fundId, page, error },
-        );
-        return this.handleRequestException(error);
-      }),
+      map((response) =>
+        this.maybeFilterResponseError(response, deserializeValue),
+      ),
+      catchError((error) => this.handleRequestException(error)),
     );
   }
 
   async getValues(fundId: string) {
-    this.logService.info(
-      `get value for fund ${fundId} at first page to get page`,
-      { fundId },
-    );
     const firstFundValueResult = await this.getValueAtPage(
       fundId,
       1,
@@ -91,9 +63,7 @@ export class EastMoneyService {
       return firstFundValueResult;
     }
     const { pages } = firstFundValueResult.data;
-    this.logService.info(`there are ${pages} pages for fund ${fundId}`, {
-      fundId,
-    });
+    this.logService.info('total page number received', { fundId, pages });
     // page starts from 2, because 1 has been received before
     const valueResultPromises = new Array(pages - 1)
       .fill(0)
@@ -103,10 +73,11 @@ export class EastMoneyService {
     for (let idx = 0; idx < valueResults.length; idx += 1) {
       const valueResult = valueResults[idx];
       if (valueResult.kind === 'error') {
-        this.logService.error(
-          `fail to get value for fund ${fundId} at page ${idx + 2}`,
-          { fundId, page: idx + 2 },
-        );
+        this.logService.error('fail to get value', {
+          fundId,
+          page: idx + 2,
+          error: valueResult.error,
+        });
         return valueResult;
       }
       values.push(...valueResult.data.values);
@@ -118,21 +89,10 @@ export class EastMoneyService {
     const url = 'http://fund.eastmoney.com/js/fundcode_search.js';
     this.logService.info('fetching fund list', { url });
     return this.httpService.get(url).pipe(
-      map((response) => {
-        const result = this.maybeFilterResponseError(response, deserializeList);
-        if (result.kind === 'ok') {
-          this.logService.info('fund list fetched');
-        } else {
-          this.logService.error('fail to fetch fund list', {
-            error: result.error,
-          });
-        }
-        return result;
-      }),
-      catchError((error) => {
-        this.logService.error('fail to fetch fund list', { error });
-        return this.handleRequestException(error);
-      }),
+      map((response) =>
+        this.maybeFilterResponseError(response, deserializeList),
+      ),
+      catchError((error) => this.handleRequestException(error)),
     );
   }
 }
