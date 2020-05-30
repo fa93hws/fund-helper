@@ -38,7 +38,8 @@ function deserializeFundValues(responseBody: any): FundValueWithInfoCN {
     info: {
       name,
       id,
-      type,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      type: type as any,
     },
     values: fundValues,
   };
