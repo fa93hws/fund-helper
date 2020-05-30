@@ -11,8 +11,8 @@ import {
 } from './deserialize-response';
 import { BunyanLogService } from '../../log/bunyan.service';
 import type {
-  FundCNBasicInfo,
-  FundCNValue,
+  FundBasicInfoCN,
+  FundValueCN,
 } from '../../../protos/fund-cn.proto';
 
 @Injectable()
@@ -43,11 +43,17 @@ export class EastMoneyService {
     );
   }
 
-  getValueAtPage(
-    fundId: string,
-    page: number,
-  ): Observable<Result.T<FundValueResponse, any>> {
-    const url = `http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=${fundId}&page=${page}&per=20`;
+  getValueAtPage({
+    fundId,
+    page,
+    startDate,
+  }: {
+    fundId: string;
+    page: number;
+    // YYYY-MM-DD
+    startDate: string;
+  }): Observable<Result.T<FundValueResponse, any>> {
+    const url = `http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=${fundId}&page=${page}&per=20&sdate=${startDate}`;
     this.logService.info('fetching fund values from remote', { url });
     return this.httpService.get(url).pipe(
       map((response) =>
@@ -57,22 +63,36 @@ export class EastMoneyService {
     );
   }
 
-  async getValues(fundId: string) {
-    const firstFundValueResult = await this.getValueAtPage(
+  async getValues({
+    fundId,
+    startDate,
+  }: {
+    fundId: string;
+    // YYYY-MM-DD
+    startDate: string;
+  }) {
+    const firstFundValueResult = await this.getValueAtPage({
       fundId,
-      1,
-    ).toPromise();
+      startDate,
+      page: 1,
+    }).toPromise();
     if (firstFundValueResult.kind === 'error') {
       return firstFundValueResult;
     }
     const { pages } = firstFundValueResult.data;
-    this.logService.info('total page number received', { fundId, pages });
+    this.logService.info('total page number received', {
+      fundId,
+      pages,
+      startDate,
+    });
     // page starts from 2, because 1 has been received before
     const valueResultPromises = new Array(pages - 1)
       .fill(0)
-      .map((_, idx) => this.getValueAtPage(fundId, idx + 2).toPromise());
+      .map((_, idx) =>
+        this.getValueAtPage({ fundId, page: idx + 2, startDate }).toPromise(),
+      );
     const valueResults = await Promise.all(valueResultPromises);
-    const values: FundCNValue[] = firstFundValueResult.data.values;
+    const values: FundValueCN[] = firstFundValueResult.data.values;
     for (let idx = 0; idx < valueResults.length; idx += 1) {
       const valueResult = valueResults[idx];
       if (valueResult.kind === 'error') {
@@ -80,6 +100,7 @@ export class EastMoneyService {
           fundId,
           page: idx + 2,
           error: valueResult.error,
+          startDate,
         });
         return valueResult;
       }
@@ -88,7 +109,7 @@ export class EastMoneyService {
     return Result.createOk(values);
   }
 
-  getList(): Observable<Result.T<FundCNBasicInfo[], any>> {
+  getList(): Observable<Result.T<FundBasicInfoCN[], any>> {
     const url = 'http://fund.eastmoney.com/js/fundcode_search.js';
     this.logService.info('fetching fund list', { url });
     return this.httpService.get(url).pipe(

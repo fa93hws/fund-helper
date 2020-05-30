@@ -3,13 +3,13 @@ import * as cheerio from 'cheerio';
 import { utc } from 'moment';
 import { Result } from '../../../utils/result-type';
 import type {
-  FundCNValue,
-  FundCNBasicInfo,
+  FundValueCN,
+  FundBasicInfoCN,
 } from '../../../protos/fund-cn.proto';
-import { FundCNType } from '../../../protos/fund-cn.proto';
+import { FundTypeCN } from '../../../protos/fund-cn.proto';
 
 export type FundValueResponse = {
-  values: FundCNValue[];
+  values: FundValueCN[];
   curPage: number;
   pages: number;
 };
@@ -17,7 +17,7 @@ export type FundValueResponse = {
 export function deserializeValue(
   valueResponse: unknown,
 ): Result.T<{
-  values: FundCNValue[];
+  values: FundValueCN[];
   curPage: number;
   pages: number;
 }> {
@@ -54,7 +54,7 @@ export function deserializeValue(
 
 function tryExtractValuesFromHTML(
   html: string,
-): { date: Date; value: number }[] {
+): { time: Date; value: number }[] {
   const $ = cheerio.load(html);
   const rows = $('tbody>tr').toArray();
   const values = rows.map((row) => {
@@ -71,14 +71,14 @@ function tryExtractValuesFromHTML(
       );
     }
     const value = parseFloat(valueStr);
-    return { date, value };
+    return { time: date, value };
   });
   return values;
 }
 
 export function deserializeList(
   listResponse: unknown,
-): Result.T<FundCNBasicInfo[]> {
+): Result.T<FundBasicInfoCN[]> {
   if (typeof listResponse !== 'string') {
     return Result.createError(new Error('valueResponse is not string!'));
   }
@@ -96,7 +96,7 @@ export function deserializeList(
   }
 }
 
-function tryExtractFundBasicInfos(rawList: unknown[]): FundCNBasicInfo[] {
+function tryExtractFundBasicInfos(rawList: unknown[]): FundBasicInfoCN[] {
   return rawList.map((rawInfo) => {
     if (!Array.isArray(rawInfo)) {
       throw new Error(`rawInfo must be an array, got ${rawInfo}`);
@@ -128,32 +128,32 @@ function tryExtractFundBasicInfos(rawList: unknown[]): FundCNBasicInfo[] {
   });
 }
 
-function getFundTypeFromStr(typeStr: string): FundCNType {
+function getFundTypeFromStr(typeStr: string): FundTypeCN {
   switch (typeStr) {
     case '混合型':
     case '混合-FOF':
-      return FundCNType.混合;
+      return FundTypeCN.混合;
     case '债券型':
     case '定开债券':
     case '债券指数':
-      return FundCNType.债券;
+      return FundTypeCN.债券;
     case '联接基金':
     case '股票指数':
     case 'QDII-指数':
     case 'ETF-场内':
     case 'QDII-ETF':
-      return FundCNType.指数;
+      return FundTypeCN.指数;
     case '货币型':
     case '理财型':
     case '固定收益':
     case '分级杠杆':
     case '保本型':
     case '其他创新':
-      return FundCNType.其他;
+      return FundTypeCN.其他;
     case 'QDII':
     case '股票型':
     case '股票-FOF':
-      return FundCNType.股票;
+      return FundTypeCN.股票;
     default:
       throw new Error(`unknown fund type ${typeStr}`);
   }

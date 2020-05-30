@@ -6,11 +6,11 @@ export namespace Result {
       }
     | {
         kind: 'error';
-        error: E;
+        error?: E;
       };
 
   export const createOk = <R>(data: R): T<R, any> => ({ kind: 'ok', data });
-  export const createError = <E>(error: E): T<any, E> => ({
+  export const createError = <E>(error?: E): T<any, E> => ({
     kind: 'error',
     error,
   });

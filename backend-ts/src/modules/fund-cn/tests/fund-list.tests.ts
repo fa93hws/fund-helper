@@ -2,15 +2,13 @@ import { of } from 'rxjs';
 import type { EastMoneyService } from '../eastmoney/eastmoney.service';
 import type { PGService } from '../../database/pg.service';
 import { fakeBunyanLogService } from '../../log/fake/fake-bunyan.service';
-import { FundCNService } from '../fund-cn.service';
+import { FundInfoCNService } from '../fund-info.service';
 
 describe('valuesService', () => {
   const fakeEastMoneyGetList = jest.fn();
-  const fakeEastMoneyGetValues = jest.fn();
 
   const fakeEastMoneyService = ({
     getList: fakeEastMoneyGetList,
-    getValues: fakeEastMoneyGetValues,
   } as any) as EastMoneyService;
 
   const fakePgInsert = jest.fn();
@@ -19,20 +17,19 @@ describe('valuesService', () => {
     insert: fakePgInsert,
     select: fakePgSelect,
   } as any) as PGService;
-  const fakeService = new FundCNService(
+  const fakeService = new FundInfoCNService(
     fakeEastMoneyService,
     pgService,
     fakeBunyanLogService,
   );
 
-  beforeEach(() => {
-    fakeEastMoneyGetValues.mockRestore();
-    fakeEastMoneyGetList.mockRestore();
-    fakePgInsert.mockRestore();
-    fakePgSelect.mockRestore();
-  });
-
   describe('getList', () => {
+    beforeEach(() => {
+      fakeEastMoneyGetList.mockRestore();
+      fakePgInsert.mockRestore();
+      fakePgSelect.mockRestore();
+    });
+
     it('update db with result from east money service', async (done) => {
       fakeEastMoneyGetList.mockReturnValueOnce(
         of({
@@ -59,7 +56,7 @@ describe('valuesService', () => {
               ['$4', '$5', '$6'],
             ],
             conflict: {
-              field: 'id',
+              fields: ['id'],
               set: [
                 {
                   field: 'name',
@@ -112,6 +109,12 @@ describe('valuesService', () => {
   });
 
   describe('getFundInfo', () => {
+    beforeEach(() => {
+      fakeEastMoneyGetList.mockRestore();
+      fakePgInsert.mockRestore();
+      fakePgSelect.mockRestore();
+    });
+
     it('return info directly without send request if it is in the DB', async () => {
       fakePgSelect.mockReturnValue({
         kind: 'ok',

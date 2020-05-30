@@ -12,11 +12,15 @@ type BaseStatement = {
 
 export type SelectStatement = BaseStatement & {
   where?: string;
+  order?: {
+    field: string;
+    type: 'ASC' | 'DESC';
+  }[];
 };
 
 type InsertStatement = BaseStatement & {
   conflict?: {
-    field: string;
+    fields: string[];
     set?: {
       field: string;
       value: string;
@@ -40,10 +44,15 @@ export class PGService {
     statement: SelectStatement,
     params?: any[],
   ): Promise<Result.T<{ rows: T[]; rowCount: number }, any>> {
-    const { fields, tableName, where } = statement;
+    const { fields, tableName, where, order } = statement;
     const sqlBuffer = [`SELECT ${fields.join(',')} FROM ${tableName}`];
     if (where != null) {
       sqlBuffer.push(`WHERE ${where}`);
+    }
+    if (order != null) {
+      sqlBuffer.push('ORDER BY');
+      const ordersSqlText = order.map(({ field, type }) => `${field} ${type}`);
+      sqlBuffer.push(ordersSqlText.join(','));
     }
     try {
       const queryResult = await this.pool.query<T>(sqlBuffer.join(' '), params);
@@ -75,7 +84,7 @@ export class PGService {
     }
     sqlBuffer.push(valueBuffer.join(','));
     if (conflict != null) {
-      sqlBuffer.push(`ON CONFLICT (${conflict.field}) DO`);
+      sqlBuffer.push(`ON CONFLICT (${conflict.fields.join(',')}) DO`);
       const { set } = conflict;
       if (set == null) {
         sqlBuffer.push('NOTHING');
