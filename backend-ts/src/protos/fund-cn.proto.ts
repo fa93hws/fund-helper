@@ -16,3 +16,8 @@ export type FundCNBasicInfo = {
   name: string;
   type: FundCNType;
 };
+
+export type FundCNValueResponse = {
+  values: FundCNValue[];
+  info: FundCNBasicInfo;
+};

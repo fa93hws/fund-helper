@@ -1,0 +1,1 @@
+../../../../backend-ts/src/protos/fund-cn.proto.ts
