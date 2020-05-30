@@ -11,7 +11,7 @@
     "start:dev": "DEV=true nest start --watch | ./node_modules/.bin/bunyan",
     "format": "prettier --check **/*",
     "lint": "eslint \"src/**/*.ts\"",
-    "lint:ts": "tsc --noEmit",
+    "lint:ts": "tsc --noEmit --project tsconfig.check.json",
     "build": "nest build",
     "nest": "nest",
     "test": "jest --ci",
