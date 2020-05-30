@@ -6,12 +6,16 @@ import {
   fakeListResponseRaw,
 } from './fake-data';
 import { EastMoneyService } from '../eastmoney.service';
+import { fakeBunyanLogService } from '../../../log/fake-bunyan.service';
 import { of } from 'rxjs';
 
 describe('EastMoneyService', () => {
   const fakeGet = jest.fn();
   const fakeHttpService: HttpService = { get: fakeGet } as any;
-  const fakeService = new EastMoneyService(fakeHttpService);
+  const fakeService = new EastMoneyService(
+    fakeHttpService,
+    fakeBunyanLogService,
+  );
 
   beforeEach(() => {
     fakeGet.mockRestore();
@@ -85,7 +89,10 @@ describe('EastMoneyService', () => {
 
   describe('getValues', () => {
     const fakeEastMoneyGetValueAtPage = jest.fn();
-    const fakeService = new EastMoneyService(fakeHttpService);
+    const fakeService = new EastMoneyService(
+      fakeHttpService,
+      fakeBunyanLogService,
+    );
     fakeService.getValueAtPage = fakeEastMoneyGetValueAtPage;
 
     beforeEach(() => {

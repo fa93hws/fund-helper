@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { EastMoneyService } from './eastmoney/eastmoney.service';
 import { Result } from '../../utils/result-type';
-import { PGService, SelectStatement } from '../../services/database/pg.service';
-import { tableNames } from '../../services/database/pg.constant';
+import { PGService, SelectStatement } from '../database/pg.service';
+import { tableNames } from '../database/pg.constant';
+import { BunyanLogService } from '../log/bunyan.service';
 import { FundCNValue, FundCNBasicInfo } from './fund-cn.dto';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class FundCNService {
   constructor(
     private readonly eastMoneyService: EastMoneyService,
     private readonly pgService: PGService,
+    private readonly logService: BunyanLogService,
   ) {}
 
   async getValues(fundId: string): Promise<Result.T<FundCNValue[], any>> {
@@ -56,8 +58,10 @@ export class FundCNService {
       valuesParams,
     );
     if (insertResult.kind === 'ok') {
+      this.logService.info('fund list is written into database');
       return listResponseResult;
     }
+    this.logService.error('fund list failed to be written into database');
     return insertResult;
   }
 
