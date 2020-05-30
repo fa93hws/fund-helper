@@ -9,13 +9,15 @@ import {
   deserializeList,
   FundValueResponse,
 } from './deserialize-response';
+import { BunyanLogService } from '../../log/bunyan.service';
 import type { FundCNBasicInfo, FundCNValue } from '../fund-cn.dto';
 
 @Injectable()
 export class EastMoneyService {
-  constructor(private readonly httpService: HttpService) {
-    this.handleRequestException = this.handleRequestException.bind(this);
-  }
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly logService: BunyanLogService,
+  ) {}
 
   private maybeFilterResponseError<R>(
     response: AxiosResponse<any>,
@@ -42,19 +44,45 @@ export class EastMoneyService {
     fundId: string,
     page: number,
   ): Observable<Result.T<FundValueResponse, any>> {
-    return this.httpService
-      .get(
-        `http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=${fundId}&page=${page}&per=20`,
-      )
-      .pipe(
-        map((response) =>
-          this.maybeFilterResponseError(response, deserializeValue),
-        ),
-        catchError(this.handleRequestException),
-      );
+    const url = `http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=${fundId}&page=${page}&per=20`;
+    this.logService.info(
+      `fetching fund values for fundId=${fundId} at page ${page}`,
+      { fundId, page, url },
+    );
+    return this.httpService.get(url).pipe(
+      map((response) => {
+        const result = this.maybeFilterResponseError(
+          response,
+          deserializeValue,
+        );
+        if (result.kind === 'ok') {
+          this.logService.info(
+            `fund values for fundId=${fundId} at page ${page} fetched`,
+            { fundId, page },
+          );
+        } else {
+          this.logService.error(
+            `fail to fetch fund values for fundId=${fundId} at page ${page}`,
+            { fundId, page, error: result.error },
+          );
+        }
+        return result;
+      }),
+      catchError((error) => {
+        this.logService.error(
+          `fail to fetch fund values for fundId=${fundId} at page ${page}`,
+          { fundId, page, error },
+        );
+        return this.handleRequestException(error);
+      }),
+    );
   }
 
   async getValues(fundId: string) {
+    this.logService.info(
+      `get value for fund ${fundId} at first page to get page`,
+      { fundId },
+    );
     const firstFundValueResult = await this.getValueAtPage(
       fundId,
       1,
@@ -63,6 +91,9 @@ export class EastMoneyService {
       return firstFundValueResult;
     }
     const { pages } = firstFundValueResult.data;
+    this.logService.info(`there are ${pages} pages for fund ${fundId}`, {
+      fundId,
+    });
     // page starts from 2, because 1 has been received before
     const valueResultPromises = new Array(pages - 1)
       .fill(0)
@@ -72,6 +103,10 @@ export class EastMoneyService {
     for (let idx = 0; idx < valueResults.length; idx += 1) {
       const valueResult = valueResults[idx];
       if (valueResult.kind === 'error') {
+        this.logService.error(
+          `fail to get value for fund ${fundId} at page ${idx + 2}`,
+          { fundId, page: idx + 2 },
+        );
         return valueResult;
       }
       values.push(...valueResult.data.values);
@@ -80,13 +115,24 @@ export class EastMoneyService {
   }
 
   getList(): Observable<Result.T<FundCNBasicInfo[], any>> {
-    return this.httpService
-      .get('http://fund.eastmoney.com/js/fundcode_search.js')
-      .pipe(
-        map((response) =>
-          this.maybeFilterResponseError(response, deserializeList),
-        ),
-        catchError(this.handleRequestException),
-      );
+    const url = 'http://fund.eastmoney.com/js/fundcode_search.js';
+    this.logService.info('fetching fund list', { url });
+    return this.httpService.get(url).pipe(
+      map((response) => {
+        const result = this.maybeFilterResponseError(response, deserializeList);
+        if (result.kind === 'ok') {
+          this.logService.info('fund list fetched');
+        } else {
+          this.logService.error('fail to fetch fund list', {
+            error: result.error,
+          });
+        }
+        return result;
+      }),
+      catchError((error) => {
+        this.logService.error('fail to fetch fund list', { error });
+        return this.handleRequestException(error);
+      }),
+    );
   }
 }

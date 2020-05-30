@@ -1,6 +1,7 @@
 import { of } from 'rxjs';
 import type { EastMoneyService } from '../eastmoney/eastmoney.service';
-import type { PGService } from '../../../services/database/pg.service';
+import type { PGService } from '../../database/pg.service';
+import { fakeBunyanLogService } from '../../log/fake-bunyan.service';
 import { FundCNService } from '../fund-cn.service';
 
 describe('valuesService', () => {
@@ -18,7 +19,11 @@ describe('valuesService', () => {
     insert: fakePgInsert,
     select: fakePgSelect,
   } as any) as PGService;
-  const fakeService = new FundCNService(fakeEastMoneyService, pgService);
+  const fakeService = new FundCNService(
+    fakeEastMoneyService,
+    pgService,
+    fakeBunyanLogService,
+  );
 
   beforeEach(() => {
     fakeEastMoneyGetValues.mockRestore();

@@ -46,7 +46,7 @@ function parsePGSqlParameters(dockerComposeFilePath: string): PGServiceParam {
   };
 }
 
-export function createPGServiceFactory() {
+export function pgServiceFactory() {
   const dockerComposeFilePath = join(backendRoot, 'docker-compose.yml');
   const param = parsePGSqlParameters(dockerComposeFilePath);
   return new PGService(param);
