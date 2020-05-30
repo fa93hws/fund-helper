@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '../config/config.module';
 import { PGService } from './pg.service';
-import { pgServiceFactory } from './pg.factory';
+import { PGConfigProvider } from '../config/pg-config.provider';
+// import { pgServiceFactory } from './pg.factory';
 
 @Module({
-  providers: [
-    {
-      provide: PGService,
-      useFactory: pgServiceFactory,
-    },
-  ],
+  imports: [ConfigModule],
+  providers: [PGService],
   exports: [PGService],
 })
 export class PGSqlModule {}

@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 import type { EastMoneyService } from '../eastmoney/eastmoney.service';
 import type { PGService } from '../../database/pg.service';
-import { fakeBunyanLogService } from '../../log/fake-bunyan.service';
+import { fakeBunyanLogService } from '../../log/fake/fake-bunyan.service';
 import { FundCNService } from '../fund-cn.service';
 
 describe('valuesService', () => {
