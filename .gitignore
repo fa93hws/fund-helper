@@ -4,7 +4,6 @@ frontend/coverage
 target
 frontend/node_modules
 backend-ts/node_modules
-backend-ts/log
 backend-ts/dist
 .idea
 *.iml
