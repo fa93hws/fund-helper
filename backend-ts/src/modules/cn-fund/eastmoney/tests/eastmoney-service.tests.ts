@@ -6,7 +6,7 @@ import {
   fakeListResponseRaw,
 } from './fake-data';
 import { EastMoneyService } from '../eastmoney.service';
-import { fakeBunyanLogService } from '../../../log/fake-bunyan.service';
+import { fakeBunyanLogService } from '../../../log/fake/fake-bunyan.service';
 import { of } from 'rxjs';
 
 describe('EastMoneyService', () => {

@@ -8,13 +8,14 @@
   "main": "index.js",
   "scripts": {
     "start": "nest start | ./node_modules/.bin/bunyan",
-    "start:dev": "nest start --watch | ./node_modules/.bin/bunyan",
+    "start:dev": "DEV=true nest start --watch | ./node_modules/.bin/bunyan",
     "format": "prettier --check **/*",
     "lint": "eslint \"src/**/*.ts\"",
-    "lint:ts": "tsc --noEmit",
+    "lint:ts": "tsc --noEmit --project tsconfig.check.json",
     "build": "nest build",
     "nest": "nest",
-    "test": "jest --ci"
+    "test": "jest --ci",
+    "init-db:dev": "DEV=true node scripts/init-db/init-db.js | ./node_modules/.bin/bunyan"
   },
   "author": "",
   "license": "ISC",

@@ -1,0 +1,25 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+  db-prod:
+    image: postgres:12.2
+    container_name: 'fund-helper-db-prod'
+    restart: always
+    environment:
+      POSTGRES_USER: prod-user
+      POSTGRES_PASSWORD: prod-pwd
+      POSTGRES_DB: prod-db
+    ports:
+      - 5432:5432
+
+  db-test:
+    image: postgres:12.2
+    container_name: 'fund-helper-db-test'
+    restart: always
+    environment:
+      POSTGRES_USER: dev-user
+      POSTGRES_PASSWORD: dev-pwd
+      POSTGRES_DB: dev-db
+    ports:
+      - 54321:5432

@@ -1,4 +1,4 @@
-import { BunyanLogService } from './bunyan.service';
+import { BunyanLogService } from '../bunyan.service';
 
 export const fakeBunyanLogService: BunyanLogService = {
   info: () => undefined,

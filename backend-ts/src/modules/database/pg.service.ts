@@ -1,13 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Pool } from 'pg';
+import { Injectable, Optional } from '@nestjs/common';
+import { Pool, ClientConfig } from 'pg';
+import { PGConfigProvider } from '../config/pg-config.provider';
 import { Result } from '../../utils/result-type';
 
-export type PGServiceParam = {
-  username: string;
-  password: string;
-  dbName: string;
-  port: number;
-};
+export type PGServiceParam = ClientConfig;
 
 type BaseStatement = {
   fields: string[];
@@ -34,15 +30,10 @@ export class PGService {
   private readonly pool: Pool;
 
   constructor(
-    { username, password, dbName, port }: PGServiceParam,
-    PgPool: typeof Pool = Pool,
+    { config }: PGConfigProvider,
+    @Optional() PgPool: typeof Pool = Pool,
   ) {
-    this.pool = new PgPool({
-      user: username,
-      password,
-      port,
-      database: dbName,
-    });
+    this.pool = new PgPool(config);
   }
 
   async select<T>(

@@ -8,15 +8,7 @@ describe('PGService', () => {
       return fakeSqlQuery(...params);
     }
   } as any) as typeof Pool;
-  const pgService = new PGService(
-    {
-      username: '',
-      password: '',
-      dbName: '',
-      port: 123,
-    },
-    PGPool,
-  );
+  const pgService = new PGService({} as any, PGPool);
 
   beforeEach(() => {
     fakeSqlQuery.mockRestore();
