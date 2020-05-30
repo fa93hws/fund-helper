@@ -4,12 +4,12 @@ on:
   push:
     branches: [master]
     paths:
-      - backend-ts/**
+      - backend/**
       - .github/workflows/backend.yml
   pull_request:
     branches: [master]
     paths:
-      - backend-ts/**
+      - backend/**
       - .github/workflows/backend.yml
 
 jobs:
@@ -21,26 +21,26 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v1
         with:
-          path: backend-ts/node_modules
-          key: ${{ runner.os }}-npm-${{ hashFiles('backend-ts/package-lock.json') }}
+          path: backend/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('backend/package-lock.json') }}
       - name: Install node_modules
         run: npm ci
-        working-directory: backend-ts
+        working-directory: backend
       - name: Format
         run: npm run format
-        working-directory: backend-ts
+        working-directory: backend
       - name: Lint
         run: npm run lint
-        working-directory: backend-ts
+        working-directory: backend
       - name: Type check
         run: npm run lint:ts
-        working-directory: backend-ts
+        working-directory: backend
       - name: Unit test
         run: npm run test
-        working-directory: backend-ts
+        working-directory: backend
       - name: Build
         run: npm run build
-        working-directory: backend-ts
+        working-directory: backend
       - name: Start docker image
         run: docker-compose up -d
-        working-directory: backend-ts
+        working-directory: backend
