@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { FundCNService } from './fund-cn.service';
 import { BunyanLogService } from '../log/bunyan.service';
+import { FundCNValueResponse } from '../../protos/fund-cn.proto';
 
 @Controller({
   path: 'cn-funds',
@@ -18,7 +19,9 @@ export class FundCNController {
   ) {}
 
   @Get(':id')
-  async getFundValues(@Param('id') fundId: string) {
+  async getFundValues(
+    @Param('id') fundId: string,
+  ): Promise<FundCNValueResponse> {
     this.logService.info('Receive request querying fund values', { fundId });
     const infoResult = await this.fundValueService.getFundInfo(fundId);
     if (infoResult.kind === 'error') {
@@ -34,10 +37,8 @@ export class FundCNController {
       this.logService.error('failed to find fund', { fundId });
       throw new InternalServerErrorException(valuesResult.error.toString());
     }
-    if (valuesResult.kind === 'ok' && infoResult.kind === 'ok') {
-      this.logService.info('fund values found', { fundId });
-      return { values: valuesResult.data, info: infoResult.data };
-    }
+    this.logService.info('fund values found', { fundId });
+    return { values: valuesResult.data, info: infoResult.data };
   }
 
   @Get()

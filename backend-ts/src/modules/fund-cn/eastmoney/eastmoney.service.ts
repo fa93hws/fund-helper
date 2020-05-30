@@ -10,7 +10,10 @@ import {
   FundValueResponse,
 } from './deserialize-response';
 import { BunyanLogService } from '../../log/bunyan.service';
-import type { FundCNBasicInfo, FundCNValue } from '../fund-cn.dto';
+import type {
+  FundCNBasicInfo,
+  FundCNValue,
+} from '../../../protos/fund-cn.proto';
 
 @Injectable()
 export class EastMoneyService {

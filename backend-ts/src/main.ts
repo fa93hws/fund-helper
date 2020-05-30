@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { FundCNModule } from './modules/cn-fund/fund-cn.module';
+import { FundCNModule } from './modules/fund-cn/fund-cn.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(FundCNModule);

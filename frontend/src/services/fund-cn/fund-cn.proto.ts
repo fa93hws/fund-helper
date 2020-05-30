@@ -1,0 +1,1 @@
+/Users/junchao/coding/fund-helper/backend-ts/src/protos/fund-cn.proto.ts

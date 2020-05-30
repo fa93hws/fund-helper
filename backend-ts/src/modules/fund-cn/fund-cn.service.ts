@@ -4,7 +4,7 @@ import { Result } from '../../utils/result-type';
 import { PGService, SelectStatement } from '../database/pg.service';
 import { tableNames } from '../database/pg.constant';
 import { BunyanLogService } from '../log/bunyan.service';
-import { FundCNValue, FundCNBasicInfo } from './fund-cn.dto';
+import { FundCNValue, FundCNBasicInfo } from '../../protos/fund-cn.proto';
 
 @Injectable()
 export class FundCNService {
