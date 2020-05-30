@@ -1,24 +1,19 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
+import { IComputedValue } from 'mobx';
 import AppBar from '@material-ui/core/AppBar';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import ToolBar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { observer } from 'mobx-react';
-import { IComputedValue } from 'mobx';
+import type { FundBasicInfoCN } from '../../services/fund-cn/fund-cn.proto';
 import { HeaderStore } from './header-store';
 import styles from './header.css';
 
-export type FundInfo = {
-  id: string;
-  name: string;
-  typ: string;
-};
-
 type HeaderProps = {
   idInput: string;
-  info: FundInfo | undefined;
+  info: FundBasicInfoCN | undefined;
   onIdChange: (id: string) => void;
   onSubmit: () => void;
 };
@@ -59,7 +54,7 @@ export const Header = React.memo(
           <div className={styles.fundInfo}>
             {info && (
               <Typography variant="h6" component="h6">
-                {info.name}@{info.id} ({info.typ})
+                {info.name}@{info.id} ({info.type})
               </Typography>
             )}
           </div>
@@ -71,7 +66,7 @@ export const Header = React.memo(
 
 export function createHeader(
   fetchValues: (id: string) => Promise<void>,
-  basicInfo: IComputedValue<FundInfo | undefined>,
+  basicInfo: IComputedValue<FundBasicInfoCN | undefined>,
 ) {
   const store = new HeaderStore(fetchValues);
   const onIdChange = (id: string) => store.setIdInput(id);

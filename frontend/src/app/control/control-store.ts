@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx';
-import { FundValues } from '../../services/fund-value-service';
 import { Markup } from '../k-line/plot/plot';
+import { FundValueCN } from '../../services/fund-cn/fund-cn.proto';
 
 export class ControlPanelStore {
   @observable.ref entryPoint = 50;
@@ -15,9 +15,9 @@ export class ControlPanelStore {
     this.exitPoint = point;
   }
 
-  calculateMarkups({ values }: FundValues) {
+  calculateMarkups({ values }: { values: FundValueCN[] }) {
     const markups: Markup[] = [];
-    const realValues = values.map((v) => v.real_value);
+    const realValues = values.map((v) => v.value);
     let hasBought = false;
     const result = {
       money: 100,
@@ -40,7 +40,7 @@ export class ControlPanelStore {
         result.share = 0;
         markups.push({
           text: '卖',
-          coord: [values[idx].date, values[idx].real_value],
+          coord: [values[idx].time, values[idx].value],
           backgroundColor: 'blue',
         });
       } else if (!hasBought && currentValue > maxValue) {
@@ -50,7 +50,7 @@ export class ControlPanelStore {
         result.money = 0;
         markups.push({
           text: '买',
-          coord: [values[idx].date, values[idx].real_value],
+          coord: [values[idx].time, values[idx].value],
           backgroundColor: 'red',
         });
       }

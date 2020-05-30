@@ -2,7 +2,7 @@ import Container from '@material-ui/core/Container';
 import * as React from 'react';
 import { IComputedValue, reaction } from 'mobx';
 import { observer } from 'mobx-react';
-import { FundValues } from '../../services/fund-value-service';
+import { FundValueWithInfoCN } from '../../services/fund-cn/fund-cn.proto';
 import { Plotter, Markup } from './plot/plot';
 import styles from './k-line.css';
 
@@ -19,7 +19,7 @@ const KLine = React.memo(({ onMounted }: KLineProperty) => {
 });
 
 export function createKLine(
-  values: IComputedValue<FundValues | undefined>,
+  values: IComputedValue<FundValueWithInfoCN | undefined>,
   makrups: IComputedValue<Markup[]>,
 ) {
   let plotter: Plotter;

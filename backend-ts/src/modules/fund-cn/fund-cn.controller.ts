@@ -8,7 +8,7 @@ import {
 import { FundValueCNService } from './fund-value.service';
 import { FundInfoCNService } from './fund-info.service';
 import { BunyanLogService } from '../log/bunyan.service';
-import { FundValueResponseCN } from '../../protos/fund-cn.proto';
+import type { FundValueWithInfoCN } from '../../protos/fund-cn.proto';
 
 @Controller({
   path: 'cn-funds',
@@ -23,7 +23,7 @@ export class FundCNController {
   @Get(':id')
   async getFundValues(
     @Param('id') fundId: string,
-  ): Promise<FundValueResponseCN> {
+  ): Promise<FundValueWithInfoCN> {
     this.logService.info('Receive request querying fund values', { fundId });
     const infoResult = await this.fundInfoService.getFundInfo(fundId);
     if (infoResult.kind === 'error') {

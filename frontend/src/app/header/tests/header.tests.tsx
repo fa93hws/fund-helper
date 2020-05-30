@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { mount, render } from 'enzyme';
-import { Header, FundInfo } from '../header';
+import { Header } from '../header';
+import type { FundBasicInfoCN } from '../../../services/fund-cn/fund-cn.proto';
+import { FundTypeCN } from '../../../services/fund-cn/fund-cn.proto';
 
 describe('Header', () => {
   it('renders header without fund info and input', () => {
@@ -15,10 +17,10 @@ describe('Header', () => {
   });
 
   it('renders header with fund info and input', () => {
-    const info: FundInfo = {
+    const info: FundBasicInfoCN = {
       id: 'hanasaki',
       name: 'guming',
-      typ: 'crystal',
+      type: FundTypeCN.混合,
     };
     expect(
       render(

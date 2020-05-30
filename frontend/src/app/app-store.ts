@@ -1,5 +1,6 @@
 import { action, observable } from 'mobx';
-import { CanFetchFundValue, FundValues } from '../services/fund-value-service';
+import { CanFetchFundValue } from '../services/fund-cn/fund-value-service';
+import { FundValueWithInfoCN } from '../services/fund-cn/fund-cn.proto';
 import { Markup } from './k-line/plot/plot';
 
 export class AppStore {
@@ -20,7 +21,7 @@ export class AppStore {
     this.alertTimeout = alertTimeout;
   }
 
-  @observable.ref values: FundValues | undefined = undefined;
+  @observable.ref valuesAndInfo: FundValueWithInfoCN | undefined = undefined;
 
   @observable.ref errorMessage: string | undefined = undefined;
 
@@ -30,7 +31,7 @@ export class AppStore {
     this.closeErrorAlert();
     const response = await this.fundValueService.fetchFundValues(id);
     if (response.kind === 'ok') {
-      this.values = response.data;
+      this.valuesAndInfo = response.data;
     } else {
       this.displayErrorMessage(response.error.message, this.alertTimeout);
     }

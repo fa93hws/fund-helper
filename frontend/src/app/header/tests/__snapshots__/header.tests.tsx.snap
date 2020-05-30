@@ -38,7 +38,7 @@ exports[`Header renders header with fund info and input 1`] = `
       <h6
         class="MuiTypography-root MuiTypography-h6"
       >
-        guming@hanasaki (crystal)
+        guming@hanasaki (混合)
       </h6>
     </div>
   </div>
