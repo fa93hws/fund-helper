@@ -3,6 +3,7 @@ import {
   Get,
   InternalServerErrorException,
   Param,
+  NotFoundException,
 } from '@nestjs/common';
 import { FundCNService } from './fund-cn.service';
 import { BunyanLogService } from '../log/bunyan.service';
@@ -18,27 +19,23 @@ export class FundCNController {
 
   @Get(':id')
   async getFundValues(@Param('id') fundId: string) {
-    this.logService.info(`Receive request querying fund values for ${fundId}`, {
-      fundId,
-    });
+    this.logService.info('Receive request querying fund values', { fundId });
     const infoResult = await this.fundValueService.getFundInfo(fundId);
     if (infoResult.kind === 'error') {
-      this.logService.error(`failed to find fund info for for ${fundId}`, {
-        fundId,
-      });
-      throw new InternalServerErrorException(infoResult.error.toString());
+      if (infoResult.error === 'NOT_FOUND') {
+        this.logService.info('no match fund with id', { fundId });
+        throw new NotFoundException();
+      }
+      this.logService.error('failed to find fund info', { fundId });
+      throw new InternalServerErrorException();
     }
     const valuesResult = await this.fundValueService.getValues(fundId);
     if (valuesResult.kind === 'error') {
-      this.logService.error(`failed to find fund values for ${fundId}`, {
-        fundId,
-      });
+      this.logService.error('failed to find fund', { fundId });
       throw new InternalServerErrorException(valuesResult.error.toString());
     }
     if (valuesResult.kind === 'ok' && infoResult.kind === 'ok') {
-      this.logService.info(`fund values found for ${fundId}`, {
-        fundId,
-      });
+      this.logService.info('fund values found', { fundId });
       return { values: valuesResult.data, info: infoResult.data };
     }
   }

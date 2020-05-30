@@ -65,43 +65,62 @@ export class FundCNService {
     return insertResult;
   }
 
-  async getFundInfo(id: string): Promise<Result.T<FundCNBasicInfo, any>> {
+  private async findFundInfoFromDB(
+    id: string,
+  ): Promise<Result.T<FundCNBasicInfo, 'NOT_FOUND' | 'OTHERS'>> {
     const queryStatement: SelectStatement = {
       fields: ['id', 'name', 'type'],
       tableName: tableNames.fundCnList,
       where: 'id = $1',
     };
+    this.logService.info('try getting fund info from database', { fundId: id });
     const queryResult = await this.pgService.select<FundCNBasicInfo>(
       queryStatement,
       [id],
     );
     if (queryResult.kind === 'error') {
-      return queryResult;
+      this.logService.error('error happens during searching fund info', {
+        fundId: id,
+        error: queryResult.error,
+        queryStatement,
+      });
+      return Result.createError('OTHERS');
     }
     if (queryResult.data.rowCount === 1) {
       return Result.createOk(queryResult.data.rows[0]);
     }
     if (queryResult.data.rowCount > 1) {
-      return Result.createError(
-        new Error(`multiple match found for fund id=${id}`),
+      this.logService.error(
+        'multiple entries found during searching fund info',
+        {
+          fundId: id,
+          queryStatement,
+        },
       );
+      return Result.createError('OTHERS');
     }
+    return Result.createError('NOT_FOUND');
+  }
+
+  async getFundInfo(
+    id: string,
+  ): Promise<Result.T<FundCNBasicInfo, 'NOT_FOUND' | 'OTHERS'>> {
+    const infoResult = await this.findFundInfoFromDB(id);
+    if (infoResult.kind === 'ok' || infoResult.error === 'OTHERS') {
+      return infoResult;
+    }
+    this.logService.info(
+      'no match fund info at the first place, retry after updating the list',
+      { fundId: id },
+    );
     const getListResult = await this.getList();
     if (getListResult.kind === 'error') {
       return getListResult;
     }
-    const queryAgainResult = await this.pgService.select<FundCNBasicInfo>(
-      queryStatement,
-      [id],
-    );
-    if (queryAgainResult.kind === 'error') {
+    const queryAgainResult = await this.findFundInfoFromDB(id);
+    if (queryAgainResult.kind === 'ok' || queryAgainResult.error === 'OTHERS') {
       return queryAgainResult;
     }
-    if (queryAgainResult.data.rowCount !== 1) {
-      return Result.createError(
-        new Error(`0 or multiple results found for fundId=${id}`),
-      );
-    }
-    return Result.createOk(queryAgainResult.data.rows[0]);
+    return Result.createError('NOT_FOUND');
   }
 }
