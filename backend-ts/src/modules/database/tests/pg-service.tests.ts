@@ -35,6 +35,33 @@ describe('PGService', () => {
       );
     });
 
+    it('builds simple sql with single orderby', async () => {
+      pgService.select({
+        fields: ['fieldA', 'fieldB'],
+        tableName: 'table',
+        order: [{ field: 'fieldA', type: 'DESC' }],
+      });
+      expect(fakeSqlQuery).toBeCalledWith(
+        'SELECT fieldA,fieldB FROM table ORDER BY fieldA DESC',
+        undefined,
+      );
+    });
+
+    it('builds simple sql with multiple orderbys', async () => {
+      pgService.select({
+        fields: ['fieldA', 'fieldB'],
+        tableName: 'table',
+        order: [
+          { field: 'fieldA', type: 'DESC' },
+          { field: 'fieldB', type: 'ASC' },
+        ],
+      });
+      expect(fakeSqlQuery).toBeCalledWith(
+        'SELECT fieldA,fieldB FROM table ORDER BY fieldA DESC,fieldB ASC',
+        undefined,
+      );
+    });
+
     it('builds simple sql with where and params', async () => {
       pgService.select(
         {
@@ -88,12 +115,28 @@ describe('PGService', () => {
         tableName: 'table',
         values: [['1', '2']],
         conflict: {
-          field: 'fieldA',
+          fields: ['fieldA'],
           set: [{ field: 'fieldA', value: 'value' }],
         },
       });
       expect(fakeSqlQuery).toBeCalledWith(
         'INSERT INTO table (fieldA,fieldB) VALUES (1,2) ON CONFLICT (fieldA) DO UPDATE SET fieldA = value',
+        undefined,
+      );
+    });
+
+    it('builds simple sql with update when conflicts with multiple fields', async () => {
+      pgService.insert({
+        fields: ['fieldA', 'fieldB'],
+        tableName: 'table',
+        values: [['1', '2']],
+        conflict: {
+          fields: ['fieldA', 'fieldC'],
+          set: [{ field: 'fieldA', value: 'value' }],
+        },
+      });
+      expect(fakeSqlQuery).toBeCalledWith(
+        'INSERT INTO table (fieldA,fieldB) VALUES (1,2) ON CONFLICT (fieldA,fieldC) DO UPDATE SET fieldA = value',
         undefined,
       );
     });
@@ -104,7 +147,7 @@ describe('PGService', () => {
         tableName: 'table',
         values: [['1', '2']],
         conflict: {
-          field: 'fieldA',
+          fields: ['fieldA'],
           set: [
             { field: 'fieldA', value: 'value' },
             { field: 'fieldB', value: 'val' },

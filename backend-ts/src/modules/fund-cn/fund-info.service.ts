@@ -4,21 +4,17 @@ import { Result } from '../../utils/result-type';
 import { PGService, SelectStatement } from '../database/pg.service';
 import { tableNames } from '../database/pg.constant';
 import { BunyanLogService } from '../log/bunyan.service';
-import { FundCNValue, FundCNBasicInfo } from '../../protos/fund-cn.proto';
+import { FundBasicInfoCN } from '../../protos/fund-cn.proto';
 
 @Injectable()
-export class FundCNService {
+export class FundInfoCNService {
   constructor(
     private readonly eastMoneyService: EastMoneyService,
     private readonly pgService: PGService,
     private readonly logService: BunyanLogService,
   ) {}
 
-  async getValues(fundId: string): Promise<Result.T<FundCNValue[], any>> {
-    return this.eastMoneyService.getValues(fundId);
-  }
-
-  async getList(): Promise<Result.T<FundCNBasicInfo[], any>> {
+  async getList(): Promise<Result.T<FundBasicInfoCN[], any>> {
     const listResponseResult = await this.eastMoneyService
       .getList()
       .toPromise();
@@ -39,10 +35,10 @@ export class FundCNService {
     const insertResult = await this.pgService.insert(
       {
         fields: ['id', 'name', 'type'],
-        tableName: tableNames.fundCnList,
+        tableName: tableNames.fundListCN,
         values: valuesPlaceholders,
         conflict: {
-          field: 'id',
+          fields: ['id'],
           set: [
             {
               field: 'name',
@@ -67,14 +63,14 @@ export class FundCNService {
 
   private async findFundInfoFromDB(
     id: string,
-  ): Promise<Result.T<FundCNBasicInfo, 'NOT_FOUND' | 'OTHERS'>> {
+  ): Promise<Result.T<FundBasicInfoCN, 'NOT_FOUND' | 'OTHERS'>> {
     const queryStatement: SelectStatement = {
       fields: ['id', 'name', 'type'],
-      tableName: tableNames.fundCnList,
+      tableName: tableNames.fundListCN,
       where: 'id = $1',
     };
     this.logService.info('try getting fund info from database', { fundId: id });
-    const queryResult = await this.pgService.select<FundCNBasicInfo>(
+    const queryResult = await this.pgService.select<FundBasicInfoCN>(
       queryStatement,
       [id],
     );
@@ -104,7 +100,7 @@ export class FundCNService {
 
   async getFundInfo(
     id: string,
-  ): Promise<Result.T<FundCNBasicInfo, 'NOT_FOUND' | 'OTHERS'>> {
+  ): Promise<Result.T<FundBasicInfoCN, 'NOT_FOUND' | 'OTHERS'>> {
     const infoResult = await this.findFundInfoFromDB(id);
     if (infoResult.kind === 'ok' || infoResult.error === 'OTHERS') {
       return infoResult;
