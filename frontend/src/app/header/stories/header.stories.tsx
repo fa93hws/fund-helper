@@ -3,14 +3,16 @@ import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
 import { text } from '@storybook/addon-knobs';
 import { computed } from 'mobx';
-import { Header, createHeader, FundInfo } from '../header';
+import { Header, createHeader } from '../header';
+import { FundBasicInfoCN } from '../../../services/fund-cn/fund-cn.proto';
 
 storiesOf('app.header', module)
   .add('header (stateless)', () => {
-    const info: FundInfo = {
+    const info: FundBasicInfoCN = {
       id: text('显示基金ID', '320007'),
       name: text('显示基金名称', '诺安成长混合'),
-      typ: text('显示基金类型', '混合型'),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      type: text('显示基金类型', '混合型') as any,
     };
     return (
       <Header
@@ -23,10 +25,11 @@ storiesOf('app.header', module)
   })
   .add('header (stateful)', () => {
     const fetchFundValues = async (id: string) => action('fetch')(id);
-    const info: FundInfo = {
+    const info: FundBasicInfoCN = {
       id: text('显示基金ID', '320007'),
       name: text('显示基金名称', '诺安成长混合'),
-      typ: text('显示基金类型', '混合型'),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      type: text('显示基金类型', '混合型') as any,
     };
     const HeaderImpl = createHeader(
       fetchFundValues,

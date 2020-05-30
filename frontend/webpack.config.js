@@ -54,7 +54,7 @@ module.exports = {
     hot: true,
     port: 8081,
     proxy: {
-      '/api_v1': 'http://localhost:8080',
+      '/api/v1': 'http://localhost:3000',
     },
   },
   plugins: [

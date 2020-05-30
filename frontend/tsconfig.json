@@ -3,7 +3,7 @@
     "strict": true,
     "module": "esNext",
     "moduleResolution": "node",
-    "target": "ESNext",
+    "target": "ES2019",
     "jsx": "react",
     "baseUrl": "./",
     "experimentalDecorators": true,

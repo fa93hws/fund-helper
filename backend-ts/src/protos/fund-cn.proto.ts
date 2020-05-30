@@ -17,7 +17,7 @@ export type FundBasicInfoCN = {
   type: FundTypeCN;
 };
 
-export type FundValueResponseCN = {
+export type FundValueWithInfoCN = {
   values: FundValueCN[];
   info: FundBasicInfoCN;
 };

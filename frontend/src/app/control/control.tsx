@@ -6,9 +6,9 @@ import ToolTip from '@material-ui/core/Tooltip';
 import Slider from '@material-ui/core/Slider';
 import Help from '@material-ui/icons/Help';
 import { Markup } from '../k-line/plot/plot';
-import { FundValues } from '../../services/fund-value-service';
 import { ControlPanelStore } from './control-store';
 import styles from './control.css';
+import { FundValueWithInfoCN } from '../../services/fund-cn/fund-cn.proto';
 
 type ControlPanelProperty = {
   // 入场点
@@ -93,7 +93,7 @@ const ControlPanel = React.memo(
 
 export function createControlPanel(
   setMarkups: (markups: Markup[]) => void,
-  values: IComputedValue<FundValues | undefined>,
+  values: IComputedValue<FundValueWithInfoCN | undefined>,
 ) {
   const controlPanelStore = new ControlPanelStore();
   const setEntryPoint = (point: number) =>

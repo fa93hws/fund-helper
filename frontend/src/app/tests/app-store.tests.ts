@@ -1,5 +1,5 @@
 import { AppStore } from '../app-store';
-import { CanFetchFundValue } from '../../services/fund-value-service';
+import { CanFetchFundValue } from '../../services/fund-cn/fund-value-service';
 import { Result } from '../../utils/result-type';
 
 describe('AppStore', () => {
@@ -16,7 +16,7 @@ describe('AppStore', () => {
 
   it('has the following default value', () => {
     const store = new AppStore({ fundValueService: fakeService });
-    expect(store.values).toBeUndefined();
+    expect(store.valuesAndInfo).toBeUndefined();
   });
 
   it('send the requests through fund value service', async () => {
@@ -38,7 +38,7 @@ describe('AppStore', () => {
       fundValueService: fakeService,
     });
     await store.fetchValue('guming');
-    expect(store.values).toEqual('hanasaki');
+    expect(store.valuesAndInfo).toEqual('hanasaki');
   });
 
   it('display message if error encountered', async () => {
