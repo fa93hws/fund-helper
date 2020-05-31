@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Header renders header with fund info and input 1`] = `
+exports[`Header renders header with subjectMatter info and input 1`] = `
 <header
   class="MuiPaper-root MuiAppBar-root MuiAppBar-positionStatic MuiAppBar-colorPrimary MuiPaper-elevation4"
 >
@@ -38,14 +38,14 @@ exports[`Header renders header with fund info and input 1`] = `
       <h6
         class="MuiTypography-root MuiTypography-h6"
       >
-        guming@hanasaki (混合)
+        guming@hanasaki (crystal)
       </h6>
     </div>
   </div>
 </header>
 `;
 
-exports[`Header renders header without fund info and input 1`] = `
+exports[`Header renders header without subjectMatter info and input 1`] = `
 <header
   class="MuiPaper-root MuiAppBar-root MuiAppBar-positionStatic MuiAppBar-colorPrimary MuiPaper-elevation4"
 >

@@ -1,5 +1,5 @@
 import { ECharts, init, EChartOption } from 'echarts';
-import type { FundValueWithInfoCN } from '../../../services/fund-cn/fund-cn.proto';
+import type { SubjectMatter } from '../../../services/subject-matter/subject-matter';
 
 type LineData = {
   data: [string, number][];
@@ -19,7 +19,7 @@ export class Plotter {
     this.chart = init(container);
   }
 
-  private convertData({ values, info }: FundValueWithInfoCN): LineData {
+  private convertData({ values, info }: SubjectMatter): LineData {
     const data = values.reduce<[string, number][]>((acc, cur) => {
       acc.push([cur.time.toISOString(), cur.value]);
       return acc;
@@ -43,8 +43,8 @@ export class Plotter {
     return { data };
   }
 
-  drawLine(valueWithInfo: FundValueWithInfoCN, plotMarkups: Markup[]) {
-    const lineData = this.convertData(valueWithInfo);
+  drawLine(subjectMatter: SubjectMatter, plotMarkups: Markup[]) {
+    const lineData = this.convertData(subjectMatter);
     const markPoint = this.convertMarkup(plotMarkups);
     this.chart.setOption({
       title: { text: lineData.title, left: 'center' },

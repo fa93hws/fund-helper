@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { mount, render } from 'enzyme';
 import { Header } from '../header';
-import type { FundBasicInfoCN } from '../../../services/fund-cn/fund-cn.proto';
-import { FundTypeCN } from '../../../services/fund-cn/fund-cn.proto';
+import type { SubjectMatterInfo } from '../../../services/subject-matter/subject-matter';
 
 describe('Header', () => {
-  it('renders header without fund info and input', () => {
+  it('renders header without subjectMatter info and input', () => {
     expect(
       <Header
         idInput=""
@@ -16,11 +15,11 @@ describe('Header', () => {
     ).toMatchRenderedSnapshot();
   });
 
-  it('renders header with fund info and input', () => {
-    const info: FundBasicInfoCN = {
+  it('renders header with subjectMatter info and input', () => {
+    const info: SubjectMatterInfo = {
       id: 'hanasaki',
       name: 'guming',
-      type: FundTypeCN.混合,
+      type: 'crystal',
     };
     expect(
       render(

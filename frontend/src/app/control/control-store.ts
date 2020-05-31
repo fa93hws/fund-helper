@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx';
 import { Markup } from '../k-line/plot/plot';
-import { FundValueCN } from '../../services/fund-cn/fund-cn.proto';
+import type { SubjectMatterValue } from '../../services/subject-matter/subject-matter';
 
 export class ControlPanelStore {
   @observable.ref entryPoint = 50;
@@ -15,7 +15,7 @@ export class ControlPanelStore {
     this.exitPoint = point;
   }
 
-  calculateMarkups({ values }: { values: FundValueCN[] }) {
+  calculateMarkups({ values }: { values: SubjectMatterValue[] }) {
     const markups: Markup[] = [];
     const realValues = values.map((v) => v.value);
     let hasBought = false;

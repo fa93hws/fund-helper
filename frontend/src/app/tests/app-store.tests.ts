@@ -1,13 +1,13 @@
 import { AppStore } from '../app-store';
-import { CanFetchFundValue } from '../../services/fund-cn/fund-value-service';
+import { CanFetchSubjectMatter } from '../../services/subject-matter/subject-matter';
 import { Result } from '../../utils/result-type';
 
 describe('AppStore', () => {
   jest.useFakeTimers();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mockFetchFundValues = jest.fn<Promise<Result<any>>, [string]>();
-  const fakeService: CanFetchFundValue = {
-    fetchFundValues: mockFetchFundValues,
+  const fakeService: CanFetchSubjectMatter = {
+    fetchSubjectMatter: mockFetchFundValues,
   };
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('AppStore', () => {
 
   it('has the following default value', () => {
     const store = new AppStore({ fundValueService: fakeService });
-    expect(store.valuesAndInfo).toBeUndefined();
+    expect(store.subjectMatter).toBeUndefined();
   });
 
   it('send the requests through fund value service', async () => {
@@ -38,7 +38,7 @@ describe('AppStore', () => {
       fundValueService: fakeService,
     });
     await store.fetchValue('guming');
-    expect(store.valuesAndInfo).toEqual('hanasaki');
+    expect(store.subjectMatter).toEqual('hanasaki');
   });
 
   it('display message if error encountered', async () => {

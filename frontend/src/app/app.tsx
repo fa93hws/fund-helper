@@ -4,7 +4,7 @@ import SnackBar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import { observer } from 'mobx-react';
 import { createHeader } from './header/header';
-import { FundValueService } from '../services/fund-cn/fund-value-service';
+import { CNFundValueService } from '../services/subject-matter/fund-cn/fund-value-service';
 import { createKLine } from './k-line/k-line';
 import { createControlPanel } from './control/control';
 import { AppStore } from './app-store';
@@ -34,17 +34,16 @@ const App = React.memo(
 );
 
 export function createApp() {
-  const fundValueService = new FundValueService();
+  const fundValueService = new CNFundValueService();
   const appStore = new AppStore({ fundValueService });
-  const valueWithInfo = computed(() => appStore.valuesAndInfo);
-  const info = computed(() => valueWithInfo.get()?.info);
+  const subjectMatter = computed(() => appStore.subjectMatter);
   const fetchValues = async (id: string) => appStore.fetchValue(id);
   const makrups = computed(() => appStore.markups);
   const setMarkups = (markups: Markup[]) => appStore.setMarkups(markups);
 
-  const Header = createHeader(fetchValues, info);
-  const KLine = createKLine(valueWithInfo, makrups);
-  const ControlPanel = createControlPanel(setMarkups, valueWithInfo);
+  const Header = createHeader(fetchValues, subjectMatter);
+  const KLine = createKLine(subjectMatter, makrups);
+  const ControlPanel = createControlPanel(setMarkups, subjectMatter);
   return observer(() => (
     <App
       Header={Header}

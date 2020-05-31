@@ -7,13 +7,16 @@ import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import ToolBar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import type { FundBasicInfoCN } from '../../services/fund-cn/fund-cn.proto';
+import type {
+  SubjectMatter,
+  SubjectMatterInfo,
+} from '../../services/subject-matter/subject-matter';
 import { HeaderStore } from './header-store';
 import styles from './header.css';
 
 type HeaderProps = {
   idInput: string;
-  info: FundBasicInfoCN | undefined;
+  info: SubjectMatterInfo | undefined;
   onIdChange: (id: string) => void;
   onSubmit: () => void;
 };
@@ -51,7 +54,7 @@ export const Header = React.memo(
               }
             />
           </form>
-          <div className={styles.fundInfo}>
+          <div className={styles.subjectMatterInfo}>
             {info && (
               <Typography variant="h6" component="h6">
                 {info.name}@{info.id} ({info.type})
@@ -66,7 +69,7 @@ export const Header = React.memo(
 
 export function createHeader(
   fetchValues: (id: string) => Promise<void>,
-  basicInfo: IComputedValue<FundBasicInfoCN | undefined>,
+  subjectMatter: IComputedValue<SubjectMatter | undefined>,
 ) {
   const store = new HeaderStore(fetchValues);
   const onIdChange = (id: string) => store.setIdInput(id);
@@ -74,7 +77,7 @@ export function createHeader(
   return observer(() => (
     <Header
       idInput={store.idInput}
-      info={basicInfo.get()}
+      info={subjectMatter.get()?.info}
       onSubmit={onSubmit}
       onIdChange={onIdChange}
     />

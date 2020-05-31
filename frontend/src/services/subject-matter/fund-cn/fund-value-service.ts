@@ -1,9 +1,6 @@
-import { Result } from '../../utils/result-type';
+import { Result } from '../../../utils/result-type';
 import type { FundValueWithInfoCN } from './fund-cn.proto';
-
-export interface CanFetchFundValue {
-  fetchFundValues(id: string): Promise<Result<FundValueWithInfoCN>>;
-}
+import { CanFetchSubjectMatter } from '../subject-matter';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function deserializeFundValues(responseBody: any): FundValueWithInfoCN {
@@ -38,14 +35,13 @@ function deserializeFundValues(responseBody: any): FundValueWithInfoCN {
     info: {
       name,
       id,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: type as any,
+      type,
     },
     values: fundValues,
   };
 }
 
-export class FundValueService implements CanFetchFundValue {
+export class CNFundValueService implements CanFetchSubjectMatter {
   private readonly URL = '/api/v1/cn-funds/';
 
   private readonly fetch: typeof window.fetch;
@@ -58,7 +54,7 @@ export class FundValueService implements CanFetchFundValue {
         : (this.fetch = fetch);
   }
 
-  async fetchFundValues(id: string): Promise<Result<FundValueWithInfoCN>> {
+  async fetchSubjectMatter(id: string): Promise<Result<FundValueWithInfoCN>> {
     try {
       const response = await this.fetch(this.URL + id);
       switch (response.status) {

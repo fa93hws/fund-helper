@@ -14,7 +14,7 @@ export const enum FundTypeCN {
 export type FundBasicInfoCN = {
   id: string;
   name: string;
-  type: FundTypeCN;
+  type: string;
 };
 
 export type FundValueWithInfoCN = {
