@@ -9,7 +9,7 @@
   "scripts": {
     "start": "nest start | ./node_modules/.bin/bunyan",
     "start:dev": "DEV=true nest start --watch | ./node_modules/.bin/bunyan",
-    "format": "prettier --check **/*",
+    "format": "prettier --check \"**/*\"",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:ts": "tsc --noEmit --project tsconfig.check.json",
     "build": "nest build",
