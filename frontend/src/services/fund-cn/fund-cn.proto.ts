@@ -1,1 +1,1 @@
-../../../../backend-ts/src/protos/fund-cn.proto.ts
+../../../../backend/src/protos/fund-cn.proto.ts
