@@ -133,7 +133,7 @@ describe('FundValueCNService', () => {
       });
     });
 
-    it.only('aggregates the additional values and save to database', async () => {
+    it('aggregates the additional values and save to database', async () => {
       jest.useFakeTimers();
       fakeGetValuesFromDB.mockReturnValue({
         kind: 'ok',

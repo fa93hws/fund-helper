@@ -84,6 +84,7 @@ export class PGConfigProvider {
       process.exit(1);
     }
 
+    this.logService.info(`service parameter parsed`);
     return {
       user: POSTGRES_USER,
       password: POSTGRES_PASSWORD,
