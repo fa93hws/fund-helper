@@ -14,6 +14,7 @@ import type {
   FundBasicInfoCN,
   FundValueCN,
 } from '../../../protos/fund-cn.proto';
+import { runInPool } from '../../../utils/promise-pool';
 
 @Injectable()
 export class EastMoneyService {
@@ -85,27 +86,43 @@ export class EastMoneyService {
       pages,
       startDate,
     });
-    // page starts from 2, because 1 has been received before
-    const valueResultPromises = new Array(pages - 1)
-      .fill(0)
-      .map((_, idx) =>
-        this.getValueAtPage({ fundId, page: idx + 2, startDate }).toPromise(),
-      );
-    const valueResults = await Promise.all(valueResultPromises);
-    const values: FundValueCN[] = firstFundValueResult.data.values;
-    for (let idx = 0; idx < valueResults.length; idx += 1) {
-      const valueResult = valueResults[idx];
-      if (valueResult.kind === 'error') {
-        this.logService.error('fail to get value', {
-          fundId,
-          page: idx + 2,
-          error: valueResult.error,
-          startDate,
-        });
-        return valueResult;
-      }
-      values.push(...valueResult.data.values);
+    const valueResults = await runInPool<FundValueResponse>({
+      generatePromise: (idx) =>
+        new Promise(async (resolve, reject) => {
+          const result = await this.getValueAtPage({
+            fundId,
+            page: idx + 2,
+            startDate,
+          }).toPromise();
+          if (result.kind === 'ok') {
+            this.logService.info('fund value fetched', {
+              fundId,
+              page: idx + 2,
+              startDate,
+            });
+            // So that we won't be banned by third party api
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            resolve(result.data);
+          } else {
+            this.logService.error('fail to get fund value from eastMoney', {
+              fundId,
+              startDate,
+              page: idx + 2,
+              error: result.error,
+            });
+            reject(result.error);
+          }
+        }),
+      totalNumber: pages - 1,
+      maxConcurrency: 5,
+    });
+    if (valueResults.kind === 'error') {
+      return valueResults;
     }
+    const values: FundValueCN[] = firstFundValueResult.data.values;
+    valueResults.data.forEach((response) => {
+      values.push(...response.values);
+    });
     return Result.createOk(values);
   }
 
