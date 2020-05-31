@@ -32,9 +32,6 @@ jobs:
       - name: Install node_modules
         run: npm ci
         working-directory: frontend
-      - name: Format
-        run: npm run format
-        working-directory: frontend
       - name: Lint
         run: npm run lint
         working-directory: frontend
