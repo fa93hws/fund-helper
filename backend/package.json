@@ -15,7 +15,8 @@
     "build": "nest build",
     "nest": "nest",
     "test": "jest --ci",
-    "init-db:dev": "DEV=true node scripts/init-db/init-db.js | ./node_modules/.bin/bunyan"
+    "init-db": "node scripts/init-db/init-db.js | ./node_modules/.bin/bunyan",
+    "init-db:dev": "cross-env DEV=true npm run init-db"
   },
   "author": "",
   "license": "ISC",
@@ -46,6 +47,7 @@
     "@types/supertest": "^2.0.8",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
+    "cross-env": "^7.0.2",
     "eslint": "^7.0.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-config-prettier": "^6.11.0",
