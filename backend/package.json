@@ -15,7 +15,7 @@
     "build": "nest build",
     "nest": "nest",
     "test": "jest --ci",
-    "init-db:dev": "DEV=true node scripts/init-db/init-db.js | ./node_modules/.bin/bunyan"
+    "init-db": "node scripts/init-db/init-db.js | ./node_modules/.bin/bunyan"
   },
   "author": "",
   "license": "ISC",

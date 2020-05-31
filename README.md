@@ -16,6 +16,8 @@ It is designed to run regression test for trading strategy on fund in China main
 1. Start docker by running `docker-compose up -d`
 1. install `node_modules` by running `npm ci`
 1. Confirm all unit tests passed by running `npm run test`
+1. Initialize database for prod by running `npm run init-db`
+1. (Optional) Initialize database for dev by running `DEV=true npm run init-db`
 1. Start backend by running `npm run start`
 
 ### Start frontend page
