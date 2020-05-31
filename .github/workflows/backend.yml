@@ -52,5 +52,5 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           npm run init-db
-          DEV=true npm run init-db
+          npm run init-db:dev
         working-directory: backend
