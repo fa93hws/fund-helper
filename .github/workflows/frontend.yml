@@ -5,16 +5,22 @@ on:
     branches: [master]
     paths:
       - frontend/**
+      - backend/src/protos/**
       - .github/workflows/frontend.yml
   pull_request:
     branches: [master]
     paths:
       - frontend/**
+      - backend/src/protos/**
       - .github/workflows/frontend.yml
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-18.04]
+        node: [12]
 
     steps:
       - uses: actions/checkout@v2
@@ -25,9 +31,6 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package-lock.json') }}
       - name: Install node_modules
         run: npm ci
-        working-directory: frontend
-      - name: Format
-        run: npm run format
         working-directory: frontend
       - name: Lint
         run: npm run lint

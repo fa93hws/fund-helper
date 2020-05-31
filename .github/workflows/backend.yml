@@ -14,7 +14,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-18.04]
+        node: [12]
 
     steps:
       - uses: actions/checkout@v2
@@ -25,9 +29,6 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('backend/package-lock.json') }}
       - name: Install node_modules
         run: npm ci
-        working-directory: backend
-      - name: Format
-        run: npm run format
         working-directory: backend
       - name: Lint
         run: npm run lint
@@ -42,5 +43,6 @@ jobs:
         run: npm run build
         working-directory: backend
       - name: Start docker image
+        if: matrix.os != 'windows-latest'
         run: docker-compose up -d
         working-directory: backend
