@@ -1,5 +1,5 @@
 import { Result } from '../../../utils/result-type';
-import type { FundValueWithInfoCN } from './fund-cn.proto';
+import type { FundValueWithInfoCN, FundTypeCN } from './fund-cn.proto';
 import { CanFetchSubjectMatter } from '../subject-matter';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,7 +35,7 @@ function deserializeFundValues(responseBody: any): FundValueWithInfoCN {
     info: {
       name,
       id,
-      type,
+      type: type as FundTypeCN,
     },
     values: fundValues,
   };
