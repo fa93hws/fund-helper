@@ -44,9 +44,7 @@ export class PGService {
     statement: SelectStatement,
     params?: any[],
   ): Promise<Result.T<{ rows: T[]; rowCount: number }, any>> {
-    const {
-      fields, tableName, where, order,
-    } = statement;
+    const { fields, tableName, where, order } = statement;
     const sqlBuffer = [`SELECT ${fields.join(',')} FROM ${tableName}`];
     if (where != null) {
       sqlBuffer.push(`WHERE ${where}`);
@@ -71,9 +69,7 @@ export class PGService {
     statement: InsertStatement,
     params?: any[],
   ): Promise<Result.T<number, any>> {
-    const {
-      fields, tableName, conflict, values,
-    } = statement;
+    const { fields, tableName, conflict, values } = statement;
     const sqlBuffer = [`INSERT INTO ${tableName} (${fields.join(',')}) VALUES`];
     const valueBuffer = [];
     for (const value of values) {

@@ -2,9 +2,10 @@ import { runInPool, PromisePool } from '../promise-pool';
 
 describe('runInPool', () => {
   it('resolves the value eventually', async () => {
-    const generatePromise = (idx: number) => new Promise((resolve) => {
-      setTimeout(() => resolve(idx), 10 - idx);
-    }) as Promise<number>;
+    const generatePromise = (idx: number) =>
+      new Promise((resolve) => {
+        setTimeout(() => resolve(idx), 10 - idx);
+      }) as Promise<number>;
 
     const result = await runInPool({
       generatePromise,
@@ -18,15 +19,16 @@ describe('runInPool', () => {
   });
 
   it('return errors if rejected', async () => {
-    const generatePromise = (idx: number) => new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (idx !== 4) {
-          resolve(idx);
-        } else {
-          reject(idx);
-        }
-      }, 10 - idx);
-    }) as Promise<number>;
+    const generatePromise = (idx: number) =>
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (idx !== 4) {
+            resolve(idx);
+          } else {
+            reject(idx);
+          }
+        }, 10 - idx);
+      }) as Promise<number>;
 
     const result = await runInPool({
       generatePromise,
@@ -47,9 +49,10 @@ describe('PromisePool', () => {
     while (idx < total) {
       yield {
         idx,
-        promise: ((i: number) => new Promise((resolve) => {
-          setTimeout(() => resolve(i), 10);
-        }))(idx),
+        promise: ((i: number) =>
+          new Promise((resolve) => {
+            setTimeout(() => resolve(i), 10);
+          }))(idx),
       };
       idx += 1;
     }
@@ -107,15 +110,16 @@ describe('PromisePool', () => {
       while (idx < total) {
         yield {
           idx,
-          promise: ((i: number) => new Promise((resolve, reject) => {
-            setTimeout(() => {
-              if (i !== 2) {
-                resolve(i);
-              } else {
-                reject(i);
-              }
-            }, 10);
-          }))(idx),
+          promise: ((i: number) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                if (i !== 2) {
+                  resolve(i);
+                } else {
+                  reject(i);
+                }
+              }, 10);
+            }))(idx),
         };
         idx += 1;
       }
