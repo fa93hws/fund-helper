@@ -3,7 +3,7 @@ module.exports = {
   testMatch: ['**/tests/**/*.tests.ts{,x}'],
   collectCoverageFrom: ['src/**/*.ts{,x}'],
   coverageDirectory: 'coverage',
-  setupFilesAfterEnv: ['<rootDir>/jest/setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/config/jest/setup.ts'],
   moduleNameMapper: {
     '.css$': 'identity-obj-proxy',
   },
