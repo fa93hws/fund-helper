@@ -101,7 +101,7 @@ describe('PGService', () => {
       expect(fakeSqlQuery).not.toBeCalled();
       if (sqlResult.kind === 'error') {
         expect(sqlResult.error).toMatchInlineSnapshot(
-          `[Error: got values length 3 but fields length 2. values: 1,2,3, fields: fieldA,fieldB]`,
+          '[Error: got values length 3 but fields length 2. values: 1,2,3, fields: fieldA,fieldB]',
         );
         done();
       } else {

@@ -10,10 +10,7 @@ import {
   FundValueResponse,
 } from './deserialize-response';
 import { BunyanLogService } from '../../log/bunyan.service';
-import type {
-  FundBasicInfoCN,
-  FundValueCN,
-} from '../../../protos/fund-cn.proto';
+import type { FundBasicInfoCN } from '../../../protos/fund-cn.proto';
 import { runInPool } from '../../../utils/promise-pool';
 
 @Injectable()
@@ -88,6 +85,7 @@ export class EastMoneyService {
     });
     const valueResults = await runInPool<FundValueResponse>({
       generatePromise: (idx) =>
+        // eslint-disable-next-line no-async-promise-executor
         new Promise(async (resolve, reject) => {
           const result = await this.getValueAtPage({
             fundId,
@@ -101,7 +99,7 @@ export class EastMoneyService {
               startDate,
             });
             // So that we won't be banned by third party api
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((r) => setTimeout(r, 500));
             resolve(result.data);
           } else {
             this.logService.error('fail to get fund value from eastMoney', {
@@ -119,7 +117,7 @@ export class EastMoneyService {
     if (valueResults.kind === 'error') {
       return valueResults;
     }
-    const values: FundValueCN[] = firstFundValueResult.data.values;
+    const { values } = firstFundValueResult.data;
     valueResults.data.forEach((response) => {
       values.push(...response.values);
     });

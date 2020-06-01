@@ -27,6 +27,7 @@ module.exports = {
     'eslint-plugin-react',
     'react-hooks',
     'jsx-a11y',
+    'jest',
   ],
   extends: [
     'airbnb-base',

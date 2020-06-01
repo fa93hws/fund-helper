@@ -1,4 +1,5 @@
 import { HttpService } from '@nestjs/common';
+import { of } from 'rxjs';
 import {
   fakeValueResponseRaw,
   fakeValueResponseParsed,
@@ -7,7 +8,6 @@ import {
 } from './fake-data';
 import { EastMoneyService } from '../eastmoney.service';
 import { fakeBunyanLogService } from '../../../log/fake/fake-bunyan.service';
-import { of } from 'rxjs';
 
 describe('EastMoneyService', () => {
   const fakeGet = jest.fn();
@@ -65,7 +65,7 @@ describe('EastMoneyService', () => {
         .toPromise();
       if (result.kind === 'error') {
         expect(result.error).toMatchInlineSnapshot(
-          `[Error: Failed to get apidata.content as string]`,
+          '[Error: Failed to get apidata.content as string]',
         );
         done();
       } else {
@@ -97,11 +97,11 @@ describe('EastMoneyService', () => {
 
   describe('getValues', () => {
     const fakeEastMoneyGetValueAtPage = jest.fn();
-    const fakeService = new EastMoneyService(
+    const overrideFakeService = new EastMoneyService(
       fakeHttpService,
       fakeBunyanLogService,
     );
-    fakeService.getValueAtPage = fakeEastMoneyGetValueAtPage;
+    overrideFakeService.getValueAtPage = fakeEastMoneyGetValueAtPage;
 
     beforeEach(() => {
       fakeGet.mockRestore();
@@ -118,7 +118,7 @@ describe('EastMoneyService', () => {
           },
         }),
       );
-      const values = await fakeService.getValues({
+      const values = await overrideFakeService.getValues({
         fundId: 'id',
         startDate: 'start-date',
       });
@@ -143,7 +143,7 @@ describe('EastMoneyService', () => {
           },
         }),
       );
-      const values = await fakeService.getValues({
+      const values = await overrideFakeService.getValues({
         fundId: 'id',
         startDate: 'start-date',
       });
@@ -172,7 +172,7 @@ describe('EastMoneyService', () => {
             },
           }),
       );
-      const values = await fakeService.getValues({
+      const values = await overrideFakeService.getValues({
         fundId: 'id',
         startDate: 'start-date',
       });
@@ -222,7 +222,7 @@ describe('EastMoneyService', () => {
           });
         },
       );
-      const values = await fakeService.getValues({
+      const values = await overrideFakeService.getValues({
         fundId: 'id',
         startDate: 'start-date',
       });
@@ -291,7 +291,7 @@ describe('EastMoneyService', () => {
       const result = await fakeService.getList().toPromise();
       if (result.kind === 'error') {
         expect(result.error).toMatchInlineSnapshot(
-          `[Error: Failed to get r in context as array]`,
+          '[Error: Failed to get r in context as array]',
         );
         done();
       } else {

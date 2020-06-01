@@ -10,7 +10,7 @@ type HttpError = {
 export type HttpResult = Result.T<unknown, HttpError>;
 
 export function transformResponse(response: AxiosResponse<any>): HttpResult {
-  if (200 <= response.status && response.status < 300) {
+  if (response.status >= 200 && response.status < 300) {
     return Result.createOk(response.data);
   }
   return Result.createError({
