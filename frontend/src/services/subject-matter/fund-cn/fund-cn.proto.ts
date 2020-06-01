@@ -3,4 +3,4 @@ export {
   FundTypeCN,
   FundBasicInfoCN,
   FundValueWithInfoCN,
-} from '../../../../backend/src/protos/fund-cn.proto';
+} from '../../../../../backend/src/protos/fund-cn.proto';

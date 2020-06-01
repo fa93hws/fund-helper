@@ -4,15 +4,14 @@ import { storiesOf } from '@storybook/react';
 import { text } from '@storybook/addon-knobs';
 import { computed } from 'mobx';
 import { Header, createHeader } from '../header';
-import { FundBasicInfoCN } from '../../../services/fund-cn/fund-cn.proto';
+import type { SubjectMatterInfo } from '../../../services/subject-matter/subject-matter';
 
 storiesOf('app.header', module)
   .add('header (stateless)', () => {
-    const info: FundBasicInfoCN = {
+    const info: SubjectMatterInfo = {
       id: text('显示基金ID', '320007'),
       name: text('显示基金名称', '诺安成长混合'),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: text('显示基金类型', '混合型') as any,
+      type: text('显示基金类型', '混合型'),
     };
     return (
       <Header
@@ -25,15 +24,14 @@ storiesOf('app.header', module)
   })
   .add('header (stateful)', () => {
     const fetchFundValues = async (id: string) => action('fetch')(id);
-    const info: FundBasicInfoCN = {
+    const info: SubjectMatterInfo = {
       id: text('显示基金ID', '320007'),
       name: text('显示基金名称', '诺安成长混合'),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: text('显示基金类型', '混合型') as any,
+      type: text('显示基金类型', '混合型'),
     };
     const HeaderImpl = createHeader(
       fetchFundValues,
-      computed(() => info),
+      computed(() => ({ info, values: [] })),
     );
     return <HeaderImpl />;
   });

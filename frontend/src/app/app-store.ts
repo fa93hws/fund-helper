@@ -1,10 +1,12 @@
 import { action, observable } from 'mobx';
-import { CanFetchFundValue } from '../services/fund-cn/fund-value-service';
-import { FundValueWithInfoCN } from '../services/fund-cn/fund-cn.proto';
-import { Markup } from './k-line/plot/plot';
+import type {
+  SubjectMatter,
+  CanFetchSubjectMatter,
+} from '../services/subject-matter/subject-matter';
+import type { Markup } from './k-line/plot/plot';
 
 export class AppStore {
-  private readonly fundValueService: CanFetchFundValue;
+  private readonly fundValueService: CanFetchSubjectMatter;
 
   private readonly alertTimeout: number;
 
@@ -14,24 +16,24 @@ export class AppStore {
     fundValueService,
     alertTimeout = 5000,
   }: {
-    fundValueService: CanFetchFundValue;
+    fundValueService: CanFetchSubjectMatter;
     alertTimeout?: number;
   }) {
     this.fundValueService = fundValueService;
     this.alertTimeout = alertTimeout;
   }
 
-  @observable.ref valuesAndInfo: FundValueWithInfoCN | undefined = undefined;
+  @observable.ref subjectMatter: SubjectMatter | undefined;
 
-  @observable.ref errorMessage: string | undefined = undefined;
+  @observable.ref errorMessage: string | undefined;
 
   @observable.ref markups: Markup[] = [];
 
   @action async fetchValue(id: string) {
     this.closeErrorAlert();
-    const response = await this.fundValueService.fetchFundValues(id);
+    const response = await this.fundValueService.fetchSubjectMatter(id);
     if (response.kind === 'ok') {
-      this.valuesAndInfo = response.data;
+      this.subjectMatter = response.data;
     } else {
       this.displayErrorMessage(response.error.message, this.alertTimeout);
     }

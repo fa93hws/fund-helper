@@ -8,7 +8,7 @@ import Help from '@material-ui/icons/Help';
 import { Markup } from '../k-line/plot/plot';
 import { ControlPanelStore } from './control-store';
 import styles from './control.css';
-import { FundValueWithInfoCN } from '../../services/fund-cn/fund-cn.proto';
+import { SubjectMatter } from '../../services/subject-matter/subject-matter';
 
 type ControlPanelProperty = {
   // 入场点
@@ -92,22 +92,24 @@ const ControlPanel = React.memo(
 );
 
 export function createControlPanel(
-  setMarkups: (markups: Markup[]) => void,
-  values: IComputedValue<FundValueWithInfoCN | undefined>,
+  setMarkup: (markups: Markup[]) => void,
+  boxedSubjectMatter: IComputedValue<SubjectMatter | undefined>,
 ) {
   const controlPanelStore = new ControlPanelStore();
   const setEntryPoint = (point: number) =>
     controlPanelStore.setEntryPoint(point);
   const setExitPoint = (point: number) => controlPanelStore.setExitPoint(point);
   const onChangeCommitted = () => {
-    const fundValues = values.get();
+    const subjectMatter = boxedSubjectMatter.get();
     const markups =
-      fundValues == null ? [] : controlPanelStore.calculateMarkups(fundValues);
-    setMarkups(markups);
+      subjectMatter == null
+        ? []
+        : controlPanelStore.calculateMarkups(subjectMatter);
+    setMarkup(markups);
   };
   reaction(
-    () => values.get(),
-    (fundValues) => fundValues && onChangeCommitted(),
+    () => boxedSubjectMatter.get(),
+    (subjectMatter) => subjectMatter && onChangeCommitted(),
     { fireImmediately: true },
   );
   return observer(() => (
