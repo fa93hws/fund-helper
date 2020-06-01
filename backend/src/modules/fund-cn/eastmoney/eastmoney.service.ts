@@ -10,10 +10,7 @@ import {
   FundValueResponse,
 } from './deserialize-response';
 import { BunyanLogService } from '../../log/bunyan.service';
-import type {
-  FundBasicInfoCN,
-  FundValueCN,
-} from '../../../protos/fund-cn.proto';
+import type { FundBasicInfoCN } from '../../../protos/fund-cn.proto';
 import { runInPool } from '../../../utils/promise-pool';
 
 @Injectable()
