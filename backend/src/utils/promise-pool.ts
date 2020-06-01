@@ -5,6 +5,7 @@ type PromiseGenerator<T> = (idx: number) => Promise<T>;
 // export for testing only
 export class PromisePool<T> {
   error?: any;
+
   results = new Array<T>();
 
   constructor(
@@ -67,8 +68,8 @@ export async function runInPool<T>({
   generatePromise: PromiseGenerator<T>;
   maxConcurrency: number;
   totalNumber: number;
-}) {
+}): Promise<Result.T<T[]>> {
   const generator = toGenerator(generatePromise, totalNumber);
   const pool = new PromisePool(generator, maxConcurrency);
-  return await pool.run();
+  return pool.run();
 }

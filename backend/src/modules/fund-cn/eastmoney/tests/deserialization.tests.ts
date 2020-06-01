@@ -19,7 +19,7 @@ describe('deserializeValue', () => {
     const deserializationResult = deserializeValue('var a = "response"');
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: Failed to get apidata.content as string]`,
+        '[Error: Failed to get apidata.content as string]',
       );
       done();
     } else {
@@ -33,7 +33,7 @@ describe('deserializeValue', () => {
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: Failed to get apidata.content as string]`,
+        '[Error: Failed to get apidata.content as string]',
       );
       done();
     } else {
@@ -47,7 +47,7 @@ describe('deserializeValue', () => {
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: Failed to get apidata.curpage as number]`,
+        '[Error: Failed to get apidata.curpage as number]',
       );
       done();
     } else {
@@ -61,7 +61,7 @@ describe('deserializeValue', () => {
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: Failed to get apidata.pages as number]`,
+        '[Error: Failed to get apidata.pages as number]',
       );
       done();
     } else {
@@ -71,11 +71,11 @@ describe('deserializeValue', () => {
 
   it('returns error if date is not in format', (done) => {
     const deserializationResult = deserializeValue(
-      `var apidata={ content:"<table><tbody><tr><td>20200-04-24</td><td>123</td></tr></tbody></table>",records:1,pages:1,curpage:1};`,
+      'var apidata={ content:"<table><tbody><tr><td>20200-04-24</td><td>123</td></tr></tbody></table>",records:1,pages:1,curpage:1};',
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: type of date is not in yyyy-mm-dd, html: <table><tbody><tr><td>20200-04-24</td><td>123</td></tr></tbody></table>]`,
+        '[Error: type of date is not in yyyy-mm-dd, html: <table><tbody><tr><td>20200-04-24</td><td>123</td></tr></tbody></table>]',
       );
       done();
     } else {
@@ -85,11 +85,11 @@ describe('deserializeValue', () => {
 
   it('returns error if value is not in float', (done) => {
     const deserializationResult = deserializeValue(
-      `var apidata={ content:"<table><tbody><tr><td>2020-04-24</td><td>value</td></tr></tbody></table>",records:1,pages:1,curpage:1};`,
+      'var apidata={ content:"<table><tbody><tr><td>2020-04-24</td><td>value</td></tr></tbody></table>",records:1,pages:1,curpage:1};',
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: type of value can not be parsed to float, html: <table><tbody><tr><td>2020-04-24</td><td>value</td></tr></tbody></table>]`,
+        '[Error: type of value can not be parsed to float, html: <table><tbody><tr><td>2020-04-24</td><td>value</td></tr></tbody></table>]',
       );
       done();
     } else {
@@ -111,7 +111,7 @@ describe('deserializeList', () => {
     const deserializationResult = deserializeList('var r = ""');
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: Failed to get r in context as array]`,
+        '[Error: Failed to get r in context as array]',
       );
       done();
     } else {
@@ -123,7 +123,7 @@ describe('deserializeList', () => {
     const deserializationResult = deserializeList('var r = ["aa"]');
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: rawInfo must be an array, got aa]`,
+        '[Error: rawInfo must be an array, got aa]',
       );
       done();
     } else {
@@ -135,7 +135,7 @@ describe('deserializeList', () => {
     const deserializationResult = deserializeList('var r = [["1", "2", "3"]]');
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: rawInfo should have 5 element, got 3 from [1,2,3]]`,
+        '[Error: rawInfo should have 5 element, got 3 from [1,2,3]]',
       );
       done();
     } else {
@@ -149,7 +149,7 @@ describe('deserializeList', () => {
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: id should be string, got 1 from [1,a,b,c,d]]`,
+        '[Error: id should be string, got 1 from [1,a,b,c,d]]',
       );
       done();
     } else {
@@ -163,7 +163,7 @@ describe('deserializeList', () => {
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: name should be string, got 1 from [o,a,1,c,d]]`,
+        '[Error: name should be string, got 1 from [o,a,1,c,d]]',
       );
       done();
     } else {
@@ -177,7 +177,7 @@ describe('deserializeList', () => {
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: typeStr should be string, got 1 from [o,a,b,1,d]]`,
+        '[Error: typeStr should be string, got 1 from [o,a,b,1,d]]',
       );
       done();
     } else {
@@ -191,7 +191,7 @@ describe('deserializeList', () => {
     );
     if (deserializationResult.kind === 'error') {
       expect(deserializationResult.error).toMatchInlineSnapshot(
-        `[Error: unknown fund type 1]`,
+        '[Error: unknown fund type 1]',
       );
       done();
     } else {

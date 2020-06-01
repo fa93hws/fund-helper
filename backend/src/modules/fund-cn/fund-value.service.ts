@@ -131,9 +131,7 @@ export class FundValueCNService {
     ];
     // Writing the additional values to database should not block the response.
     // It can be pushed into MQ
-    setTimeout(
-      async () => await this.writeValuesToDB(fundId, additionalValues),
-    );
+    setTimeout(async () => this.writeValuesToDB(fundId, additionalValues));
     return Result.createOk(fundValues);
   }
 }

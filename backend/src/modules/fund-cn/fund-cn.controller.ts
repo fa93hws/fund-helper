@@ -50,9 +50,8 @@ export class FundCNController {
     if (response.kind === 'ok') {
       this.logService.info('Fundlist request returned');
       return { response: response.data };
-    } else {
-      this.logService.error('Fundlist request failed');
-      throw new InternalServerErrorException(response.error.toString());
     }
+    this.logService.error('Fundlist request failed');
+    throw new InternalServerErrorException(response.error.toString());
   }
 }

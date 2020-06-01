@@ -67,7 +67,7 @@ export class PGConfigProvider {
     }
     const [portStr] = ports[0].split(':');
     const port = parseInt(portStr, 10);
-    if (isNaN(port)) {
+    if (Number.isNaN(port)) {
       this.logService.error('port must be integer!', { dbConfig });
       process.exit(1);
     }
@@ -84,7 +84,7 @@ export class PGConfigProvider {
       process.exit(1);
     }
 
-    this.logService.info(`service parameter parsed`);
+    this.logService.info('service parameter parsed');
     return {
       user: POSTGRES_USER,
       password: POSTGRES_PASSWORD,

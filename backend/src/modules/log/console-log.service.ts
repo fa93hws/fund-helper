@@ -3,6 +3,7 @@ import { Injectable, Logger, Scope } from '@nestjs/common';
 @Injectable({ scope: Scope.TRANSIENT })
 export class ConsoleLogService {
   private readonly logger: Logger;
+
   constructor() {
     this.logger = new Logger('**', true);
   }
@@ -11,12 +12,12 @@ export class ConsoleLogService {
     this.logger.setContext(context);
   }
 
-  info(msg: string, contextObj?: object) {
+  info(msg: string, contextObj?: Record<string, unknown>) {
     const context = contextObj == null ? undefined : JSON.stringify(contextObj);
     this.logger.debug(msg, context);
   }
 
-  error(msg: string, contextObj?: object) {
+  error(msg: string, contextObj?: Record<string, unknown>) {
     const context = contextObj == null ? undefined : JSON.stringify(contextObj);
     this.logger.error(msg, new Error().stack, context);
   }

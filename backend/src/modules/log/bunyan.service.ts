@@ -7,6 +7,7 @@ const logger = Bunyan.createLogger({ name: 'fund-helper' });
 @Injectable({ scope: Scope.REQUEST })
 export class BunyanLogService {
   private readonly logger: Bunyan;
+
   constructor(
     @Inject(providerNames.moduleName) moduleName: string,
     @Inject(providerNames.requestId) requestId: string,
@@ -14,13 +15,11 @@ export class BunyanLogService {
     this.logger = logger.child({ moduleName, requestId });
   }
 
-  static createRootLogger() {}
-
-  info(message: string, param: object = {}) {
+  info(message: string, param: Record<string, unknown> = {}) {
     this.logger.info(message, param);
   }
 
-  error(message: string, param: object = {}) {
+  error(message: string, param: Record<string, unknown> = {}) {
     this.logger.error(message, param);
   }
 }
