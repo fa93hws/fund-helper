@@ -1,14 +1,15 @@
-/* eslint-disable */
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const { resolve } = require('path');
+import { resolve, join } from 'path';
+import { Configuration } from 'webpack';
+import * as HtmlWebpackPlugin from 'html-webpack-plugin';
+import * as MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
-module.exports = {
+const frontendDir = resolve(__dirname, '..', '..');
+
+export const webpackConfig: Configuration = {
   mode: 'development',
-  entry: './src/index.tsx',
+  entry: join(frontendDir, 'src', 'index.tsx'),
   output: {
-    path: resolve('target'),
+    path: join(frontendDir, 'target'),
     filename: `static/js/[name].[hash:8].js`,
     chunkFilename: `static/js/[name].[hash:8].js`,
   },
@@ -35,7 +36,7 @@ module.exports = {
             options: {
               modules: {
                 mode: 'local',
-                context: resolve(__dirname, 'src'),
+                context: resolve(frontendDir, 'src'),
                 localIdentName: '[path][name]__[local]',
               },
               localsConvention: 'camelCaseOnly',
@@ -64,22 +65,4 @@ module.exports = {
       chunkFilename: `static/css/[name].[chunkhash:8].css`,
     }),
   ],
-  optimization: {
-    splitChunks: {
-      cacheGroups: {
-        vendors: {
-          test: /node_modules/,
-          name: 'vendors',
-          chunks: 'all',
-        },
-      },
-    },
-    minimizer: [
-      new TerserPlugin({
-        cache: true,
-        parallel: 4,
-        sourceMap: true,
-      }),
-    ],
-  },
 };
