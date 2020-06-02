@@ -1,7 +1,7 @@
 import { Injectable, Optional } from '@nestjs/common';
 import { Pool, ClientConfig } from 'pg';
+import { Result } from '@fund-helper/utils/result-type';
 import { PGConfigProvider } from '../config/pg-config.provider';
-import { Result } from '../../utils/result-type';
 
 export type PGServiceParam = ClientConfig;
 

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { Result } from '@fund-helper/utils/result-type';
+import { FundBasicInfoCN } from '@fund-helper/protos/fund-cn.proto';
 import { EastMoneyService } from './eastmoney/eastmoney.service';
-import { Result } from '../../utils/result-type';
 import { PGService, SelectStatement } from '../database/pg.service';
 import { tableNames } from '../database/pg.constant';
 import { BunyanLogService } from '../log/bunyan.service';
-import { FundBasicInfoCN } from '../../protos/fund-cn.proto';
 
 @Injectable()
 export class FundInfoCNService {

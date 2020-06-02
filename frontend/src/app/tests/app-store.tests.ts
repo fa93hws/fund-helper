@@ -1,11 +1,11 @@
+import type { Result } from '@fund-helper/utils/result-type';
 import { AppStore } from '../app-store';
 import { CanFetchSubjectMatter } from '../../services/subject-matter/subject-matter';
-import { Result } from '../../utils/result-type';
 
 describe('AppStore', () => {
   jest.useFakeTimers();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mockFetchFundValues = jest.fn<Promise<Result<any>>, [string]>();
+  const mockFetchFundValues = jest.fn<Promise<Result.T<any>>, [string]>();
   const fakeService: CanFetchSubjectMatter = {
     fetchSubjectMatter: mockFetchFundValues,
   };

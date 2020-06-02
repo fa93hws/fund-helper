@@ -1,12 +1,12 @@
 import * as vm from 'vm';
 import * as cheerio from 'cheerio';
 import { utc } from 'moment';
-import { Result } from '../../../utils/result-type';
+import { Result } from '@fund-helper/utils/result-type';
 import type {
   FundValueCN,
   FundBasicInfoCN,
-} from '../../../protos/fund-cn.proto';
-import { FundTypeCN } from '../../../protos/fund-cn.proto';
+} from '@fund-helper/protos/fund-cn.proto';
+import { FundTypeCN } from '@fund-helper/protos/fund-cn.proto';
 
 export type FundValueResponse = {
   values: FundValueCN[];

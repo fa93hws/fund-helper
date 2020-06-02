@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { Result } from './result-type';
+import { Result } from '@fund-helper/utils/result-type';
 
 type HttpError = {
   statusCode: number;

@@ -2,7 +2,8 @@ import { AxiosResponse } from 'axios';
 import { Injectable, HttpService } from '@nestjs/common';
 import { of, Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { Result } from '../../../utils/result-type';
+import { Result } from '@fund-helper/utils/result-type';
+import type { FundBasicInfoCN } from '@fund-helper/protos/fund-cn.proto';
 import { transformResponse } from '../../../utils/http-result';
 import {
   deserializeValue,
@@ -10,7 +11,6 @@ import {
   FundValueResponse,
 } from './deserialize-response';
 import { BunyanLogService } from '../../log/bunyan.service';
-import type { FundBasicInfoCN } from '../../../protos/fund-cn.proto';
 import { runInPool } from '../../../utils/promise-pool';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { Result } from './result-type';
+import { Result } from '@fund-helper/utils/result-type';
 
 type PromiseGenerator<T> = (idx: number) => Promise<T>;
 
