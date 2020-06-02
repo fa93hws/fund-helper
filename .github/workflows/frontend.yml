@@ -5,13 +5,13 @@ on:
     branches: [master]
     paths:
       - frontend/**
-      - backend/src/protos/**
+      - shared/**
       - .github/workflows/frontend.yml
   pull_request:
     branches: [master]
     paths:
       - frontend/**
-      - backend/src/protos/**
+      - shared/**
       - .github/workflows/frontend.yml
 
 jobs:
