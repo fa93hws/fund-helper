@@ -1,4 +1,4 @@
-import type { Result } from '../../utils/result-type';
+import type { Result } from '@fund-helper/utils/result-type';
 
 export type SubjectMatterInfo = {
   id: string;
@@ -17,5 +17,5 @@ export type SubjectMatter = {
 };
 
 export interface CanFetchSubjectMatter {
-  fetchSubjectMatter(id: string): Promise<Result<SubjectMatter>>;
+  fetchSubjectMatter(id: string): Promise<Result.T<SubjectMatter>>;
 }

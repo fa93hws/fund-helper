@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@fund-helper/eslint-config": "file:../shared/eslint",
     "@storybook/addon-actions": "^5.3.18",
     "@storybook/addon-knobs": "^5.3.18",
     "@storybook/addons": "^5.3.18",
@@ -32,8 +33,8 @@
     "@types/terser-webpack-plugin": "^3.0.0",
     "@types/webpack": "^4.41.12",
     "@types/webpack-dev-server": "^3.10.1",
-    "@typescript-eslint/eslint-plugin": "^3.0.2",
-    "@typescript-eslint/parser": "^3.0.2",
+    "@typescript-eslint/eslint-plugin": "^3.1.0",
+    "@typescript-eslint/parser": "^3.1.0",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.5.3",
     "css-modules-typescript-loader": "^4.0.0",
@@ -45,7 +46,7 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-jest": "^23.10.0",
+    "eslint-plugin-jest": "^23.13.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-react-hooks": "^4.0.4",
@@ -66,6 +67,8 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@fund-helper/protos": "file:../shared/protos",
+    "@fund-helper/utils": "file:../shared/utils",
     "@material-ui/core": "^4.9.13",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.52",

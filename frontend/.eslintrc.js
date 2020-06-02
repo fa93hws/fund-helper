@@ -1,15 +1,17 @@
+const baseConfig = require('@fund-helper/eslint-config');
+
 module.exports = {
+  ...baseConfig,
   root: true,
-  parser: '@typescript-eslint/parser',
   env: {
     node: true,
     browser: true,
   },
   parserOptions: {
+    ...baseConfig.parserOptions,
     ecmaFeatures: {
       jsx: true,
     },
-    sourceType: 'module',
   },
   settings: {
     react: {
@@ -21,38 +23,15 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    '@typescript-eslint',
-    'babel',
-    'eslint-plugin-react',
-    'react-hooks',
-    'jsx-a11y',
-    'jest',
-  ],
+  plugins: [...baseConfig.plugins, 'react-hooks', 'jsx-a11y', 'jest'],
   extends: [
-    'airbnb-base',
-    'eslint-config-prettier',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:jest/recommended',
+    ...baseConfig.extends,
     'plugin:jsx-a11y/recommended',
     'plugin:react/recommended',
   ],
   rules: {
-    // import
-    'import/prefer-default-export': 'off',
-    'import/no-default-export': 'error',
-    'import/extensions': 'off',
-    'import/no-unresolved': 'off',
-    'import/no-extraneous-dependencies': 'off',
-
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/no-namespace': 'off',
-    'no-useless-constructor': 'off',
-    'no-unused-expressions': 'off',
+    ...baseConfig.rules,
     'react/display-name': 'off',
-    'no-console': 'error',
-    'class-methods-use-this': 'off',
-    'no-continue': 'off',
   },
   overrides: [
     {

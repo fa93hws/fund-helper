@@ -4,6 +4,7 @@ frontend/coverage
 target
 frontend/node_modules
 backend/node_modules
+shared/eslint/node_modules
 backend/dist
 .idea
 *.iml

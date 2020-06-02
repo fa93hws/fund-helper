@@ -29,17 +29,18 @@ export class AppStore {
 
   @observable.ref markups: Markup[] = [];
 
-  @action async fetchValue(id: string) {
+  @action async fetchValue(id: string): Promise<void> {
     this.closeErrorAlert();
     const response = await this.fundValueService.fetchSubjectMatter(id);
     if (response.kind === 'ok') {
       this.subjectMatter = response.data;
     } else {
-      this.displayErrorMessage(response.error.message, this.alertTimeout);
+      const errorMessage = response.error?.message ?? '未知错误';
+      this.displayErrorMessage(errorMessage, this.alertTimeout);
     }
   }
 
-  @action setMarkups(markups: Markup[]) {
+  @action setMarkups(markups: Markup[]): void {
     this.markups = markups;
   }
 

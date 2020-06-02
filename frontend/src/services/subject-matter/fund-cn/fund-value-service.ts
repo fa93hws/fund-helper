@@ -1,5 +1,8 @@
-import { Result } from '../../../utils/result-type';
-import type { FundValueWithInfoCN, FundTypeCN } from './fund-cn.proto';
+import type { Result } from '@fund-helper/utils/result-type';
+import type {
+  FundValueWithInfoCN,
+  FundTypeCN,
+} from '@fund-helper/protos/fund-cn.proto';
 import { CanFetchSubjectMatter } from '../subject-matter';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,7 +57,7 @@ export class CNFundValueService implements CanFetchSubjectMatter {
         : (this.fetch = fetch);
   }
 
-  async fetchSubjectMatter(id: string): Promise<Result<FundValueWithInfoCN>> {
+  async fetchSubjectMatter(id: string): Promise<Result.T<FundValueWithInfoCN>> {
     try {
       const response = await this.fetch(this.URL + id);
       switch (response.status) {

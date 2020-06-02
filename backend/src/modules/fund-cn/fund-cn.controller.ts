@@ -5,10 +5,10 @@ import {
   Param,
   NotFoundException,
 } from '@nestjs/common';
+import type { FundValueWithInfoCN } from '@fund-helper/protos/fund-cn.proto';
 import { FundValueCNService } from './fund-value.service';
 import { FundInfoCNService } from './fund-info.service';
 import { BunyanLogService } from '../log/bunyan.service';
-import type { FundValueWithInfoCN } from '../../protos/fund-cn.proto';
 
 @Controller({
   path: 'cn-funds',
