@@ -21,7 +21,7 @@ async function handler({ paramsPath, subjectMatterId }: CliArgs) {
   const paramsConfig: ParamsConfig = require(normalizedPath);
   const subjectMatter = await fetchSubjectMatter(subjectMatterId);
   const res = calculateMetrics(subjectMatter, paramsConfig);
-  console.log(res);
+  return res;
 }
 
 export function main() {
