@@ -1,0 +1,40 @@
+name: Machine Learning
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ml/**
+      - shared/**
+      - .github/workflows/ml.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - ml/**
+      - shared/**
+      - .github/workflows/ml.yml
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-18.04]
+        node: [12]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        with:
+          path: ml/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('ml/package-lock.json') }}
+      - name: Install node_modules
+        run: npm ci
+        working-directory: ml
+      - name: Lint
+        run: npm run lint
+        working-directory: ml
+      - name: Type check
+        run: npm run lint:ts
+        working-directory: ml
