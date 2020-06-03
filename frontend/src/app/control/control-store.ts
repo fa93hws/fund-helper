@@ -15,6 +15,71 @@ export class ControlPanelStore {
     this.exitPoint = point;
   }
 
+  calculateMarkupsOnGiven({ values }: { values: SubjectMatterValue[] }) {
+    const buyPoints = [
+      0,
+      100,
+      207,
+      303,
+      895,
+      1244,
+      1524,
+      1542,
+      1564,
+      1662,
+      1679,
+      2246,
+      2380,
+      2459,
+      2689,
+    ];
+    const sellPoints = [
+      80,
+      164,
+      249,
+      466,
+      1103,
+      1506,
+      1535,
+      1552,
+      1617,
+      1674,
+      1769,
+      2269,
+      2440,
+      2656,
+      2712,
+    ];
+    const markups: Markup[] = [];
+    const result = {
+      money: 100,
+      buyCount: 0,
+    };
+    for (let idx = 0; idx < buyPoints.length; idx += 1) {
+      const buyIdx = buyPoints[idx];
+      markups.push({
+        text: '买',
+        coord: [values[buyIdx].time, values[buyIdx].value],
+        backgroundColor: 'red',
+      });
+      const sellIdx = sellPoints[idx];
+      markups.push({
+        text: '卖',
+        coord: [values[sellIdx].time, values[sellIdx].value],
+        backgroundColor: 'blue',
+      });
+      result.money =
+        (result.money * values[sellIdx].value) / values[buyIdx].value;
+    }
+    // eslint-disable-next-line
+    console.log({
+      yearCount: values.length / 250,
+      buyCount: buyPoints.length,
+      money: result.money,
+    });
+    return markups;
+  }
+
   calculateMarkups({ values }: { values: SubjectMatterValue[] }) {
     const markups: Markup[] = [];
     const realValues = values.map((v) => v.value);
