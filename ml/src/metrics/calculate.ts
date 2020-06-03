@@ -1,11 +1,7 @@
 import type { ParamsConfig } from '../interfaces/params-config.interface';
 import type { SubjectMatter } from '../interfaces/subject-matter.interface';
+import { calculateOptimalPoints } from './optimal-points';
 
-export function calculateMetrics(
-  subjectMatter: SubjectMatter,
-  config: ParamsConfig,
-) {
-  const { info, values } = subjectMatter;
-  const out: Record<string, unknown> = { info, values };
-  return { config, out };
+export function calculate(subjectMatter: SubjectMatter, config: ParamsConfig) {
+  return calculateOptimalPoints(subjectMatter, config.optimalPoints);
 }

@@ -2,7 +2,7 @@ import { existsSync } from 'fs';
 import { join, resolve } from 'path';
 import * as Yargs from 'yargs';
 import { fetchSubjectMatter } from './http';
-import { calculateMetrics } from './metrics/calculate';
+import { calculate } from './metrics/calculate';
 import type { ParamsConfig } from './interfaces/params-config.interface';
 
 const mlRoot = resolve(__dirname, '..');
@@ -20,7 +20,7 @@ async function handler({ paramsPath, subjectMatterId }: CliArgs) {
   // eslint-disable-next-line
   const paramsConfig: ParamsConfig = require(normalizedPath);
   const subjectMatter = await fetchSubjectMatter(subjectMatterId);
-  const res = calculateMetrics(subjectMatter, paramsConfig);
+  const res = calculate(subjectMatter, paramsConfig);
   return res;
 }
 
